@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0}[hidden]{display:none!important}</style></head><body>
+<title>기능상속</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 행정 업무 도구. 왼쪽 = 지도와 시설 등록, 오른쪽 = ②~⑤ 단계 결과가 위에서 아래로 이어짐 */
+:root{
+  --bg:#F2F4EF; --surface:#FFFFFF; --sunk:#E9EDE6; --ink:#17221E; --muted:#5A6862; --line:#D6DDD5;
+  --accent:#2B654B; --accent-soft:#DFEDE4; --on-accent:#FFFFFF;
+  --ochre:#A86B12; --ochre-soft:#F5E9D3; --risk:#AE3631; --risk-soft:#F6E0DC;
+  --map-land:#E6EBE1; --map-road:#C3CCBF;
+  --f-display:"Gowun Batang","Nanum Myeongjo",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211D; --sunk:#151C18; --ink:#E4EBE6; --muted:#97A59E; --line:#2B3731;
+  --accent:#72C198; --accent-soft:#1D3328; --on-accent:#0E1A13;
+  --ochre:#E2A84F; --ochre-soft:#382C17; --risk:#E57D73; --risk-soft:#3B211E;
+  --map-land:#1C2520; --map-road:#36443C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211D; --sunk:#151C18; --ink:#E4EBE6; --muted:#97A59E; --line:#2B3731;
+  --accent:#72C198; --accent-soft:#1D3328; --on-accent:#0E1A13;
+  --ochre:#E2A84F; --ochre-soft:#382C17; --risk:#E57D73; --risk-soft:#3B211E;
+  --map-land:#1C2520; --map-road:#36443C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1240px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:28px 20px;border-bottom:1px solid var(--line)}
+.brand h1{font-family:var(--f-display);font-size:clamp(28px,4vw,38px);line-height:1.15;margin:0;letter-spacing:-.01em}
+.brand p{margin:4px 0 0;color:var(--muted);text-wrap:balance}
+.demo-badge{font-size:12.5px;color:var(--ochre);background:var(--ochre-soft);padding:6px 10px;border-radius:6px;max-width:420px}
+
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:28px;margin-top:24px;align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+section.step{display:flex;flex-direction:column;gap:12px;min-width:0}
+.step-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.step-no{font-family:var(--f-mono);font-size:12px;color:var(--on-accent);background:var(--accent);border-radius:4px;padding:1px 7px;letter-spacing:.04em}
+.step-head h2{font-family:var(--f-display);font-size:21px;margin:0;line-height:1.3}
+.step-head .hint{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+
+/* map */
+.map-wrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.map-wrap svg{display:block;width:100%;height:auto}
+.map-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line)}
+.map-legend i{display:inline-block;width:14px;height:0;border-top:2px dashed var(--ochre);vertical-align:middle;margin-right:5px}
+.map-legend b{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--surface);border:1.5px solid var(--ink);vertical-align:-1px;margin-right:5px}
+.map-legend s{display:inline-block;width:14px;height:0;border-top:2px solid var(--accent);vertical-align:middle;margin-right:5px;text-decoration:none}
+
+/* form */
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;cursor:pointer}
+.chip-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:13px}
+.chip-btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip-btn:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label,.lbl{font-size:12.5px;color:var(--muted);font-weight:500}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=text],input[type=date],select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
+@media (max-width:420px){.items{grid-template-columns:1fr}}
+.items label{display:flex;gap:7px;align-items:flex-start;font-size:13.5px;color:var(--ink);cursor:pointer;line-height:1.4;padding:3px 0}
+.items input{margin-top:2px;accent-color:var(--accent)}
+.slider{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.slider input{grid-column:1/-1;accent-color:var(--accent);width:100%}
+.slider output{font-family:var(--f-mono);font-size:13px}
+.form{display:flex;flex-direction:column;gap:14px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:7px;padding:8px 14px;font-weight:600;font-size:14px}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:default}
+.ai-box{border:1px dashed var(--accent);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--accent-soft)}
+.ai-box .lbl{color:var(--accent)}
+.ai-out{font-size:13px;color:var(--muted)}
+
+/* step 2 */
+.fn-list{display:flex;flex-direction:column;gap:10px}
+.fn{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 46px;gap:4px 12px;align-items:center}
+.fn .nm{font-weight:600;font-size:14.5px}
+.fn .src{grid-column:1/-1;font-size:12.5px;color:var(--muted);margin-top:-2px}
+.bar{height:10px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.bar > span{display:block;height:100%;background:var(--accent);border-radius:3px}
+.num{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.tag-ai{font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 5px;margin-left:6px;font-weight:500}
+.lost{font-size:13.5px;background:var(--risk-soft);color:var(--ink);border-radius:8px;padding:10px 12px}
+.lost b{color:var(--risk)}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:640px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:500;background:var(--sunk);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tr.out td{color:var(--muted)}
+.rid{font-family:var(--f-mono);font-size:12px;display:inline-grid;place-items:center;width:20px;height:20px;border:1.5px solid var(--ink);border-radius:4px}
+.fchips{display:flex;flex-wrap:wrap;gap:4px}
+.fc{font-size:12px;border-radius:4px;padding:1px 6px;background:var(--sunk);white-space:nowrap}
+.fc em{font-style:normal;font-family:var(--f-mono);font-size:11.5px;margin-left:4px;color:var(--muted)}
+.fc.hi{background:var(--accent-soft)}
+.fc.hi em{color:var(--accent)}
+
+/* step 4 */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.plans{grid-template-columns:minmax(0,1fr)}}
+.plan{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px 14px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:6px}
+.plan[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.plan .pn{font-weight:700;font-size:14px;display:flex;justify-content:space-between;gap:6px}
+.plan .pn small{font-weight:500;color:var(--accent);font-size:12px}
+.plan .big{font-family:var(--f-mono);font-size:24px;line-height:1.1}
+.plan .meta{font-size:12.5px;color:var(--muted)}
+.kpi{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:flex-end}
+.kpi .k{display:flex;flex-direction:column}
+.kpi .k span{font-size:12px;color:var(--muted)}
+.kpi .k strong{font-family:var(--f-mono);font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .arrow{color:var(--muted);font-size:20px;padding-bottom:4px}
+.retbar{position:relative;height:14px;background:var(--sunk);border-radius:4px;overflow:hidden;flex:1 1 220px;min-width:180px;align-self:center}
+.retbar .b0{position:absolute;inset:0 auto 0 0;background:var(--risk);opacity:.55}
+.retbar .b1{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.st{font-size:11.5px;font-weight:600;border-radius:4px;padding:1px 7px;white-space:nowrap}
+.st.ok{background:var(--accent-soft);color:var(--accent)}
+.st.adj{background:var(--ochre-soft);color:var(--ochre)}
+.st.gap{background:var(--risk-soft);color:var(--risk)}
+.why{font-size:12px;color:var(--muted);margin-top:3px;font-family:var(--f-mono)}
+.mini{display:inline-block;width:64px;height:7px;background:var(--sunk);border-radius:2px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.mini span{display:block;height:100%;background:var(--accent)}
+.mini.low span{background:var(--risk)}
+details.alts{margin-top:4px}
+details.alts summary{font-size:12px;color:var(--accent);cursor:pointer}
+details.alts ul{margin:4px 0 0;padding-left:16px;font-size:12px;color:var(--muted)}
+.gapnote{font-size:12.5px;color:var(--risk);margin-top:3px}
+
+/* step 5 */
+.dec select{width:auto;padding:4px 8px;font-size:13px}
+.out-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:760px){.out-grid{grid-template-columns:minmax(0,1fr)}}
+pre.summary{white-space:pre-wrap;word-break:keep-all;font-family:var(--f-body);font-size:13px;line-height:1.65;margin:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;max-height:360px;overflow:auto}
+.notice{background:var(--surface);border:2px solid var(--ink);border-radius:10px;padding:18px;font-size:17px;line-height:1.7}
+.notice h3{font-family:var(--f-display);font-size:22px;margin:0 0 8px;line-height:1.35;text-wrap:balance}
+.notice ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.notice .foot{font-size:14px;color:var(--muted);margin-top:12px}
+.bar-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toast{font-size:12.5px;color:var(--accent)}
+
+.method{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px;margin-top:8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:820px){.method{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (max-width:460px){.method{grid-template-columns:minmax(0,1fr)}}
+.method h4{margin:0 0 4px;color:var(--ink);font-size:13.5px}
+.method p{margin:0}
+@media (prefers-reduced-motion:no-preference){.bar>span,.retbar .b1,.mini span{transition:width .35s ease}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <h1>기능상속</h1>
+    <p>사라지는 지역 생활서비스를 기존 자원에 이어주는 AI 지역상생 서비스</p>
+  </div>
+  <div class="demo-badge">시연용 가상 지역 ‘새들군 솔메면’입니다. 마을·시설·운영정보는 모두 예시 데이터이며 실제 기관과 무관합니다.</div>
+</header>
+
+<div class="grid">
+  <!-- LEFT -->
+  <div class="col">
+    <div class="map-wrap">
+      <svg id="map" viewBox="0 0 220 210" role="img" aria-label="솔메면 마을과 생활자원 지도"></svg>
+      <div class="map-legend">
+        <span><i></i>이동장터 노선(화·금)</span>
+        <span><b></b>생활자원(번호는 ③ 표와 같음)</span>
+        <span><s></s>선택한 상속안 연결</span>
+      </div>
+    </div>
+
+    <section class="step" aria-labelledby="s1">
+      <div class="step-head"><span class="step-no">①</span><h2 id="s1">중단 예정 시설 등록</h2></div>
+      <div class="panel form">
+        <div class="field"><span class="lbl">예시 불러오기</span>
+          <div class="presets" id="presets"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="f-name">시설명</label><input id="f-name" type="text"></div>
+          <div class="field"><label for="f-date">폐업·중단 예정일</label><input id="f-date" type="date"></div>
+        </div>
+        <div class="field"><label for="f-village">위치(마을)</label><select id="f-village"></select></div>
+        <div class="field"><span class="lbl">판매품목·하던 역할</span><div class="items" id="items"></div></div>
+        <div class="row2">
+          <div class="field slider"><label for="f-elderly">65세 이상 비율</label><output id="o-elderly"></output><input id="f-elderly" type="range" min="0" max="100" step="1"></div>
+          <div class="field slider"><label for="f-carless">자가용 없는 가구</label><output id="o-carless"></output><input id="f-carless" type="range" min="0" max="100" step="1"></div>
+        </div>
+        <div class="ai-box" id="ai-extract" hidden>
+          <label class="lbl" for="f-memo">이 가게가 하던 다른 역할 (자유롭게 적으면 AI가 생활기능으로 나눕니다)</label>
+          <textarea id="f-memo" placeholder="예: 어르신들이 읍내 병원 다녀온 약봉지를 맡겨두고, 이장님 공지도 여기 붙였어요."></textarea>
+          <div class="bar-actions"><button class="btn" id="btn-extract" type="button">AI로 기능 찾기</button><span class="ai-out" id="extract-out"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col">
+    <section class="step" aria-labelledby="s2">
+      <div class="step-head"><span class="step-no">②</span><h2 id="s2">사라질 생활기능 분리</h2><span class="hint">품목과 주민 이용 특성으로 기능별 중요도를 계산</span></div>
+      <div class="lost" id="lost"></div>
+      <div class="panel"><div class="fn-list" id="fn-list"></div></div>
+    </section>
+
+    <section class="step" aria-labelledby="s3">
+      <div class="step-head"><span class="step-no">③</span><h2 id="s3">주변 기존 자원 탐색</h2><span class="hint">숫자 = 기능별 적합도(0–100)</span></div>
+      <div class="tbl-wrap"><table id="res-tbl"></table></div>
+    </section>
+
+    <section class="step" aria-labelledby="s4">
+      <div class="step-head"><span class="step-no">④</span><h2 id="s4">기능별 상속안</h2><span class="hint">자원 조합을 모두 비교해 상위 3안을 제시</span></div>
+      <div class="panel kpi" id="kpi"></div>
+      <div class="plans" id="plans"></div>
+      <div class="tbl-wrap"><table id="plan-tbl"></table></div>
+    </section>
+
+    <section class="step" aria-labelledby="s5">
+      <div class="step-head"><span class="step-no">⑤</span><h2 id="s5">담당자 검토·결정</h2><span class="hint">AI는 제안만 하고, 결정은 담당자가 합니다</span></div>
+      <div class="tbl-wrap"><table id="dec-tbl" class="dec"></table></div>
+      <div class="out-grid">
+        <div class="panel" style="display:flex;flex-direction:column;gap:10px">
+          <div class="bar-actions" style="justify-content:space-between"><strong>검토안 요약</strong><span class="bar-actions"><span class="toast" id="copy-toast"></span><button class="btn ghost" id="btn-copy" type="button">복사</button></span></div>
+          <pre class="summary" id="summary"></pre>
+          <div class="ai-box" id="ai-review" hidden>
+            <div class="bar-actions"><button class="btn" id="btn-review" type="button">AI 검토 의견 받기</button><button class="btn ghost" id="btn-stop" type="button" hidden>중지</button></div>
+            <div class="ai-out" id="review-out" style="white-space:pre-wrap"></div>
+          </div>
+        </div>
+        <div class="notice" id="notice" aria-label="주민 안내문 미리보기"></div>
+      </div>
+    </section>
+
+    <div class="method">
+      <div><h4>기능 분리</h4><p>판매품목·역할을 생활기능 분류체계에 대응시키고, 고령·무차량 비율로 기능별 중요도를 보정합니다. 자유서술은 언어모델이 기능으로 분류합니다.</p></div>
+      <div><h4>적합도</h4><p>자원 역량 × 주민 접근성 × 운영빈도 충족도. 가장 가까운 곳이 아니라 실제로 이용할 수 있는 조건을 봅니다.</p></div>
+      <div><h4>조합 최적화</h4><p>기능마다 후보를 두고 모든 조합을 비교합니다. 한 기관의 조정으로 여러 기능을 잇는 조합에 가점, 참여기관·신규조치 부담엔 감점.</p></div>
+      <div><h4>공백 경보</h4><p>적합도 45 미만은 기존 자원으로 잇기 어려운 기능으로 표시하고, 신규 지원 검토 대상으로 넘깁니다.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ---------- 예시 데이터 (가상 지역) ---------- */
+const FUNCS = {
+  daily:  {name:'생필품 구매',     imp:1.0, need:1,   short:'생필품(휴지·세제·조미료)'},
+  fresh:  {name:'신선식품 구매',   imp:1.0, need:2,   short:'신선식품(두부·계란·채소)'},
+  heavy:  {name:'무거운 상품 구매', imp:0.8, need:0.5, short:'무거운 물건(쌀·생수·가스)'},
+  urgent: {name:'급한 소량 구매',   imp:0.6, need:5,   short:'급한 물건(건전지·라면)'},
+  pickup: {name:'물품 공동수령',   imp:0.5, need:5,   short:'택배·주문품 받기'},
+  hub:    {name:'마을 생활거점',   imp:0.7, need:5,   short:'모여서 안부 나누기'}
+};
+const FORDER = ['daily','fresh','heavy','urgent','pickup','hub'];
+const ITEMS = [
+  {id:'goods', label:'휴지·세제·생활용품', f:['daily']},
+  {id:'pantry',label:'라면·통조림·조미료', f:['daily','urgent']},
+  {id:'dairy', label:'두부·계란·우유',     f:['fresh']},
+  {id:'veg',   label:'채소·과일',          f:['fresh']},
+  {id:'rice',  label:'쌀·생수',            f:['heavy']},
+  {id:'gas',   label:'부탄가스·연탄',      f:['heavy']},
+  {id:'misc',  label:'건전지·전구 등 급한 물건', f:['urgent']},
+  {id:'drink', label:'음료·담배',          f:['urgent']},
+  {id:'parcel',label:'택배 맡아주기',      f:['pickup']},
+  {id:'bench', label:'가게 앞 평상 모임',  f:['hub']}
+];
+const VILLAGES = [
+  {name:'솔메리', x:10,  y:10,  pop:820, elderly:41, carless:22},
+  {name:'상리',   x:4,   y:15.5,pop:96,  elderly:63, carless:48},
+  {name:'하리',   x:6,   y:4,   pop:74,  elderly:58, carless:40},
+  {name:'덕곡리', x:15,  y:16,  pop:58,  elderly:71, carless:55},
+  {name:'새터',   x:16.5,y:5,   pop:110, elderly:52, carless:35},
+  {name:'구룡리', x:1.8, y:8,   pop:45,  elderly:76, carless:60}
+];
+const ROADS = [['솔메리','상리'],['솔메리','하리'],['솔메리','덕곡리'],['솔메리','새터'],['하리','구룡리'],['구룡리','상리'],['하리','새터']];
+const V = n => VILLAGES.find(v=>v.name===n);
+const ROUTE = ['솔메리','새터','하리','구룡리'];
+
+const RES = [
+  {id:1, name:'새들 이동장터', kind:'market', owner:'새들군·사회적협동조합', at:{x:11.4,y:11.1}, days:'화·금', freq:2, slots:1,
+   caps:{daily:.9, fresh:.85, urgent:.35, heavy:.3}},
+  {id:2, name:'솔메농협 하나로마트 배송', kind:'delivery', owner:'솔메농협', at:{x:8.6,y:11.1}, days:'화·목·토', freq:3, radius:13, cost:1,
+   caps:{daily:.75, fresh:.6, heavy:1}, action:'마을 공동주문 단위로 배송 (최소주문 3만원 기준 조정 협의)'},
+  {id:3, name:'솔메마트 공동배송', kind:'delivery', owner:'솔메마트(민간)', at:{x:11.4,y:8.9}, days:'수·토', freq:2, radius:13, cost:1,
+   caps:{fresh:.95, daily:.6}, action:'냉장 공동배송 협약 → 마을회관으로 주 2회 배송'},
+  {id:4, name:'들녘꾸러미', kind:'delivery', owner:'사회적협동조합 들녘', at:{x:17.1,y:6.1}, days:'목', freq:1, radius:14, cost:1,
+   caps:{fresh:.8, daily:.3}, action:'정기 신선꾸러미 배송지에 마을 추가'},
+  {id:5, name:'행복콜택시', kind:'transport', owner:'새들군 농촌형 교통', at:{x:10,y:12.2}, days:'평일 예약', freq:5, cost:0,
+   caps:{daily:.65, fresh:.65, urgent:.45, heavy:.35}},
+  {id:6, name:'새터상회', kind:'store', owner:'민간 상점', at:{x:15.7,y:4.0}, days:'매일 07–20시', freq:7, cost:0,
+   caps:{daily:.85, urgent:.8, fresh:.4}},
+  {id:7, name:'노인복지관 생활지원', kind:'care', owner:'새들군노인복지관', at:{x:8.6,y:8.9}, days:'주 1회 방문', freq:1,
+   caps:{urgent:.6, daily:.45, hub:.35}},
+  {id:8, name:'상리 마을회관', kind:'hall', village:'상리', fridge:true, at:{x:4.9,y:14.6}, days:'상시', freq:7, caps:{hub:1, pickup:.9}},
+  {id:9, name:'덕곡리 마을회관', kind:'hall', village:'덕곡리', fridge:false, at:{x:15.9,y:15.1}, days:'상시', freq:7, caps:{hub:1, pickup:.75}},
+  {id:10,name:'하리 경로당', kind:'hall', village:'하리', fridge:false, at:{x:6.9,y:4.9}, days:'상시', freq:7, caps:{hub:1, pickup:.75}},
+  {id:11,name:'새터 마을회관', kind:'hall', village:'새터', fridge:true, at:{x:17.4,y:4.1}, days:'상시', freq:7, caps:{hub:1, pickup:.9}}
+];
+
+const PRESETS = [
+  {key:'A', label:'상리상회 (상리)', name:'상리상회', village:'상리', date:'2026-11-30', items:['goods','pantry','dairy','veg','rice','gas','misc','parcel','bench']},
+  {key:'B', label:'덕곡슈퍼 (덕곡리)', name:'덕곡슈퍼', village:'덕곡리', date:'2026-12-20', items:['goods','pantry','dairy','rice','gas','drink','bench']},
+  {key:'C', label:'구룡상회 (구룡리)', name:'구룡상회', village:'구룡리', date:'2027-01-15', items:['goods','pantry','veg','misc','parcel','bench']}
+];
+
+const GAP_IDEAS = {
+  daily:'이동장터 정차 신설 또는 전화주문 배송 시범사업 검토',
+  fresh:'냉장 공동배송 신규 협약 또는 신선꾸러미 지원 검토',
+  heavy:'무거운 품목 문 앞 배송 바우처 검토',
+  urgent:'마을회관 상비품 보관함(무인 판매) 또는 이장 대리구매 시범 검토',
+  pickup:'공동수령 보관함 설치 검토',
+  hub:'마을 쉼터 지정 또는 복지관 순회 프로그램 검토'
+};
+
+/* ---------- 상태 ---------- */
+const state = {preset:'A', name:'', village:'상리', date:'', items:new Set(), elderly:63, carless:48, extra:[]};
+let selectedPlan = 0;
+const decisions = {};
+let plansCache = [];
+
+/* ---------- 엔진 ---------- */
+const road = (a,b) => Math.hypot(a.x-b.x, a.y-b.y) * 1.25;   // 직선거리 × 도로 우회계수
+const clamp = (x,lo=0,hi=1) => Math.max(lo, Math.min(hi, x));
+const freqFit = (freq, need) => Math.sqrt(clamp(freq/need));
+
+function decompose(){
+  const map = {};
+  for (const it of ITEMS) if (state.items.has(it.id)) for (const f of it.f) (map[f] ||= []).push(it.label);
+  for (const e of state.extra) (map[e.f] ||= []).push('AI: ' + e.note);
+  const el = state.elderly/100, cl = state.carless/100;
+  const out = [];
+  for (const f of FORDER) {
+    if (!map[f]) continue;
+    const n = map[f].length;
+    let w = FUNCS[f].imp * (1 + .25*(n-1));
+    if (f==='fresh'||f==='heavy'||f==='urgent') w *= 1 + .6*cl;
+    if (f==='hub') w *= 1 + .5*el;
+    out.push({f, w, src:map[f], ai: state.extra.some(e=>e.f===f)});
+  }
+  const W = out.reduce((s,o)=>s+o.w,0) || 1;
+  out.forEach(o=>o.share=o.w/W);
+  return out;
+}
+
+function evalRes(r, f, v){
+  if (!r.caps[f]) return null;
+  const el = state.elderly/100, cl = state.carless/100;
+  let acc, freq = r.freq, cost = 0, action, when = r.days, d = road(r.at, v);
+  switch (r.kind){
+    case 'market': {
+      if (ROUTE.includes(v.name)) { acc = 1; action = `기존 ${r.days} 정차 이용`; d = 0; }
+      else {
+        let best = null;
+        for (const s of ROUTE){ const dd = road(V(s), v); if (!best || dd < best.d) best = {s, d:dd}; }
+        if (best.d > 10 || r.slots < 1) return null;
+        acc = .95; freq = 1; cost = 1; d = best.d;
+        action = `${v.name} 정차 추가 검토 (주 1회, ${best.s} 정차 후 약 ${best.d.toFixed(1)}km 연장)`;
+        when = '화요일 (신설 검토)';
+      }
+      break;
+    }
+    case 'delivery':
+      if (d > r.radius) return null;
+      acc = 1; cost = r.cost; action = r.action; break;
+    case 'transport':
+      acc = .9 - .35*el; action = '콜택시로 솔메리 상점 이용 (월 8회 이용권)'; d = road(V('솔메리'), v); break;
+    case 'store':
+      acc = clamp(1 - d/15) * (1 - .55*cl);
+      if (acc < .05) return null;
+      action = `${r.name} 방문 이용 (도로 약 ${d.toFixed(1)}km)`; break;
+    case 'care':
+      acc = .55; cost = f==='urgent' ? 0 : 1; d = 0;
+      action = f==='hub' ? '생활지원사 방문 때 안부 확인 강화' : '생활지원사 방문 때 구매대행 항목 추가';
+      if (f==='urgent') action = '생활지원사 방문 때 구매대행 (기존 대상자)';
+      break;
+    case 'hall':
+      if (r.village !== v.name) return null;
+      acc = 1; d = 0;
+      if (f==='hub'){ cost = 0; action = '마을회관을 생활거점으로 지정, 개방시간 확대'; }
+      else { cost = 1; action = '주문품·택배 공동수령 장소로 지정 (보관 규칙·관리자 지정)' + (r.fridge ? ', 냉장고 있음' : ''); }
+      break;
+  }
+  const cap = r.caps[f], ff = freqFit(freq, FUNCS[f].need);
+  return {r, f, cap, acc, ff, s: cap*acc*ff, cost, action, when, d};
+}
+
+function optionsFor(f, v){
+  return RES.map(r=>evalRes(r,f,v)).filter(Boolean).sort((a,b)=>b.s-a.s);
+}
+
+function plan(fns, v){
+  const W = fns.reduce((s,o)=>s+o.w,0) || 1;
+  const cands = fns.map(fn => {
+    const opts = optionsFor(fn.f, v).filter(o=>o.s>=.15).slice(0,4);
+    return [...opts, null];
+  });
+  const baseline = fns.reduce((s,fn)=>{
+    const b = optionsFor(fn.f, v).filter(o=>o.cost===0);
+    return s + fn.w*(b[0]?.s || 0);
+  },0)/W;
+  const results = [];
+  const pick = new Array(fns.length);
+  (function rec(i){
+    if (i===fns.length){
+      let cov = 0; const used = new Map();
+      pick.forEach((o,k)=>{ if(!o) return; cov += fns[k].w*o.s; used.set(o.r.id, Math.max(used.get(o.r.id)??0, o.cost)); });
+      cov /= W;
+      let costSum = 0; used.forEach(c=>costSum+=c);
+      let paidOrgs = 0; used.forEach(c=>{ if (c>0) paidOrgs++; });
+      const obj = cov - .03*paidOrgs - .035*costSum;
+      results.push({obj, cov, picks:[...pick], orgs:used.size, newActs:costSum});
+      return;
+    }
+    for (const o of cands[i]){ pick[i]=o; rec(i+1); }
+  })(0);
+  results.sort((a,b)=>b.obj-a.obj);
+  const seen = new Set(), top = [];
+  for (const r of results){
+    const key = r.picks.map(p=>p?p.r.id:0).join('-');
+    if (seen.has(key)) continue; seen.add(key); top.push(r);
+    if (top.length===3) break;
+  }
+  top.forEach(t=>{ t.gaps = t.picks.map((p,k)=>(!p || p.s<.45) ? fns[k].f : null).filter(Boolean); });
+  return {baseline, plans:top, combos:results.length};
+}
+
+/* ---------- 렌더 ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct = x => Math.round(x*100);
+const md = d => { if(!d) return '예정일 미정'; const [y,m,dd] = d.split('-'); return `${+m}월 ${+dd}일`; };
+const status = o => !o || o.s<.45 ? ['gap','공백 위험'] : o.cost===0 ? ['ok','기존 활용'] : ['adj','조정 필요'];
+
+function renderForm(){
+  $('presets').innerHTML = PRESETS.map(p=>`<button type="button" class="chip-btn" data-p="${p.key}" aria-pressed="${state.preset===p.key}">${esc(p.label)}</button>`).join('');
+  $('f-village').innerHTML = VILLAGES.filter(v=>v.name!=='솔메리').map(v=>`<option ${v.name===state.village?'selected':''}>${v.name}</option>`).join('');
+  $('items').innerHTML = ITEMS.map(it=>`<label><input type="checkbox" id="it-${it.id}" data-it="${it.id}" ${state.items.has(it.id)?'checked':''}>${esc(it.label)}</label>`).join('');
+  $('f-name').value = state.name; $('f-date').value = state.date;
+  $('f-elderly').value = state.elderly; $('f-carless').value = state.carless;
+  $('o-elderly').textContent = state.elderly + '%'; $('o-carless').textContent = state.carless + '%';
+}
+
+function loadPreset(key){
+  const p = PRESETS.find(x=>x.key===key); const v = V(p.village);
+  Object.assign(state, {preset:key, name:p.name, village:p.village, date:p.date, items:new Set(p.items), elderly:v.elderly, carless:v.carless, extra:[]});
+  selectedPlan = 0; for (const k in decisions) delete decisions[k];
+  $('extract-out').textContent = ''; $('f-memo').value = ''; $('review-out').textContent = '';
+  renderForm(); update();
+}
+
+function renderMap(v, chosen){
+  const P = k => 10 + k*10;
+  let s = `<rect x="0" y="0" width="220" height="210" fill="var(--map-land)"/>`;
+  s += `<text x="8" y="12" font-size="6.5" fill="var(--muted)" font-family="IBM Plex Sans KR, sans-serif">새들군 솔메면 (가상)</text>`;
+  s += `<line x1="160" y1="200" x2="200" y2="200" stroke="var(--muted)" stroke-width="1"/><text x="180" y="196" font-size="5.5" text-anchor="middle" fill="var(--muted)">4km</text>`;
+  for (const [a,b] of ROADS){ const A=V(a),B=V(b); s += `<line x1="${P(A.x)}" y1="${P(A.y)}" x2="${P(B.x)}" y2="${P(B.y)}" stroke="var(--map-road)" stroke-width="3" stroke-linecap="round"/>`; }
+  s += `<polyline points="${ROUTE.map(n=>`${P(V(n).x)},${P(V(n).y)}`).join(' ')}" fill="none" stroke="var(--ochre)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+  if (chosen){
+    for (const o of chosen){
+      if (!o) continue; const r = o.r;
+      const from = r.kind==='market' || r.kind==='transport' || r.kind==='care' ? r.at : r.at;
+      s += `<line x1="${P(from.x)}" y1="${P(from.y)}" x2="${P(v.x)}" y2="${P(v.y)}" stroke="var(--accent)" stroke-width="1.6" opacity=".85"/>`;
+    }
+  }
+  for (const vv of VILLAGES){
+    const rr = 3 + Math.sqrt(vv.pop)/5; const isT = vv.name===v.name;
+    s += `<circle cx="${P(vv.x)}" cy="${P(vv.y)}" r="${rr}" fill="${isT?'var(--risk-soft)':'var(--surface)'}" stroke="${isT?'var(--risk)':'var(--muted)'}" stroke-width="${isT?1.6:1}"/>`;
+    s += `<text x="${P(vv.x)}" y="${P(vv.y)+rr+7}" font-size="7" text-anchor="middle" fill="var(--ink)" font-weight="${isT?700:500}" font-family="IBM Plex Sans KR, sans-serif">${vv.name}</text>`;
+  }
+  const usedIds = new Set((chosen||[]).filter(Boolean).map(o=>o.r.id));
+  for (const r of RES){
+    const u = usedIds.has(r.id);
+    s += `<rect x="${P(r.at.x)-4.5}" y="${P(r.at.y)-4.5}" width="9" height="9" rx="1.8" fill="${u?'var(--accent)':'var(--surface)'}" stroke="${u?'var(--accent)':'var(--ink)'}" stroke-width="1"/>`;
+    s += `<text x="${P(r.at.x)}" y="${P(r.at.y)+2.2}" font-size="6" text-anchor="middle" fill="${u?'var(--on-accent)':'var(--ink)'}" font-family="IBM Plex Mono, monospace">${r.id}</text>`;
+  }
+  // closing facility
+  const fx = P(v.x)-1, fy = P(v.y)-1;
+  s += `<g stroke="var(--risk)" stroke-width="1.8" stroke-linecap="round"><line x1="${fx-3}" y1="${fy-3}" x2="${fx+3}" y2="${fy+3}"/><line x1="${fx+3}" y1="${fy-3}" x2="${fx-3}" y2="${fy+3}"/></g>`;
+  s += `<text x="${P(v.x)}" y="${P(v.y)-9}" font-size="6.5" text-anchor="middle" fill="var(--risk)" font-weight="700" font-family="IBM Plex Sans KR, sans-serif">${esc(state.name||'시설')} 폐업 예정</text>`;
+  $('map').innerHTML = s;
+}
+
+function update(){
+  const v = V(state.village);
+  const fns = decompose();
+
+  // ② 기능 분리
+  const nm = esc(state.name || '이 시설');
+  $('lost').innerHTML = fns.length
+    ? `행정자료에는 <b>‘음식료품 소매점 1개 폐업’</b>으로 남지만, ${esc(v.name)} 주민 ${v.pop}명에게는 <b>${fns.length}가지 생활기능</b>이 함께 사라집니다.`
+    : '판매품목·역할을 하나 이상 선택하세요.';
+  const maxW = Math.max(...fns.map(f=>f.share), .01);
+  $('fn-list').innerHTML = fns.map(fn=>`
+    <div class="fn">
+      <span class="nm">${FUNCS[fn.f].name}${fn.ai?'<span class="tag-ai">AI 추출</span>':''}</span>
+      <div class="bar" title="중요도 ${pct(fn.share)}%"><span style="width:${fn.share/maxW*100}%"></span></div>
+      <span class="num">${pct(fn.share)}%</span>
+      <span class="src">${fn.src.map(esc).join(' · ')}</span>
+    </div>`).join('');
+
+  // ③ 자원 탐색
+  const rows = RES.map(r=>{
+    const evs = fns.map(fn=>evalRes(r, fn.f, v)).filter(Boolean);
+    return {r, evs, dist: r.kind==='hall'||r.kind==='care' ? null : road(r.kind==='transport'?V('솔메리'):r.at, v)};
+  }).sort((a,b)=> (b.evs.length>0) - (a.evs.length>0) || a.r.id-b.r.id);
+  $('res-tbl').innerHTML = `<thead><tr><th>#</th><th>자원</th><th>운영주체</th><th>거리</th><th>이어받을 수 있는 기능</th><th>운영</th></tr></thead><tbody>` +
+    rows.map(({r,evs,dist})=>`<tr class="${evs.length?'':'out'}">
+      <td><span class="rid">${r.id}</span></td>
+      <td>${esc(r.name)}</td><td>${esc(r.owner || '마을')}</td>
+      <td class="num" style="text-align:left">${r.kind==='hall'? (r.village===v.name?'마을 안':'—') : r.kind==='care'?'방문형' : dist.toFixed(1)+'km'}</td>
+      <td>${evs.length ? `<div class="fchips">${evs.map(e=>`<span class="fc ${e.s>=.45?'hi':''}">${FUNCS[e.f].name}<em>${pct(e.s)}</em></span>`).join('')}</div>` : '서비스 범위 밖'}</td>
+      <td>${esc(r.days)}</td></tr>`).join('') + `</tbody>`;
+
+  // ④ 상속안
+  if (!fns.length){ $('kpi').innerHTML=''; $('plans').innerHTML=''; $('plan-tbl').innerHTML=''; $('dec-tbl').innerHTML=''; $('summary').textContent=''; $('notice').innerHTML=''; renderMap(v,null); return; }
+  const {baseline, plans, combos} = plan(fns, v);
+  plansCache = plans;
+  if (selectedPlan >= plans.length) selectedPlan = 0;
+  const P = plans[selectedPlan];
+
+  $('kpi').innerHTML = `
+    <div class="k"><span>조치 없을 때 기능 유지율</span><strong style="color:var(--risk)">${pct(baseline)}%</strong></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="k"><span>상속안 적용 시</span><strong style="color:var(--accent)">${pct(P.cov)}%</strong></div>
+    <div class="retbar" aria-hidden="true"><div class="b1" style="width:${pct(P.cov)}%"></div><div class="b0" style="width:${pct(baseline)}%"></div></div>
+    ${P.cov - baseline < .05 ? `<div class="k" style="flex-basis:100%"><span style="color:var(--risk);font-weight:600">기존 자원만으로는 유지율이 거의 오르지 않습니다. 이 마을은 신규 지원 우선 검토 대상입니다.</span></div>` : ''}
+    <div class="k" style="flex-basis:100%"><span>${combos.toLocaleString()}개 조합을 비교했습니다. 유지율은 기능 중요도로 가중한 적합도 평균입니다.</span></div>`;
+
+  $('plans').innerHTML = plans.map((p,i)=>`
+    <button type="button" class="plan" data-plan="${i}" aria-pressed="${i===selectedPlan}">
+      <span class="pn">안 ${'ABC'[i]}${i===0?'<small>권장</small>':''}</span>
+      <span class="big">${pct(p.cov)}%</span>
+      <span class="meta">참여기관 ${p.orgs}곳 · 조정 필요 ${p.newActs}건 · 공백 ${p.gaps.length}개</span>
+    </button>`).join('');
+
+  $('plan-tbl').innerHTML = `<thead><tr><th>사라질 기능</th><th>이어받을 자원</th><th>방식</th><th>적합도</th><th>상태</th></tr></thead><tbody>` +
+    fns.map((fn,k)=>{
+      const o = P.picks[k]; const [cls,lab] = status(o);
+      const alts = optionsFor(fn.f, v).filter(a=>!o || a.r.id!==o.r.id).slice(0,3);
+      return `<tr>
+        <td><strong>${FUNCS[fn.f].name}</strong></td>
+        <td>${o ? `<span class="rid">${o.r.id}</span> ${esc(o.r.name)}` : '—'}</td>
+        <td>${o ? esc(o.action) : '기존 자원으로 잇기 어려움'}
+          ${o ? `<div class="why">역량 ${pct(o.cap)} × 접근성 ${pct(o.acc)} × 빈도 ${pct(o.ff)}</div>` : ''}
+          ${(!o || o.s<.45) ? `<div class="gapnote">신규 지원 검토: ${GAP_IDEAS[fn.f]}</div>` : ''}
+          ${alts.length ? `<details class="alts"><summary>다른 후보 ${alts.length}</summary><ul>${alts.map(a=>`<li>${esc(a.r.name)} ${pct(a.s)} — ${esc(a.action)}</li>`).join('')}</ul></details>` : ''}
+        </td>
+        <td class="num" style="white-space:nowrap;text-align:left"><span class="mini ${o&&o.s>=.45?'':'low'}"><span style="width:${o?pct(o.s):0}%"></span></span>${o?pct(o.s):0}</td>
+        <td><span class="st ${cls}">${lab}</span></td></tr>`;
+    }).join('') + `</tbody>`;
+
+  renderMap(v, P.picks);
+
+  // ⑤ 결정
+  $('dec-tbl').innerHTML = `<thead><tr><th>기능</th><th>제안</th><th>결정</th><th>메모</th></tr></thead><tbody>` +
+    fns.map((fn,k)=>{
+      const o = P.picks[k]; const key = fn.f; const d = decisions[key] || {v: (!o || o.s<.45) ? '재검토' : '승인', memo:''};
+      decisions[key] = d;
+      return `<tr><td>${FUNCS[fn.f].name}</td><td>${o?esc(o.r.name):'공백'}</td>
+        <td><select id="dec-${key}" data-dec="${key}" aria-label="${FUNCS[fn.f].name} 결정">${['승인','보류','재검토'].map(x=>`<option ${x===d.v?'selected':''}>${x}</option>`).join('')}</select></td>
+        <td><input type="text" id="memo-${key}" data-memo="${key}" value="${esc(d.memo)}" placeholder="비용·운영주체·주민 의견" style="min-width:160px"></td></tr>`;
+    }).join('') + `</tbody>`;
+  renderOutputs(fns, v, P, baseline);
+}
+
+function renderOutputs(fns, v, P, baseline){
+  const lines = [];
+  lines.push(`[기능상속 검토안] ${v.name} · ${state.name||'시설'} (${md(state.date)} 폐업 예정)`);
+  lines.push(`주민 ${v.pop}명 · 65세 이상 ${state.elderly}% · 자가용 없는 가구 ${state.carless}%`);
+  lines.push(`기능 유지율: 조치 없을 때 ${pct(baseline)}% → 안 ${'ABC'[selectedPlan]} 적용 시 ${pct(P.cov)}%`);
+  lines.push('');
+  fns.forEach((fn,k)=>{
+    const o = P.picks[k]; const d = decisions[fn.f];
+    lines.push(`■ ${FUNCS[fn.f].name} → ${o ? o.r.name : '공백'}  [${d.v}]`);
+    if (o) lines.push(`   ${o.action} (${o.when}, 적합도 ${pct(o.s)})`);
+    if (!o || o.s<.45) lines.push(`   신규 지원 검토: ${GAP_IDEAS[fn.f]}`);
+    if (d.memo) lines.push(`   메모: ${d.memo}`);
+  });
+  const orgs = [...new Set(P.picks.filter(Boolean).map(o=>o.r.owner||o.r.name))];
+  lines.push('');
+  lines.push(`협의 대상: ${orgs.join(', ')}`);
+  $('summary').textContent = lines.join('\n');
+
+  const ok = fns.map((fn,k)=>({fn, o:P.picks[k], d:decisions[fn.f]})).filter(x=>x.o && x.o.s>=.45 && x.d.v==='승인');
+  const how = x => {
+    const r = x.o.r;
+    if (r.kind==='market') return `이동장터 트럭이 ${x.o.when.replace(' (신설 검토)','')}에 마을에 옵니다`;
+    if (r.kind==='delivery') return `${r.name.replace(' 공동배송','').replace(' 배송','')}에서 ${r.days}요일에 ${v.name} 마을회관으로 배달합니다`;
+    if (r.kind==='transport') return `행복콜택시(평일 예약)를 타고 솔메리 가게에 가실 수 있습니다`;
+    if (r.kind==='hall') return x.fn.f==='hub' ? `${r.name}을 언제든 이용하세요` : `택배와 주문한 물건은 ${r.name}에서 받아 두었다가 드립니다`;
+    if (r.kind==='care') return `생활지원사가 방문할 때 부탁하시면 대신 사다 드립니다`;
+    return `${r.name}(${r.days})을 이용하세요`;
+  };
+  $('notice').innerHTML = `
+    <h3>${esc(state.name||'가게')}가 ${md(state.date)} 문을 닫습니다. 그 뒤에도 이렇게 이용하세요.</h3>
+    ${ok.length ? `<ul>${ok.map(x=>`<li><strong>${FUNCS[x.fn.f].short}</strong> — ${how(x)}.</li>`).join('')}</ul>` : '<p>승인된 항목이 생기면 여기에 안내문이 만들어집니다.</p>'}
+    <div class="foot">주민 안내문 미리보기 · 승인한 항목만 들어갑니다 · 문의: 솔메면 행정복지센터</div>`;
+}
+
+/* ---------- 이벤트 ---------- */
+document.addEventListener('click', e=>{
+  const p = e.target.closest('[data-p]'); if (p){ loadPreset(p.dataset.p); return; }
+  const pl = e.target.closest('[data-plan]'); if (pl){ selectedPlan = +pl.dataset.plan; for (const k in decisions) delete decisions[k]; update(); return; }
+});
+document.addEventListener('change', e=>{
+  const t = e.target;
+  if (t.dataset.it){ t.checked ? state.items.add(t.dataset.it) : state.items.delete(t.dataset.it); state.preset=''; markPreset(); update(); }
+  else if (t.id==='f-village'){ state.village = t.value; const v=V(t.value); state.elderly=v.elderly; state.carless=v.carless; renderForm(); state.preset=''; markPreset(); for (const k in decisions) delete decisions[k]; update(); }
+  else if (t.id==='f-date'){ state.date = t.value; update(); }
+  else if (t.dataset.dec){ decisions[t.dataset.dec].v = t.value; const v=V(state.village); renderOutputs(decompose(), v, plansCache[selectedPlan], plan(decompose(), v).baseline); }
+});
+document.addEventListener('input', e=>{
+  const t = e.target;
+  if (t.id==='f-name'){ state.name = t.value; update(); }
+  else if (t.id==='f-elderly'){ state.elderly = +t.value; $('o-elderly').textContent = t.value+'%'; update(); }
+  else if (t.id==='f-carless'){ state.carless = +t.value; $('o-carless').textContent = t.value+'%'; update(); }
+  else if (t.dataset.memo){ decisions[t.dataset.memo].memo = t.value; const v=V(state.village); const fns=decompose(); renderOutputs(fns, v, plansCache[selectedPlan], plan(fns, v).baseline); }
+});
+function markPreset(){ document.querySelectorAll('[data-p]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.p===state.preset)); }
+
+$('btn-copy').addEventListener('click', ()=>{
+  const txt = $('summary').textContent;
+  const done = m => { $('copy-toast').textContent = m; setTimeout(()=>$('copy-toast').textContent='',1800); };
+  try {
+    navigator.clipboard.writeText(txt).then(()=>done('복사했습니다'), ()=>{ selectSummary(); done('선택됨 — Ctrl+C로 복사'); });
+  } catch(_) { selectSummary(); done('선택됨 — Ctrl+C로 복사'); }
+});
+function selectSummary(){ const r = document.createRange(); r.selectNodeContents($('summary')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+/* ---------- 언어모델 연결 (가능한 화면에서만 표시) ---------- */
+let sample = null, ctl = null;
+const errCopy = c => ({rate_limited:'요청이 많습니다. 잠시 뒤 다시 시도하세요.', session_expired:'다시 로그인해야 합니다.', refused:'이 내용은 처리할 수 없습니다.', invalid_json:'결과를 읽지 못했습니다. 다시 시도하세요.'}[c] || '연결에 실패했습니다. 다시 시도하세요.');
+const hideAI = () => { $('ai-extract').hidden = true; $('ai-review').hidden = true; };
+if (window.claude?.use){
+  window.claude.use('sample').then(s=>{ if (!s) return; sample = s; $('ai-extract').hidden = false; $('ai-review').hidden = false; }).catch(()=>{});
+}
+
+$('btn-extract').addEventListener('click', async ()=>{
+  const memo = $('f-memo').value.trim();
+  if (!memo){ $('extract-out').textContent = '먼저 역할을 적어 주세요.'; return; }
+  const btn = $('btn-extract'); btn.disabled = true; $('extract-out').textContent = '분석 중…';
+  const list = FORDER.map(f=>`${f}: ${FUNCS[f].name} (${FUNCS[f].short})`).join('\n');
+  try {
+    const res = await sample.json(
+      `농촌 마을의 작은 가게가 문을 닫습니다. 아래 주민 메모에서 이 가게가 하던 생활기능을 찾아 정해진 분류에만 대응시키세요.\n\n분류:\n${list}\n\n메모:\n${memo.slice(0,1500)}\n\n` +
+      `JSON 배열만 답하세요. 각 항목은 {"f": 분류 id, "note": 메모 근거를 12자 이내로 요약}. 해당 없으면 []. 예: [{"f":"pickup","note":"약봉지 맡아둠"}]`,
+      {modelTier:'quick'});
+    const valid = (Array.isArray(res)?res:[]).filter(x=>x && FUNCS[x.f]).map(x=>({f:x.f, note:String(x.note||'').slice(0,24)||FUNCS[x.f].name}));
+    state.extra = valid;
+    $('extract-out').textContent = valid.length ? `${valid.length}개 기능을 찾아 ②에 반영했습니다.` : '분류에 맞는 기능을 찾지 못했습니다.';
+    for (const k in decisions) delete decisions[k];
+    update();
+  } catch(e){
+    if (['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e?.code)) hideAI();
+    else $('extract-out').textContent = errCopy(e?.code);
+  } finally { btn.disabled = false; }
+});
+
+$('btn-review').addEventListener('click', async ()=>{
+  const out = $('review-out'), btn = $('btn-review'), stop = $('btn-stop');
+  ctl = new AbortController(); btn.disabled = true; stop.hidden = false; out.textContent = '검토 중…';
+  try {
+    await sample(
+      `당신은 인구감소지역 군청의 생활서비스 정책 검토자입니다. 아래는 폐업 예정 가게의 생활기능을 기존 지역자원에 나눠 잇는 검토안입니다.\n\n${$('summary').textContent}\n\n` +
+      `담당자가 결정 전에 볼 검토 의견을 한국어로 쓰세요. 형식: "위험 요인" 3개, "기관·주민에게 확인할 질문" 4개, "우선 실행 1가지" 1문장. 각 항목은 한 줄. 데이터에 없는 사실은 지어내지 말 것.`,
+      {signal: ctl.signal, onText: ({text})=>{ out.textContent = text; }});
+  } catch(e){
+    out.textContent = e?.text ?? '';
+    if (['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e?.code)) hideAI();
+    else if (e?.code !== 'cancelled') out.textContent += (out.textContent?'\n':'') + errCopy(e?.code);
+  } finally { btn.disabled = false; stop.hidden = true; }
+});
+$('btn-stop').addEventListener('click', ()=>ctl?.abort());
+
+loadPreset('A');
+</script>
+
+</body></html>
