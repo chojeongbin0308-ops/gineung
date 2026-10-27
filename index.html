@@ -372,6 +372,37 @@ input[type=password],input[type=url]{font:inherit;font-size:14px;color:var(--ink
 .radio2 label{flex:1;display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:8px;cursor:pointer}
 .radio2 label:has(input:checked){border-color:var(--sage-d);color:var(--sage-d);font-weight:600;background:#FBFDFA}
 .radio2 input{accent-color:var(--sage-d);margin:0}
+#chat.page-first{padding-block:14px;min-height:0}
+#chat .chat-wrap{height:calc(100dvh - var(--navh,68px) - 28px);min-height:440px}
+#chat .chat-side{height:100%;overflow-y:auto}
+#chat .chat-main{height:100%;min-height:0}
+.page-chat footer{display:none}
+@media (max-width:900px){#chat .chat-wrap{grid-template-columns:minmax(0,1fr)}#chat .chat-side{display:none}#chat.page-first{padding-block:8px}}
+.msgs .empty{margin:auto;max-width:600px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 4px}
+.empty .big-av{width:60px;height:60px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;box-shadow:var(--shadow)}
+.empty h3{font-size:clamp(21px,3vw,27px);line-height:1.3;margin:6px 0 0;letter-spacing:-.03em;text-wrap:balance}
+.empty p{margin:0;color:var(--muted);font-size:14px}
+.empty .grid4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px;width:100%}
+.empty .grid4 button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;text-align:left;font-size:13px;line-height:1.45;display:flex;gap:10px;align-items:center}
+.empty .grid4 button:hover{border-color:var(--sage-d)}
+.empty .grid4 .ic{width:32px;height:32px}
+.empty .grid4 .ic svg.i{width:16px;height:16px}
+.empty .down{font-size:12px;color:var(--sage-d);font-weight:600;margin-top:10px}
+@media (max-width:520px){.empty .grid4{grid-template-columns:minmax(0,1fr)}.empty .grid4 button:nth-child(n+4){display:none}}
+.composer{flex-direction:column;align-items:stretch;gap:6px;padding:12px 14px 10px}
+.composer .bar{display:flex;align-items:flex-end;gap:8px;border:1.5px solid var(--line2);border-radius:26px;padding:5px 5px 5px 18px;background:#fff;box-shadow:0 2px 10px rgba(30,42,51,.06)}
+.composer .bar:focus-within{border-color:var(--sage-d);box-shadow:0 0 0 4px var(--sage-soft)}
+.composer textarea{background:transparent;border:0;padding:10px 0;font-size:16px;min-height:44px;max-height:160px;border-radius:0}
+.composer textarea:focus{box-shadow:none;background:transparent;border:0}
+.composer .send{background:var(--sage-d)}
+.composer .hint{margin:0;text-align:center;font-size:11px;color:var(--faint)}
+@media (max-width:600px){
+  #chat .in{padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  .chat-head{padding:10px 12px;gap:8px}.chat-head .av{width:32px;height:32px}.chat-head .who span{display:none}.chat-head .who strong{font-size:14px}
+  .chat-head .status{font-size:11px;padding:3px 8px}.chat-head .btn.sm{padding:5px 10px;font-size:12px}
+  .msgs{padding:14px 10px}.msg{max-width:100%}.msg.bot{grid-template-columns:26px minmax(0,1fr);gap:6px}.msg.bot .av{width:26px;height:26px}
+  .msg.bot .bub{padding:10px 12px}.composer{padding:8px 10px 8px}.composer .hint{display:none}
+}
 pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.5;background:var(--soft);border-radius:8px;padding:10px;overflow-x:auto;margin:0;word-break:normal}
 
 /* real map */
@@ -565,7 +596,6 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
 </div></section>
 
 <section class="sec page-first" id="chat" data-page="chat" hidden><div class="in">
-  <div class="sec-head"><div><p class="k">AI 상담</p><h2>기능상속 AI에게 물어보세요.</h2><p>가게 이름이나 마을을 넣어 물어보면 사라질 생활기능, 상속안, 유통망과 필요한 자격까지 답합니다.</p></div></div>
   <div class="chat-wrap">
     <aside class="chat-side">
       <div class="card">
@@ -602,15 +632,18 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
     <div class="card chat-main">
       <div class="chat-head">
         <span class="av"><svg width="22" height="22" viewBox="0 0 30 30" aria-hidden="true"><path d="M14 27C6 25 3 17 9 8c4 6 7 12 5 19z" fill="#7FA77F"/><path d="M16 27c-1-9 3-16 11-20 2 9-2 17-11 20z" fill="#2F4F5F"/><circle cx="10" cy="6" r="3" fill="#E3A33A"/></svg></span>
-        <div class="who"><strong>기능상속 AI</strong><span id="chat-model">gineung-v1</span></div>
+        <div class="who"><strong>기능상속 AI 상담</strong><span id="chat-model">gineung-v1</span></div>
         <span class="status demo" id="chat-status">시연 모드</span>
         <button class="btn sm" type="button" id="chat-reset">새 대화</button>
       </div>
       <div class="msgs" id="msgs" aria-live="polite"></div>
       <form class="composer" id="composer">
         <label for="chat-input" class="lbl" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">메시지</label>
-        <textarea id="chat-input" rows="1" placeholder="예: 하리농약사가 문 닫으면 농약은 어떻게 사?"></textarea>
-        <button class="send" type="submit" id="chat-send" aria-label="보내기"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+        <div class="bar">
+          <textarea id="chat-input" rows="1" placeholder="질문을 입력하세요"></textarea>
+          <button class="send" type="submit" id="chat-send" aria-label="보내기"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+        </div>
+        <p class="hint">Enter 보내기 · Shift+Enter 줄바꿈 · 시연 모드는 예시 데이터로 답합니다</p>
       </form>
     </div>
   </div>
@@ -1195,6 +1228,7 @@ function showPage(pg, anchor){
   if (!PAGES.includes(pg)) pg = 'home';
   document.querySelectorAll('[data-page]').forEach(el=>el.hidden = el.dataset.page !== pg);
   document.querySelectorAll('.navlinks [data-go]').forEach(b=>{ const g = b.dataset.go; const on = pg==='home' ? g===(anchor==='intro'?'intro':'top') : PAGE_OF[g]===pg; if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  document.body.classList.toggle('page-chat', pg==='chat');
   if (pg==='supply') renderSupply();
   if (pg==='chat') setTimeout(()=>{ try { $('chat-input').focus({preventScroll:true}); } catch(_){} }, 0);
   if (anchor==='intro') $('intro').scrollIntoView({block:'start', behavior:'instant'}); else window.scrollTo({top:0, behavior:'instant'});
@@ -1205,6 +1239,8 @@ function go(id){
   if (location.hash.slice(1) !== h.slice(1)) location.hash = h;
   showPage(pg, id);
 }
+const setNavH = () => { const n = document.querySelector('nav.top'); if (n) document.documentElement.style.setProperty('--navh', n.offsetHeight + 'px'); };
+window.addEventListener('resize', setNavH); setNavH();
 const fromHash = () => { const h = location.hash.slice(1); showPage(h==='intro' ? 'home' : (h||'home'), h); };
 window.addEventListener('hashchange', fromHash);
 document.addEventListener('click', e=>{
@@ -1587,6 +1623,7 @@ function helpAnswer(){
 }
 
 function addMsg(role, html){
+  $('msgs').querySelector('.empty')?.remove();
   const el = document.createElement('div'); el.className = 'msg ' + role;
   el.innerHTML = role==='bot' ? `<span class="av">${LOGO}</span><div class="bub">${html}</div>` : html;
   $('msgs').append(el); $('msgs').scrollTop = $('msgs').scrollHeight; return el;
@@ -1627,7 +1664,15 @@ function setStatus(kind){
   $('chat-model').textContent = (chatCfg.mode==='server' && chatCfg.url) ? (chatCfg.model||'gineung-v1') : `${chatCfg.model||'gineung-v1'} (시연)`;
 }
 function growInput(){ const t = $('chat-input'); t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 160) + 'px'; }
-function resetChat(){ chatLog = []; $('msgs').innerHTML = ''; addMsg('bot', helpAnswer()); }
+const EMPTY_SUG = [['store','o','하리농약사가 문 닫으면 농약은 어떻게 사?'],['bulb','b','상리상회 상속안 추천해 줘'],['nodes','g','기능상속은 어떻게 진행돼?'],['search','p','구룡상회는 어디가 공백이야?']];
+function resetChat(){
+  chatLog = [];
+  $('msgs').innerHTML = `<div class="empty"><span class="big-av">${LOGO.replace('width="18" height="18"','width="30" height="30"')}</span>
+    <h3>무엇이 궁금하세요?</h3>
+    <p>가게 이름이나 마을, 물건을 넣어 물어보세요. 아래 예시를 눌러도 됩니다.</p>
+    <div class="grid4">${EMPTY_SUG.map(([ic,c,q])=>`<button type="button" data-ask="${esc(q)}"><span class="ic ${c}">${icon(ic)}</span>${esc(q)}</button>`).join('')}</div>
+    <span class="down">↓ 아래 입력창에 직접 써도 됩니다</span></div>`;
+}
 function initChat(){
   $('sugs').innerHTML = SUGGEST.map(s=>`<button type="button" data-ask="${esc(s)}">${esc(s)}</button>`).join('');
   $('cmode-'+(chatCfg.mode==='server'?'server':'demo')).checked = true;
