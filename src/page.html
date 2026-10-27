@@ -31,7 +31,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(247,247,243,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 nav.top .in{display:flex;align-items:center;gap:28px;height:68px}
 .logo{display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;font-size:22px;font-weight:800;letter-spacing:-.03em;margin-right:auto}
-.navlinks{display:flex;gap:34px}
+.navlinks{display:flex;gap:clamp(14px,2vw,30px)}
 .navlinks button{border:0;background:none;padding:0;font-size:14px;font-weight:500;color:var(--ink)}
 .navlinks button:hover{color:var(--sage-d)}
 .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 22px;font-size:14px;font-weight:600;border:1px solid var(--line2);background:var(--card);color:var(--ink);white-space:nowrap}
@@ -44,7 +44,7 @@ nav.top .in{display:flex;align-items:center;gap:28px;height:68px}
 .textlink{border:0;background:none;padding:0;color:var(--sage-d);font-weight:600}
 .textlink:hover{text-decoration:underline}
 .navlinks button[aria-current="page"]{color:var(--sage-d);font-weight:700;box-shadow:0 2px 0 var(--sage-d)}
-@media (max-width:980px){nav.top .in{flex-wrap:wrap;height:auto;padding-block:10px 0;gap:10px 16px}.navlinks{order:3;width:100%;gap:22px;overflow-x:auto;padding-bottom:10px}.navlinks button{white-space:nowrap;padding-bottom:4px}}
+@media (max-width:1060px){nav.top .in{flex-wrap:wrap;height:auto;padding-block:10px 0;gap:10px 16px}.navlinks{order:3;width:100%;gap:22px;overflow-x:auto;padding-bottom:10px}.navlinks button{white-space:nowrap;padding-bottom:4px}}
 section.page-first{padding-top:48px;min-height:70vh}
 .mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 @media (max-width:900px){.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -395,6 +395,51 @@ input[type=password],input[type=url]{font:inherit;font-size:14px;color:var(--ink
   .msgs{padding:14px 10px}.msg{max-width:100%}.msg.bot{grid-template-columns:26px minmax(0,1fr);gap:6px}.msg.bot .av{width:26px;height:26px}
   .msg.bot .bub{padding:10px 12px}.composer{padding:8px 10px 8px}.composer .hint{display:none}
 }
+
+/* 행복택시 */
+.taxi-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px 32px;flex-wrap:wrap;margin-bottom:24px}
+.taxi-head .k{font-size:13px;font-weight:600;color:var(--sage-d);margin:0 0 6px}
+.taxi-head h2{font-size:clamp(26px,3vw,32px);line-height:1.3;letter-spacing:-.03em;margin:0;font-weight:800}
+.taxi-head p{color:var(--muted);margin:8px 0 0;max-width:56ch}
+.seg.role button{padding:10px 18px;font-size:14px;font-weight:600}
+.seg.role small{font-weight:500;opacity:.75;margin-left:4px}
+.tgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.tgrid{grid-template-columns:minmax(0,1fr)}}
+.tcard{padding:22px;display:flex;flex-direction:column;gap:14px}
+.tcard h3,.th{font-size:18px;margin:0;letter-spacing:-.02em}
+.th{margin:4px 0 10px;display:flex;align-items:baseline;gap:8px}
+.th small{font-size:13px;color:var(--muted);font-weight:500}
+.tcol{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tlist{display:flex;flex-direction:column;gap:10px}
+.feebox{background:var(--soft);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;font-size:13px}
+.feebox b{font-size:15px}
+.feebox .tot{grid-column:1/-1;border-top:1px solid var(--line2);padding-top:6px;margin-top:2px;display:flex;justify-content:space-between;font-weight:700}
+.tnote{margin:0;font-size:12px;color:var(--adj);background:var(--adj-bg);border-radius:10px;padding:8px 12px}
+.call{padding:16px 18px;display:flex;flex-direction:column;gap:8px;position:relative}
+.call .who{font-size:15px;line-height:1.5}
+.call .who b{font-weight:700}
+.call .meta{display:flex;flex-wrap:wrap;gap:6px}
+.call .meta span{font-size:12px;background:var(--soft);border-radius:999px;padding:2px 10px}
+.call .meta .route-ok{background:var(--ok-bg);color:var(--ok);font-weight:600}
+.call .meta .route-far{background:var(--adj-bg);color:var(--adj)}
+.call .row2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.call .fee{font-size:20px;font-weight:800;color:var(--sage-d);letter-spacing:-.02em}
+.call .fee small{font-size:12px;color:var(--muted);font-weight:500;margin-left:4px}
+.call .buy{font-size:12px;color:var(--muted)}
+.call.new{animation:pop .5s ease}
+@keyframes pop{from{transform:scale(.97);box-shadow:0 0 0 3px var(--sage-soft)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.call.new{animation:none}}
+.call .ex{position:absolute;top:12px;right:14px;font-size:10px;color:var(--faint)}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:2px}
+.steps span{font-size:11px;text-align:center;padding:5px 2px;border-radius:6px;background:var(--soft);color:var(--faint)}
+.steps span.on{background:var(--sage-d);color:#fff;font-weight:600}
+.steps span.done{background:var(--sage-soft);color:var(--sage-d)}
+.earn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.earn div{background:var(--soft);border-radius:12px;padding:10px 14px}
+.earn strong{display:block;font-size:22px;letter-spacing:-.02em}
+.empty2{border:1.5px dashed var(--line2);border-radius:14px;padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.fine2{font-size:12px;color:var(--faint);margin:22px 0 0}
+
 pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.5;background:var(--soft);border-radius:8px;padding:10px;overflow-x:auto;margin:0;word-break:normal}
 
 /* real map */
@@ -423,6 +468,7 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
   <div class="navlinks">
     <button type="button" data-go="top">홈</button>
     <button type="button" data-go="chat">AI 상담</button>
+    <button type="button" data-go="taxi">행복택시</button>
     <button type="button" data-go="intro">서비스 소개</button>
     <button type="button" data-go="demo">분석하기</button>
     <button type="button" data-go="supply">유통망 노트</button>
@@ -638,6 +684,59 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
       </form>
     </div>
   </div>
+</div></section>
+
+<section class="sec page-first" id="taxi" data-page="taxi" hidden><div class="in">
+  <div class="taxi-head">
+    <div><p class="k">행복택시</p><h2>돌아오는 길에, 이웃의 장보기를.</h2><p>읍내에 나간 이웃이 집으로 돌아오는 길에 필요한 물건을 대신 사다 줍니다. 부탁한 분은 물건값과 작은 수수료만 내면 됩니다.</p></div>
+    <div class="seg role" id="taxi-role" role="group" aria-label="역할 선택">
+      <button type="button" data-role="ask" aria-pressed="true">부탁하기 <small>주민</small></button>
+      <button type="button" data-role="drive" aria-pressed="false">배달하기 <small>이웃 기사</small></button>
+    </div>
+  </div>
+
+  <div id="taxi-ask" class="tgrid">
+    <form class="card tcard" id="taxi-form">
+      <h3>무엇이 필요하세요?</h3>
+      <div class="form2">
+        <div class="field"><label for="t-name">이름</label><input type="text" id="t-name" placeholder="예: 김순자" autocomplete="off"></div>
+        <div class="field"><label for="t-village">마을</label><select id="t-village"></select></div>
+        <div class="field full"><span class="lbl">물건 고르기</span><div class="checks" id="t-items"></div></div>
+        <div class="field full"><label for="t-etc">그 밖에 필요한 것</label><input type="text" id="t-etc" placeholder="예: 파 한 단, 식빵"></div>
+        <div class="field"><label for="t-due">언제까지</label><select id="t-due"><option>오늘 저녁까지</option><option>오늘 18시까지</option><option>내일 오전까지</option><option>내일 중</option></select></div>
+        <div class="field"><label for="t-drop">받는 곳</label><select id="t-drop"><option>집 앞</option><option>마을회관</option></select></div>
+      </div>
+      <div class="feebox" id="t-fee"></div>
+      <p class="tnote" id="t-warn" hidden></p>
+      <button class="btn dark lg" type="submit" id="t-submit">이웃에게 부탁하기</button>
+      <p class="why" id="t-msg" aria-live="polite"></p>
+    </form>
+    <div class="tcol">
+      <h3 class="th">내 요청</h3>
+      <div id="t-mine" class="tlist"></div>
+    </div>
+  </div>
+
+  <div id="taxi-drive" class="tgrid" hidden>
+    <div class="tcol">
+      <div class="card tcard route">
+        <h3>오늘 내 경로</h3>
+        <div class="form2">
+          <div class="field"><label for="d-from">지금 있는 곳</label><select id="d-from"></select></div>
+          <div class="field"><label for="d-to">돌아갈 마을</label><select id="d-to"></select></div>
+        </div>
+        <div class="earn"><div><span class="lbl">오늘 배달</span><strong id="d-count">0건</strong></div><div><span class="lbl">오늘 수수료</span><strong id="d-earn">0원</strong></div></div>
+      </div>
+      <h3 class="th">내 배달</h3>
+      <div id="d-mine" class="tlist"></div>
+    </div>
+    <div class="tcol">
+      <h3 class="th">들어온 부탁 <small id="d-open"></small></h3>
+      <div id="d-calls" class="tlist"></div>
+    </div>
+  </div>
+
+  <p class="fine2">시연용 화면입니다. 이름과 요청은 예시이며, 부탁·수락 내용은 이 기기에만 저장됩니다. 실제 서비스에서는 서버로 주민과 기사를 실시간 연결하고, 기사는 지자체에 등록한 이웃으로 운영합니다.</p>
 </div></section>
 
 <section class="sec page-first" id="method" data-page="method" hidden><div class="in">
@@ -1213,14 +1312,15 @@ const resetDecisions = () => { for (const k in decisions) delete decisions[k]; }
 const custom = () => { state.preset = ''; };
 
 /* ---------- 이벤트 ---------- */
-const PAGE_OF = {top:'home', intro:'home', chat:'chat', demo:'analyze', supply:'supply', method:'method', foot:'method'};
-const PAGES = ['home','chat','analyze','supply','method'];
+const PAGE_OF = {top:'home', intro:'home', chat:'chat', taxi:'taxi', demo:'analyze', supply:'supply', method:'method', foot:'method'};
+const PAGES = ['home','chat','taxi','analyze','supply','method'];
 function showPage(pg, anchor){
   if (!PAGES.includes(pg)) pg = 'home';
   document.querySelectorAll('[data-page]').forEach(el=>el.hidden = el.dataset.page !== pg);
   document.querySelectorAll('.navlinks [data-go]').forEach(b=>{ const g = b.dataset.go; const on = pg==='home' ? g===(anchor==='intro'?'intro':'top') : PAGE_OF[g]===pg; if (on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   document.body.classList.toggle('page-chat', pg==='chat');
   if (pg==='supply') renderSupply();
+  if (pg==='taxi' && typeof renderTaxi==='function') renderTaxi();
   if (pg==='chat') setTimeout(()=>{ try { $('chat-input').focus({preventScroll:true}); } catch(_){} }, 0);
   if (anchor==='intro') $('intro').scrollIntoView({block:'start', behavior:'instant'}); else window.scrollTo({top:0, behavior:'instant'});
 }
@@ -1686,6 +1786,136 @@ document.addEventListener('click', e=>{
   const g = e.target.closest('.acts [data-go^="ask:"]'); if (g){ e.stopImmediatePropagation(); sendChat(g.dataset.go.slice(4)); }
 }, true);
 initChat();
+
+
+/* ---------- 행복택시 : 이웃 장보기 배달 ---------- */
+const T_KEY = 'gineung.taxi.v1';
+const T_ITEMS = ['세제','휴지','라면','두부','계란','우유','채소','쌀 10kg','생수','부탄가스','건전지','비료','농약'];
+const TOWN = '솔메리';                                   // 읍내(상점이 모인 곳)
+const T_STEPS = ['요청','수락','구매 완료','배달 완료'];
+const T_STATUS = {open:0, accepted:1, bought:2, done:3};
+const won = n => Math.round(n).toLocaleString('ko-KR') + '원';
+const T_SEED = [
+  {name:'김순자', village:'상리', items:['세제','두부'], due:'오늘 18시까지', drop:'집 앞'},
+  {name:'박영수', village:'하리', items:['쌀 10kg'], due:'오늘 저녁까지', drop:'마을회관'},
+  {name:'최정례', village:'구룡리', items:['계란','우유'], due:'오늘 18시까지', drop:'마을회관'},
+  {name:'이말순', village:'덕곡리', items:['휴지','건전지'], due:'내일 오전까지', drop:'집 앞'},
+  {name:'정봉수', village:'새터', items:['부탄가스'], due:'내일 오전까지', drop:'집 앞'}
+];
+const PRICE = {세제:6000,휴지:7000,라면:4500,두부:2000,계란:7500,우유:3000,채소:5000,'쌀 10kg':32000,생수:5000,부탄가스:5500,건전지:4000,비료:15000,농약:18000};
+const isHeavy = items => items.some(i=>/쌀|생수|부탄|비료/.test(i));
+function tFee(village, items){
+  const d = road(V(TOWN), V(village));
+  const base = 2000, dist = Math.round(d*250/500)*500, heavy = isHeavy(items) ? 1000 : 0;
+  return {base, dist, heavy, d, total: base + dist + heavy};
+}
+const tPrice = items => items.reduce((s,i)=>s + (PRICE[i] ?? 5000), 0);
+function buyPlace(items){
+  const p = new Set();
+  for (const i of items){
+    if (/농약|비료/.test(i)) p.add('솔메농협 농자재센터');
+    else if (/두부|계란|우유|채소/.test(i)) p.add('솔메마트');
+    else p.add('솔메농협 하나로마트');
+  }
+  return [...p].join(', ');
+}
+let taxi = {role:'ask', reqs:[], route:{from:TOWN, to:'상리'}, seq:1};
+function tSave(){ try { localStorage.setItem(T_KEY, JSON.stringify(taxi)); } catch(_){} }
+function tLoad(){
+  try { const s = JSON.parse(localStorage.getItem(T_KEY) || 'null'); if (s && Array.isArray(s.reqs)) { taxi = Object.assign(taxi, s); return; } } catch(_){}
+  taxi.reqs = T_SEED.map((r,i)=>({id:'s'+i, ...r, etc:'', price:tPrice(r.items), fee:tFee(r.village, r.items).total, status:'open', mine:false, sample:true, at:Date.now()-(i+1)*7*60000}));
+}
+function tAgo(t){ const m = Math.max(0, Math.round((Date.now()-t)/60000)); return m<1 ? '방금' : m<60 ? `${m}분 전` : `${Math.floor(m/60)}시간 전`; }
+const josaN = n => josa(n,'이','가').slice(String(n).length);
+
+function tStepsHTML(st){ const k = T_STATUS[st]; return `<div class="steps">${T_STEPS.map((s,i)=>`<span class="${i<k?'done':i===k?'on':''}">${s}</span>`).join('')}</div>`; }
+function tItemsText(r){ return [...r.items, ...(r.etc ? [r.etc] : [])].join('·'); }
+
+function renderTaxiForm(){
+  $('t-village').innerHTML = VILLAGES.filter(v=>v.name!==TOWN).map(v=>`<option>${v.name}</option>`).join('');
+  $('t-items').innerHTML = T_ITEMS.map((it,i)=>`<label><input type="checkbox" id="ti-${i}" value="${esc(it)}">${esc(it)}</label>`).join('');
+  const opts = VILLAGES.map(v=>`<option>${v.name}</option>`).join('');
+  $('d-from').innerHTML = opts; $('d-to').innerHTML = opts;
+  $('d-from').value = taxi.route.from; $('d-to').value = taxi.route.to;
+  tFeePreview();
+}
+function tPicked(){ return [...document.querySelectorAll('#t-items input:checked')].map(i=>i.value); }
+function tFeePreview(){
+  const items = tPicked(), v = $('t-village').value || '상리', f = tFee(v, items), price = tPrice(items) + ($('t-etc').value.trim() ? 5000 : 0);
+  $('t-fee').innerHTML = `<span>예상 물건값${items.length?'':' (물건을 골라 주세요)'}</span><b>${won(price)}</b>
+    <span>배달 수수료 · 기본 ${won(f.base)} + 거리 ${f.d.toFixed(1)}km ${won(f.dist)}${f.heavy?` + 무거운 물건 ${won(f.heavy)}`:''}</span><b>${won(f.total)}</b>
+    <div class="tot"><span>받을 때 내실 돈 (예상)</span><span>${won(price + f.total)}</span></div>`;
+  const warn = items.includes('농약');
+  $('t-warn').hidden = !warn;
+  if (warn) $('t-warn').textContent = '농약은 판매기록제 때문에 사용할 분의 이름·주소·연락처·작물명을 판매처에 알려야 합니다. 배달 기사에게 함께 전달됩니다.';
+}
+
+function renderTaxi(){
+  document.querySelectorAll('#taxi-role [data-role]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.role===taxi.role));
+  $('taxi-ask').hidden = taxi.role!=='ask'; $('taxi-drive').hidden = taxi.role!=='drive';
+  // 내 요청
+  const mine = taxi.reqs.filter(r=>r.mine).sort((a,b)=>b.at-a.at);
+  $('t-mine').innerHTML = mine.length ? mine.map(r=>`<div class="card call">
+      <div class="who"><b>${esc(tItemsText(r))}</b> 부탁</div>
+      ${tStepsHTML(r.status)}
+      <div class="meta"><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(r.due)}</span><span>${tAgo(r.at)}</span></div>
+      <div class="row2"><span>${r.status==='open' ? '근처 이웃이 확인하는 중이에요' : r.status==='done' ? '배달이 끝났어요. 물건값과 수수료를 전달해 주세요' : `<b>${esc(r.driver)}</b>님이 ${r.status==='accepted'?'수락했어요. 읍내에서 사서 갈게요':'물건을 샀어요. 곧 도착해요'}`}</span>
+        <span class="fee">${won(r.fee)}<small>수수료</small></span></div>
+      ${r.status==='open' ? `<div class="rowact"><button class="btn sm" type="button" data-tcancel="${r.id}">요청 취소</button></div>` : ''}
+    </div>`).join('') : '<div class="empty2">아직 부탁한 물건이 없습니다. 왼쪽에서 필요한 물건을 골라 이웃에게 부탁해 보세요.</div>';
+  // 기사 화면
+  const from = V(taxi.route.from), to = V(taxi.route.to);
+  const open = taxi.reqs.filter(r=>r.status==='open').map(r=>{ const v = V(r.village); const det = Math.max(0, road(from,v) + road(v,to) - road(from,to)); return {r, det}; }).sort((a,b)=>a.det-b.det);
+  $('d-open').textContent = open.length ? `${open.length}건 · 돌아오는 길에 가까운 순` : '';
+  $('d-calls').innerHTML = open.length ? open.map(({r,det})=>`<div class="card call${r.fresh?' new':''}">
+      ${r.sample?'<span class="ex">예시</span>':''}
+      <div class="who"><b>${esc(r.name)}</b>님이 <b>${esc(tItemsText(r))}</b> 배달을 요청하셨습니다</div>
+      <div class="meta"><span class="${det<1.5?'route-ok':'route-far'}">${det<0.1?'가는 길 그대로':det<1.5?`돌아오는 길 +${det.toFixed(1)}km`:`${det.toFixed(1)}km 돌아감`}</span><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(r.due)}</span><span>${tAgo(r.at)}</span></div>
+      <div class="buy">구매처 추천: ${esc(buyPlace(r.items))} · 물건값 약 ${won(r.price)}${r.items.includes('농약')?' · 농약 구매자 정보 필요':''}</div>
+      <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span><button class="btn dark" type="button" data-taccept="${r.id}">수락하기</button></div>
+    </div>`).join('') : '<div class="empty2">지금 들어온 부탁이 없습니다.</div>';
+  const my = taxi.reqs.filter(r=>r.driver==='나' && r.status!=='open').sort((a,b)=>T_STATUS[a.status]-T_STATUS[b.status]);
+  $('d-mine').innerHTML = my.length ? my.map(r=>`<div class="card call">
+      <div class="who"><b>${esc(r.name)}</b>님 · ${esc(tItemsText(r))}</div>
+      ${tStepsHTML(r.status)}
+      <div class="meta"><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(buyPlace(r.items))}에서 구매</span></div>
+      <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span>
+        ${r.status==='accepted'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">구매 완료</button>`:r.status==='bought'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">배달 완료</button>`:'<span class="badge ok">완료</span>'}</div>
+    </div>`).join('') : '<div class="empty2">수락한 배달이 없습니다. 오른쪽 부탁 중 돌아오는 길에 있는 것을 수락해 보세요.</div>';
+  const doneMine = taxi.reqs.filter(r=>r.driver==='나' && r.status==='done');
+  $('d-count').textContent = `${doneMine.length}건`; $('d-earn').textContent = won(doneMine.reduce((s,r)=>s+r.fee,0));
+  taxi.reqs.forEach(r=>{ delete r.fresh; });
+}
+function tSimulateAccept(id){
+  setTimeout(()=>{ const r = taxi.reqs.find(x=>x.id===id); if (!r || r.status!=='open') return;
+    r.status = 'accepted'; r.driver = '이웃 기사 박○○ (솔메리 → 귀가 중)'; tSave(); renderTaxi();
+    setTimeout(()=>{ const q = taxi.reqs.find(x=>x.id===id); if (q && q.status==='accepted' && q.driver!=='나'){ q.status = 'bought'; tSave(); renderTaxi(); } }, 9000);
+  }, 6000);
+}
+$('taxi-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  const items = tPicked(), etc = $('t-etc').value.trim(), name = $('t-name').value.trim() || '주민';
+  if (!items.length && !etc){ $('t-msg').textContent = '필요한 물건을 하나 이상 골라 주세요.'; return; }
+  const v = $('t-village').value, f = tFee(v, items);
+  const r = {id:'m'+(taxi.seq++), name, village:v, items, etc, due:$('t-due').value, drop:$('t-drop').value, price:tPrice(items)+(etc?5000:0), fee:f.total, status:'open', mine:true, fresh:true, at:Date.now()};
+  taxi.reqs.push(r); tSave();
+  document.querySelectorAll('#t-items input').forEach(i=>i.checked=false); $('t-etc').value = ''; tFeePreview();
+  $('t-msg').textContent = `${v} 쪽으로 돌아가는 이웃에게 알림을 보냈습니다. (시연: 잠시 뒤 수락됩니다)`;
+  renderTaxi(); tSimulateAccept(r.id);
+});
+$('taxi').addEventListener('input', e=>{ if (e.target.closest('#taxi-form')) tFeePreview(); });
+$('taxi').addEventListener('change', e=>{
+  if (e.target.closest('#taxi-form')) tFeePreview();
+  if (e.target.id==='d-from' || e.target.id==='d-to'){ taxi.route = {from:$('d-from').value, to:$('d-to').value}; tSave(); renderTaxi(); }
+});
+$('taxi').addEventListener('click', e=>{
+  const rb = e.target.closest('[data-role]'); if (rb){ taxi.role = rb.dataset.role; tSave(); renderTaxi(); return; }
+  const a = e.target.closest('[data-taccept]'); if (a){ const r = taxi.reqs.find(x=>x.id===a.dataset.taccept); if (r){ r.status='accepted'; r.driver='나'; tSave(); renderTaxi(); } return; }
+  const n = e.target.closest('[data-tnext]'); if (n){ const r = taxi.reqs.find(x=>x.id===n.dataset.tnext); if (r){ r.status = r.status==='accepted' ? 'bought' : 'done'; tSave(); renderTaxi(); } return; }
+  const c = e.target.closest('[data-tcancel]'); if (c){ taxi.reqs = taxi.reqs.filter(x=>x.id!==c.dataset.tcancel); tSave(); renderTaxi(); }
+});
+tLoad(); renderTaxiForm(); renderTaxi();
+setInterval(()=>{ if (!$('taxi').hidden) renderTaxi(); }, 60000);
 
 fromHash();
 </script>
