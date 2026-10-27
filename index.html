@@ -383,12 +383,15 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
 .lpin.sel.b{background:var(--b);color:#fff} .lpin.sel.o{background:var(--o);color:#fff} .lpin.sel.g{background:var(--g);color:#fff} .lpin.sel.r{background:var(--r);color:#fff} .lpin.sel.p{background:var(--p);color:#fff}
 .lfac{display:inline-block;transform:translateX(-50%);background:#2F5A45;color:#fff;font:700 12px/1 var(--f);padding:6px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .ltip{font:500 11px var(--f)}
+.region.live{color:#1A73E8;border-color:#1A73E8;background:#EEF4FD;display:inline-flex;align-items:center;gap:6px;white-space:normal;text-align:right}
+.region.live::before{content:"";width:7px;height:7px;border-radius:50%;background:#1A73E8;box-shadow:0 0 0 3px rgba(26,115,232,.2);flex:none}
 #res-tbl td:nth-child(3){white-space:nowrap}
 .gps{margin-top:14px;display:flex;flex-direction:column;gap:8px}
 .gps .btn{gap:6px}
 .gps-out .cnote{color:var(--adj);font-size:12px;margin:0}
 .gps-out .cm{margin:4px 0 0}
 .realmap .ovmap .mapwrap{grid-template-columns:minmax(0,1fr) auto}
+@media (max-width:600px){.ovmap .hd{flex-direction:column;align-items:flex-start}.ovmap .mapwrap,.realmap .ovmap .mapwrap{grid-template-columns:minmax(0,1fr)}.mlegend{flex-direction:row;flex-wrap:wrap;gap:8px 14px}.lmap{aspect-ratio:4/3.4}}
 @media (prefers-reduced-motion:no-preference){.track>span{transition:width .4s ease}}
 </style>
 </head>
@@ -435,7 +438,7 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
     <article class="card ovc store" id="ov-store"></article>
     <article class="card ovc" id="ov-plan"></article>
     <article class="card ovc ovmap">
-      <div class="hd"><div><h3>우리 지역의 생활서비스 현황</h3><p class="s">지도에서 주변의 기존 자원과 연계 가능한 생활서비스를 확인할 수 있습니다.</p></div><span class="region">전북 전주 · 예시</span></div>
+      <div class="hd"><div><h3 id="ov-map-title">우리 지역의 생활서비스 현황</h3><p class="s">지도에서 주변의 기존 자원과 연계 가능한 생활서비스를 확인할 수 있습니다.</p></div><span class="region" id="region-badge" aria-live="polite">전북 전주 · 예시</span></div>
       <div class="mapwrap">
         <svg class="map" id="map2" viewBox="0 0 220 210" role="img" aria-label="생활자원 지도"></svg>
         <div class="mlegend">
@@ -1341,28 +1344,66 @@ function renderRealMap(id, v, picks, compact){
       .bindPopup(`<b>${esc(r.name)}</b><br>${esc(r.owner||'마을')} · ${esc(r.days)}<br><span style="color:#9AA0A6">예시 데이터</span>`).addTo(layer);
   }
   L.marker(toLL(v), {icon:L.divIcon({className:'', html:`<span class="lfac">${esc(state.name||'가게')} 폐업 예정</span>`, iconSize:[0,0], iconAnchor:[0,34]})}).addTo(layer);
-  if (myPos) L.circleMarker(myPos, {radius:8, color:'#fff', weight:3, fillColor:'#1A73E8', fillOpacity:1}).bindTooltip('내 위치').addTo(layer);
+  LM[id].meMk = myPos ? L.circleMarker(myPos, {radius:8, color:'#fff', weight:3, fillColor:'#1A73E8', fillOpacity:1}).bindTooltip('내 위치').addTo(layer) : null;
 }
 function refreshMaps(){ Object.values(LM).forEach(m=>setTimeout(()=>m.map.invalidateSize(), 0)); }
 
+let watchId = null, firstFix = true, lastGeo = null, lastGeoAt = 0, geoBusy = false;
+const shortProv = s => String(s||'').replace(/^(전라북도|전북특별자치도)$/,'전북').replace(/^전라남도$/,'전남').replace(/^경상북도$/,'경북').replace(/^경상남도$/,'경남').replace(/^충청북도$/,'충북').replace(/^충청남도$/,'충남').replace(/^(강원도|강원특별자치도)$/,'강원').replace(/^경기도$/,'경기').replace(/^제주특별자치도$/,'제주').replace(/(특별시|광역시|특별자치시)$/,'');
+async function reverseGeo(){
+  if (!myPos) return;
+  if (geoBusy){ clearTimeout(reverseGeo.t); reverseGeo.t = setTimeout(reverseGeo, 1600); return; }
+  const now = Date.now();
+  if (lastGeo && hav(lastGeo, myPos) < 0.15 && now - lastGeoAt < 60000) return;   // 150m 이상 움직였거나 1분마다
+  if (now - lastGeoAt < 1500){ clearTimeout(reverseGeo.t); reverseGeo.t = setTimeout(reverseGeo, 1600 - (now - lastGeoAt)); return; }   // Nominatim 이용 정책: 초당 1회 이하
+  geoBusy = true; lastGeoAt = now; lastGeo = myPos.slice();
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${myPos[0]}&lon=${myPos[1]}&zoom=16&addressdetails=1&accept-language=ko`, {headers:{'Accept':'application/json'}});
+    if (!r.ok) throw new Error(r.status);
+    const a = (await r.json()).address || {};
+    const parts = [shortProv(a.province || a.state), a.city || a.county, a.city_district || a.borough || a.district, a.suburb || a.quarter || a.village || a.town || a.neighbourhood]
+      .filter(Boolean).filter((x,i,arr)=>arr.indexOf(x)===i);
+    setRegion(parts.length ? parts.join(' ') : null);
+  } catch(_){ setRegion(null); }
+  finally { geoBusy = false; }
+}
+function setRegion(label){
+  const el = $('region-badge');
+  el.classList.add('live');
+  el.textContent = label || `위도 ${myPos[0].toFixed(3)}, 경도 ${myPos[1].toFixed(3)}`;
+  el.title = '현재 위치 (실시간)';
+  const h = $('ov-map-title'); if (h && label) h.textContent = `${label.split(' ').slice(-1)[0]} 주변 생활서비스 현황`;
+}
+function renderNear(){
+  const out = $('gps-out');
+  const near = RES.map(r=>({r, d:hav(myPos, toLL(r.at))})).sort((a,b)=>a.d-b.d).slice(0,4);
+  const nv = VILLAGES.map(v=>({v, d:hav(myPos, toLL(v))})).sort((a,b)=>a.d-b.d)[0];
+  const far = nv.d > 30;
+  const pv = PRESETS.map(p=>({p, d:hav(myPos, toLL(V(p.village)))})).sort((a,b)=>a.d-b.d)[0];
+  out.innerHTML = (far ? `<p class="cnote">현재 위치가 시연 데이터 지역(전주 일대)에서 약 ${Math.round(nv.d)}km 떨어져 있습니다. 가장 가까운 예시 자원을 보여 줍니다.</p>` : '')
+    + `<div class="cm">${near.map(x=>`<div><b>${esc(x.r.name)}</b><span class="why">${x.d<1?Math.round(x.d*1000)+'m':x.d.toFixed(1)+'km'}</span><span class="s">${esc(x.r.days)}</span></div>`).join('')}</div>`
+    + `<div class="acts"><button type="button" data-near="${pv.p.village}">가까운 ${esc(pv.p.name)}(${esc(pv.p.village)}, ${pv.d.toFixed(1)}km) 폐업 시나리오 분석</button></div>`;
+}
+function stopLocate(btn){
+  if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+  watchId = null; btn.dataset.on = ''; btn.lastChild.textContent = '내 위치로 주변 자원 찾기';
+  $('region-badge').classList.remove('live');
+}
 function locateMe(btn){
   const out = $('gps-out');
+  if (watchId !== null){ stopLocate(btn); return; }
   if (!navigator.geolocation){ out.textContent = '이 브라우저는 위치 기능을 지원하지 않습니다.'; return; }
-  btn.disabled = true; out.textContent = '위치를 확인하는 중…';
-  navigator.geolocation.getCurrentPosition(pos=>{
-    btn.disabled = false;
+  out.textContent = '위치를 확인하는 중…'; firstFix = true;
+  btn.dataset.on = '1'; btn.lastChild.textContent = '위치 추적 끄기';
+  watchId = navigator.geolocation.watchPosition(pos=>{
     myPos = [pos.coords.latitude, pos.coords.longitude];
-    const near = RES.map(r=>({r, d:hav(myPos, toLL(r.at))})).sort((a,b)=>a.d-b.d).slice(0,4);
-    const nv = VILLAGES.map(v=>({v, d:hav(myPos, toLL(v))})).sort((a,b)=>a.d-b.d)[0];
-    const far = nv.d > 30;
-    out.innerHTML = (far ? `<p class="cnote">현재 위치가 시연 지역(전주 일대)에서 약 ${Math.round(nv.d)}km 떨어져 있습니다. 가장 가까운 예시 자원을 보여 줍니다.</p>` : '')
-      + `<div class="cm">${near.map(x=>{ const [ic,c] = KSTYLE[x.r.kind]; return `<div><b>${esc(x.r.name)}</b><span class="why">${x.d<1?Math.round(x.d*1000)+'m':x.d.toFixed(1)+'km'}</span><span class="s">${esc(x.r.days)}</span></div>`; }).join('')}</div>`
-      + (()=>{ const pv = PRESETS.map(p=>({p, d:hav(myPos, toLL(V(p.village)))})).sort((a,b)=>a.d-b.d)[0]; return `<div class="acts"><button type="button" data-near="${pv.p.village}">가까운 ${esc(pv.p.name)}(${esc(pv.p.village)}, ${pv.d.toFixed(1)}km) 폐업 시나리오 분석</button></div>`; })();
-    renderAll(); Object.values(LM).forEach(({map})=>map.fitBounds([myPos, ...RES.map(r=>toLL(r.at))], {padding:[18,18], maxZoom:14}));
+    renderNear(); reverseGeo();
+    if (firstFix){ firstFix = false; renderAll(); Object.values(LM).forEach(({map})=>map.fitBounds([myPos, ...RES.map(r=>toLL(r.at))], {padding:[18,18], maxZoom:14})); }
+    else Object.values(LM).forEach(m=>{ if (m.meMk) m.meMk.setLatLng(myPos); });
   }, err=>{
-    btn.disabled = false;
-    out.textContent = err.code===1 ? '위치 권한이 거부되었습니다. 브라우저 주소창의 자물쇠 아이콘에서 위치 권한을 허용해 주세요.' : '위치를 가져오지 못했습니다. 잠시 뒤 다시 시도해 주세요.';
-  }, {enableHighAccuracy:true, timeout:10000, maximumAge:60000});
+    if (err.code===1){ stopLocate(btn); out.textContent = '위치 권한이 거부되었습니다. 브라우저 주소창의 자물쇠 아이콘에서 위치 권한을 허용해 주세요.'; return; }
+    if (!myPos) out.textContent = '위치 신호를 기다리는 중입니다. 실외나 창가에서 더 빨리 잡힙니다.';   // 일시적 오류는 추적을 계속
+  }, {enableHighAccuracy:true, maximumAge:5000});
 }
 
 if (REALMAP){
