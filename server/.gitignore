@@ -11,3 +11,5 @@ train/
 submission/
 train_v2.bat
 data/
+llm_check.txt
+rag_eval.bat
