@@ -15,7 +15,7 @@ call "%VENV%\Scripts\activate"
 set PYTHONUTF8=1
 python -m pip install --upgrade pip
 echo [1/3] PyTorch (CUDA)
-pip install torch --index-url https://download.pytorch.org/whl/cu121
+pip install torch --index-url https://download.pytorch.org/whl/cu126
 echo [2/3] Server packages
 pip install -r requirements.txt
 echo [3/3] cloudflared (public address tunnel)
