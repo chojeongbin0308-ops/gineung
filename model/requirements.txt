@@ -1,4 +1,0 @@
-transformers>=4.40,<4.50
-onnx>=1.15
-onnxruntime>=1.17
-numpy<2.1

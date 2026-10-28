@@ -5,4 +5,10 @@ runs/
 # 관리자 열쇠 파일은 절대 올리지 않음
 gineung-admin-key-*.json
 *admin-key*.json
-runs/
+
+# 질문 이해 모델(학습 코드·데이터·사전)은 맥북에서만 관리 — 공개 저장소에 올리지 않음
+model/
+
+# AI Hub 방언 데이터는 재배포 금지
+*aihub*
+*AIHub*
