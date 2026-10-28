@@ -1819,14 +1819,58 @@ async function askServer(){
     return String(a);
   } finally { clearTimeout(t); }
 }
+
+/* ---------- 대화 기능: 부탁 목록 보기 · 대신 사다 달라기 · "응/아니" 이어받기 ---------- */
+const chatCtx = {pending:null};                 // {item} — "행복택시에 올릴까요?"에 대한 답을 기다리는 중
+const YES_RE = /^(응|어|네|예|넹|그래|좋아|좋지|해\s*줘|올려\s*줘|등록해\s*줘|부탁해|그려|그랴|잉)\s*[.!~]*$/;
+const NO_RE = /^(아니|아니요|아뇨|됐어|괜찮아|안\s*해|싫어|아녀)\s*[.!~]*$/;
+const BOARD_RE = /(요청|부탁|게시판|대행|택시).*(뭐|머|어떤|목록|보여|있어|있나|올라|들어온)|(뭐|머|어떤).*(요청|부탁).*(있|올라)/;
+const ERRAND_RE = /(사다\s*줘|사다\s*주|사다\s*줄|대신\s*사|심부름|대행|배달해\s*줘|갖다\s*줘|가져다\s*줘|부탁할게|부탁해|올려\s*줘|등록해\s*줘)/;
+const errandItem = t => t.replace(/(좀|혹시|누가|이웃이|대신|하나|한\s*개|사다\s*(줘|주세요|줄\s*사람|주실\s*분|주쇼|주라)?|심부름|대행|배달해\s*줘|갖다\s*줘|가져다\s*줘|부탁(할게|해|합니다)?|올려\s*줘|등록해\s*줘|해\s*줘|[?!.~,])/g, ' ').replace(/(을|를|이|가|은|는|도|만)\s*$/,'').replace(/\s+/g,' ').trim().slice(0,40);
+function boardAnswer(){
+  const open = tReqs().filter(r=>r.status==='open' && !r.mine).sort((a,b)=>b.at-a.at);
+  const mine = tReqs().filter(r=>r.mine && r.status!=='done');
+  return `<p>지금 행복택시에 들어온 부탁은 <b>${open.length}건</b>이에요${mine.length ? ` (내 부탁 진행 중 ${mine.length}건)` : ''}.</p>
+    ${open.length ? `<div class="aistores">${open.slice(0,3).map((r,i)=>`<div class="aistore"><span class="n">${i+1}</span><div><b>${esc(r.name)}</b>님 · ${esc(tItemsText(r))}<br><span class="addr">${esc(r.village)} · ${esc(r.due)}</span></div><span class="d">${won(r.fee)}</span><span class="btns"></span></div>`).join('')}</div>` : ''}
+    <div class="acts">${act('배달하러 가기','taxi')}</div>`;
+}
+function errandOffer(item){
+  chatCtx.pending = {item};
+  return `<p><b>‘${esc(item)}’</b> 행복택시에 부탁으로 올릴까요?</p><p class="muted">돌아오는 길의 이웃이 사다 드려요. “응” 또는 “아니”라고 답해 주세요.</p>
+    <div class="acts"><button class="btn dark sm" type="button" data-ask="응">응, 올려 줘</button><button class="btn sm" type="button" data-ask="아니">아니</button></div>`;
+}
+async function errandCreate(item){
+  const v = (AU.prof && AU.prof.village && V(AU.prof.village) && AU.prof.village !== TOWN) ? AU.prof.village : (taxi.route && taxi.route.to && taxi.route.to !== TOWN ? taxi.route.to : '상리');
+  const f = tFee(v, []), price = 5000, due = '오늘 저녁까지', drop = '집 앞';
+  if (tLive()){
+    await FB.F.addDoc(FB.F.collection(FB.db, 'taxiRequests'), {requester:AU.user.uid, nick:AU.prof.nick, village:v, items:[], etc:item, due, drop, price, fee:f.total, status:'open', driver:null, at:Date.now()});
+  } else {
+    const r = {id:'m'+(taxi.seq++), name:($('t-name').value.trim() || '주민'), village:v, items:[], etc:item, due, drop, price, fee:f.total, status:'open', mine:true, fresh:true, at:Date.now()};
+    taxi.reqs.push(r); tSave(); tSimulateAccept(r.id);
+  }
+  renderTaxi();
+  return `<p>✅ <b>‘${esc(item)}’</b> 부탁을 올렸어요. ${esc(v)} 쪽으로 돌아가는 이웃에게 알렸습니다.</p>
+    <p class="muted">배달 수수료 약 ${won(f.total)} + 물건값은 받을 때 드리면 돼요.${tLive() ? '' : ' (로그인하지 않아 이 기기에서만 보이는 시연 부탁이에요)'}</p>
+    <div class="acts">${act('내 부탁 보기','taxi')}</div>`;
+}
+async function dialogAnswer(text){
+  const t = text.trim();
+  if (chatCtx.pending && YES_RE.test(t)){ const item = chatCtx.pending.item; chatCtx.pending = null; try { return await errandCreate(item); } catch(e){ return `<p class="cnote">부탁을 올리지 못했어요: ${esc(errText(e))}</p>`; } }
+  if (chatCtx.pending && NO_RE.test(t)){ chatCtx.pending = null; return '<p>네, 알겠어요. 필요하시면 언제든 다시 말씀해 주세요.</p>'; }
+  chatCtx.pending = null;                       // 다른 질문을 하면 이전 제안은 취소
+  if (YES_RE.test(t) || NO_RE.test(t)) return '<p>무엇을 찾거나 부탁하실지 말씀해 주세요. 예: “두부 사다 줘”, “등본 어디서 떼?”, “행복택시 요청 뭐 있어?”</p>';
+  if (BOARD_RE.test(t)) return boardAnswer();
+  if (ERRAND_RE.test(t)){ const item = errandItem(t); if (item) return errandOffer(item); }
+  return null;
+}
 async function sendChat(text){
   text = String(text||'').trim(); if (!text || chatBusy) return;
   chatBusy = true; $('chat-send').disabled = true;
   addMsg('user', esc(text)); chatLog.push({role:'user', content:text});
   $('chat-input').value = ''; growInput();
   const typing = addMsg('bot', '<span class="typing" aria-label="답변 작성 중"><i></i><i></i><i></i></span>');
-  let html;
-  if (aiOn() && !NOT_FIND_RE.test(text) && !GREET_RE.test(text.trim()) && !findPreset(text)){
+  let html = await dialogAnswer(text);
+  if (!html && aiOn() && !NOT_FIND_RE.test(text) && !GREET_RE.test(text.trim()) && !findPreset(text)){
     try { html = await aiAnswer(text); } catch(e){ console.warn(e); aiCheck(); }
   }
   if (html){}
@@ -2262,6 +2306,7 @@ const kmText = d => d < 1 ? `${Math.round(d*1000/10)*10}m` : `${d.toFixed(1)}km`
 async function aiAnswer(text){
   const res = await aiFetch('/search', {method:'POST', body:JSON.stringify({text:text.slice(0,200)})}, 12000);
   AISRV.lastResult = {text, res};
+  chatCtx.pending = {item: errandItem(text.replace(/(어디서|어디|워디|엇다|파는|팔어|팔아|사려면|살라믄|사야|사러|살 ?수|살 ?데|있어|있나|있능가|가야|할 ?데|곳|데|디|어떻게|사$)/g,' ')) || text.slice(0,30)};
   const here = myPos || IMSIL_HALL, usingGps = !!myPos;
   const stores = (res.stores || []).filter(s=>Number.isFinite(s.lat) && Number.isFinite(s.lng));
   if (!stores.length) return null;
@@ -2281,7 +2326,7 @@ async function aiAnswer(text){
   return `<p><b>${esc(top)}</b>에 가시면 돼요. ${usingGps ? '가까운' : '임실군청에서 가까운'} 곳이에요.</p>
     <div class="aistores">${top3.map(card).join('')}</div>
     ${prog ? `<p class="aitip">ℹ️ <b>${esc(prog.name)}</b> · ${esc(prog.items[0])}</p>` : ''}
-    <p class="aiact"><button class="textlink" type="button" data-taxi-item="${esc(text.slice(0,40))}">직접 가기 어려우면 행복택시로 부탁하기 →</button></p>
+    <p class="aiact">직접 가기 어려우세요? <button class="textlink" type="button" data-ask="응">“응”이라고 하시면 행복택시에 부탁을 올려 드려요 →</button></p>
     <details class="aiwhy"><summary>근거·자세히 보기</summary><div><ul>${more}</ul>
       AI 분석: ${esc(AISRV.info?.model_version || '')} 의미 검색 · ${res.ms ?? '-'}ms · 가까운 업종·생활기능 ${cats.map(c=>`${esc(c.name)} ${Math.round(c.score*100)}%`).join(', ')}<br>
       ${usingGps ? '거리는 이 기기에서 계산했고 위치는 서버로 보내지 않았어요.' : '위치 기능을 켜면 내 주변 기준으로 알려 드려요(위치는 서버로 보내지 않음).'} 목록 등재는 현재 영업을 뜻하지 않으니 가기 전에 전화로 확인하세요.</div></details>`;
