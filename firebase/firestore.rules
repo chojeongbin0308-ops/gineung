@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+
+    // 관리자 명단: 본인이 관리자인지만 확인 가능, 등록·삭제는 콘솔에서만
+    match /admins/{uid} {
+      allow read: if isMe(uid);
+      allow write: if false;
+    }
+
+    // 관리자 공개키: 누구나 읽기(암호화용), 쓰기는 관리자만
+    match /config/publicKey {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 서비스 정보(별명·마을·역할·동의 기록): 본인만 읽고 쓰기, 관리자는 읽기
+    match /users/{uid} {
+      allow read: if isMe(uid) || isAdmin();
+      allow create, update: if isMe(uid);
+      allow delete: if isMe(uid);
+    }
+
+    // 개인정보 금고(암호화된 이름·이메일·전화): 본인은 쓰기·삭제만, 읽기는 관리자만
+    match /vault/{uid} {
+      allow create, update, delete: if isMe(uid);
+      allow read: if isAdmin();
+    }
+
+    // 행복택시 요청: 로그인한 사람만 보기, 본인 이름으로만 요청,
+    // 아직 아무도 안 받은 요청은 한 명만 수락 가능
+    match /taxiRequests/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.requester == request.auth.uid;
+      allow update: if signedIn() && (
+        resource.data.requester == request.auth.uid ||
+        resource.data.driver == request.auth.uid ||
+        (resource.data.driver == null && request.resource.data.driver == request.auth.uid)
+      );
+      allow delete: if signedIn() && resource.data.requester == request.auth.uid;
+    }
+
+    // 그 밖의 모든 데이터는 막음
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
