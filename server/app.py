@@ -18,7 +18,33 @@ from pydantic import BaseModel, Field
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, 'data')
-MODEL_NAME = os.getenv('GINEUNG_MODEL', 'jhgan/ko-sroberta-multitask')
+MODELS_DIR = os.path.join(HERE, 'models')
+BASE_MODEL = 'jhgan/ko-sroberta-multitask'
+
+
+def pick_model():
+    """models/current.txt 에 적힌 버전 폴더(models/v2 등)를 쓰고, 없으면 기본 ko-sroberta를 쓴다."""
+    if os.getenv('GINEUNG_MODEL'):
+        return os.getenv('GINEUNG_MODEL'), 'env', {}
+    cur = os.path.join(MODELS_DIR, 'current.txt')
+    if os.path.exists(cur):
+        ver = open(cur, encoding='utf-8').read().strip()
+        path = os.path.join(MODELS_DIR, ver)
+        if ver and os.path.isdir(path):
+            meta = {}
+            mp = os.path.join(path, 'metrics.json')
+            if os.path.exists(mp):
+                try:
+                    import json
+                    meta = json.load(open(mp, encoding='utf-8'))
+                except Exception:
+                    meta = {}
+            return path, ver, meta
+        print(f'[주의] models/current.txt 의 "{ver}" 폴더가 없어 기본 모델을 씁니다.')
+    return BASE_MODEL, 'v1-base', {}
+
+
+MODEL_NAME, MODEL_VER, MODEL_META = pick_model()
 REGION = os.getenv('GINEUNG_REGION', '임실군')
 ORIGINS = ['https://chojeongbin0308-ops.github.io', 'http://localhost:8787', 'http://127.0.0.1:8787']
 RATE_PER_MIN = int(os.getenv('GINEUNG_RATE', '30'))
@@ -72,7 +98,7 @@ class Engine:
         self.df, files = load_stores()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.gpu = torch.cuda.get_device_name(0) if self.device == 'cuda' else ''
-        print(f'[모델] {MODEL_NAME} 불러오는 중 ({self.device}{" · " + self.gpu if self.gpu else ""})')
+        print(f'[모델] {MODEL_VER} · {MODEL_NAME} 불러오는 중 ({self.device}{" · " + self.gpu if self.gpu else ""})')
         self.model = SentenceTransformer(MODEL_NAME, device=self.device)
         self.cats = sorted(self.df['cat'].unique().tolist())
         key = hashlib.sha1((MODEL_NAME + REGION + '|'.join(f'{f}:{os.path.getmtime(f)}' for f in files)).encode()).hexdigest()[:12]
@@ -152,7 +178,8 @@ class Ask(BaseModel):
 @app.get('/health')
 def health():
     ms = list(stats['ms'])
-    return {'ok': engine is not None, 'service': 'gineung-ai', 'version': VERSION, 'model': MODEL_NAME,
+    return {'ok': engine is not None, 'service': 'gineung-ai', 'version': VERSION, 'model': BASE_MODEL if MODEL_VER == 'v1-base' else os.path.basename(MODEL_NAME), 'model_version': MODEL_VER,
+            'model_score': {k: MODEL_META[k] for k in ('top1', 'top3', 'dialect_top1', 'test_set') if k in MODEL_META},
             'device': engine.device if engine else '', 'gpu': engine.gpu if engine else '', 'region': REGION,
             'stores': len(engine.df) if engine else 0, 'categories': len(engine.cats) if engine else 0,
             'uptime_s': int(time.time() - started), 'requests_total': stats['total'], 'requests_today': stats['today'],

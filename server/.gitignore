@@ -3,3 +3,4 @@ data/cache_*.npz
 .venv/
 bin/
 current_url.txt
+models/*/

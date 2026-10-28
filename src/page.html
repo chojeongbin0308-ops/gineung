@@ -2301,7 +2301,7 @@ function renderStatus(){
     <div class="card stm"><span class="lbl">응답 속도</span><b>${AISRV.ms!=null ? AISRV.ms+'ms' : '-'}</b><small>상태 확인 왕복</small></div>
     <div class="card stm"><span class="lbl">켜진 지</span><b>${aiOn() ? fmtDur(i.uptime_s) : '-'}</b><small>서버 기준</small></div>
     <div class="card stm"><span class="lbl">오늘 처리한 질문</span><b>${aiOn() ? (i.requests_today ?? 0)+'건' : '-'}</b><small>누적 ${aiOn() ? (i.requests_total ?? 0) : '-'}건 · 평균 ${aiOn() && i.avg_ms!=null ? i.avg_ms+'ms' : '-'}</small></div>
-    <div class="card stm"><span class="lbl">모델</span><b class="sm">${esc(i.model || '-')}</b><small>${aiOn() ? (i.device==='cuda' ? 'GPU · '+esc(i.gpu) : 'CPU') : ''}</small></div>
+    <div class="card stm"><span class="lbl">모델 ${aiOn() && i.model_version ? '· '+esc(i.model_version) : ''}</span><b class="sm">${esc(i.model || '-')}</b><small>${aiOn() ? (i.device==='cuda' ? 'GPU · '+esc(i.gpu) : 'CPU') : ''}${aiOn() && i.model_score && i.model_score.top1!=null ? ` · 시험 정확도 ${Math.round(i.model_score.top1*100)}%` : ''}</small></div>
     <div class="card stm"><span class="lbl">상가 데이터</span><b>${aiOn() ? esc(i.region)+' '+(i.stores||0).toLocaleString('ko-KR')+'곳' : '-'}</b><small>업종 ${aiOn() ? i.categories : '-'}개</small></div>
   </div>
   <div class="card sthist"><div class="hd"><span class="lbl">이 화면을 연 뒤 기록 (15초마다 확인)</span><span class="lbl">${n ? `가동률 ${Math.round(ok/n*100)}% · 마지막 확인 ${tAgo(AISRV.last)}` : ''}</span></div>
