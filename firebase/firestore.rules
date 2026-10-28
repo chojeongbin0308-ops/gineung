@@ -27,6 +27,16 @@ service cloud.firestore {
         && request.resource.data.by == request.auth.uid;
     }
 
+    // AI 서버 주소: 누구나 읽기(사이트가 연결용으로 사용), 쓰기는 관리자만, https 주소만
+    match /config/modelServer {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['url', 'updatedAt', 'by'])
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.url is string && request.resource.data.url.size() <= 200
+        && (request.resource.data.url == '' || request.resource.data.url.matches('^https://[A-Za-z0-9.-]+(:[0-9]+)?(/[A-Za-z0-9._/-]*)?$'));
+    }
+
     // 서비스 정보(별명·마을·동의 기록): 본인만 읽고 쓰기, 관리자는 읽기
     function userShape() {
       let d = request.resource.data;
