@@ -14,7 +14,7 @@ ollama list
 ollama list > llm_check.txt 2>&1
 echo.
 echo Quick test:
-ollama run %MODEL% "임실군 주민에게 인사 한 문장" 
+ollama run %MODEL% "Say hello to a resident of Imsil county in one short Korean sentence."
 echo.
 echo Done. Restart start_server.bat - the server will use this model for RAG answers.
 pause
