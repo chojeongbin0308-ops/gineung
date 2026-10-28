@@ -2,7 +2,8 @@
 REM === Gineung AI server: start (keep this window open) ===
 cd /d "%~dp0"
 title Gineung AI server
-call .venv\Scripts\activate
+if "%VENV%"=="" set VENV=%USERPROFILE%\gineung-venv
+call "%VENV%\Scripts\activate"
 set PYTHONUTF8=1
 :loop
 python run.py

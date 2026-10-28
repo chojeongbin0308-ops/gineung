@@ -7,8 +7,10 @@ if "%PY%"=="" if exist "%USERPROFILE%\anaconda3\python.exe" set PY="%USERPROFILE
 if "%PY%"=="" if exist "%ProgramData%\anaconda3\python.exe" set PY="%ProgramData%\anaconda3\python.exe"
 if "%PY%"=="" (echo [!] Python not found. Install Python 3.11 from python.org and CHECK "Add python.exe to PATH", then run this again. & pause & exit /b 1)
 echo Using Python: %PY%
-if not exist .venv %PY% -m venv .venv
-call .venv\Scripts\activate
+set VENV=%USERPROFILE%\gineung-venv
+if not exist "%VENV%" %PY% -m venv "%VENV%"
+if "%VENV%"=="" set VENV=%USERPROFILE%\gineung-venv
+call "%VENV%\Scripts\activate"
 set PYTHONUTF8=1
 python -m pip install --upgrade pip
 echo [1/3] PyTorch (CUDA)
