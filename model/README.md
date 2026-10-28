@@ -13,7 +13,10 @@ AI 상담 질문에서 **의도 · 개체(가게/마을/물건) · 물건 분류
 
 | 파일 | 내용 |
 |---|---|
-| `schema.json` | 의도 11개, 개체 3종, 물건 분류 9종 정의 |
+| `schema.json` | v0.2 — 의도 11개, 개체 3종, 물건 분류 16종(+none), 분류→상가 업종 낱말(`shop_keywords`), 분류→사이트 생활기능(`to_site_function`) |
+| `lexicon/items.csv` | 물건 사전 473개 (분류·split). split=test 물건은 학습에 안 나옴 |
+| `lexicon/imsil_places.json` | 임실군 1읍 11면 131리. 덕치면·지사면은 시험 전용 |
+| `data/human_collect_form.csv` | 팀원이 사람 문장을 모으는 양식 (text, intent, item, writer 네 칸만) |
 | `make_dataset.py` | 문장 틀 × 어휘 × 말투 변형(전라도 어미, 띄어쓰기 생략 등)으로 학습 데이터 생성 |
 | `data/human_test.csv` | **사람이 쓴 시험 문장.** 팀원이 계속 추가해 주세요 (현재 30개는 예시) |
 | `human_to_jsonl.py` | 위 CSV를 시험 형식으로 변환 |
@@ -24,23 +27,26 @@ AI 상담 질문에서 **의도 · 개체(가게/마을/물건) · 물건 분류
 ## 시험지 설계
 
 - `test_seen`: 학습과 같은 문장 틀 (쉬움, 참고용)
-- `test_unseen`: **학습에 없는 문장 틀 + 처음 보는 물건·가게·마을** (예: 모짜렐라, 정구지, 풀약, 봉동)
+- `test_unseen`: **학습에 없는 문장 틀 + 처음 보는 물건·가게·마을** (예: 정구지, 풀약, 두꺼비집, 덕치면·지사면의 마을)
 - `human_test`: 사람이 쓴 문장 — 최종 성능은 이것으로 판단합니다
 
-## 현재 기준선 (규칙 방식)
+## 현재 기준선 (규칙 방식, schema v0.2)
 
 | 시험지 | 의도 정확도 | 물건 분류 정확도 |
 |---|---|---|
-| test_seen | 0.577 | 0.481 |
-| test_unseen | 0.122 | 0.124 |
-| human_test (예시 30문장) | 0.433 | 0.688 |
+| test_seen (869문장) | 0.503 | 0.221 |
+| test_unseen (434문장) | 0.143 | 0.175 |
+| human_test (30문장) | 0.433 | 0.750 |
 
-규칙 방식에는 `find`(주변 가게 찾기), `taxi`(행복택시 부탁) 의도가 아예 없어서 점수가 더 낮게 나옵니다.
+규칙 방식에는 `find`(주변 가게 찾기), `taxi`(행복택시 부탁) 의도가 아예 없고, 키워드 사전이 작아서 16개 분류 중 상당수를 못 맞힙니다.
 
 ## 사람이 쓴 시험 문장 추가하는 법
 
 `data/human_test.csv`에 한 줄씩 추가합니다. 칸: `text,intent,shop,village,item,item_cat,writer`
 - `intent`: buy · find · taxi · loss · plan · gap · resources · supply · license · process · other
 - `shop`·`village`·`item`: 문장 속에 **그대로 나온 글자**만 적고, 없으면 비워 둡니다
-- `item_cat`: daily · fresh · heavy · urgent · agri · seed · advice · pickup · none
+- `item_cat`: grocery · fresh · produce · meat · seafood · bakery · drink · grain · fuel · hardware · household · pharmacy · agri_chem · agri_supply · advice · pickup · none
+  (비워 두면 `lexicon/items.csv`에서 물건 이름으로 자동으로 채웁니다)
+
+팀원에게는 `data/human_collect_form.csv`(문장·의도·물건·작성자 4칸)만 나눠 주고, 모이면 `human_test.csv`에 붙이면 됩니다.
 - 어르신 말투, 사투리, 오타, 띄어쓰기 없는 문장을 많이 넣을수록 좋습니다

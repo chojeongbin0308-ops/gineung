@@ -13,65 +13,68 @@ import json, random, re, os, collections
 SEED = 20261028
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-# ── 어휘 ─────────────────────────────────────────────────────────────
-# (표면형, 분류, 'train' | 'test')  test = 학습에 절대 나오지 않는 물건
-ITEMS = [
- # 생필품
- ('세제','daily','train'),('가루세제','daily','train'),('섬유유연제','daily','test'),('휴지','daily','train'),('두루마리 휴지','daily','train'),
- ('키친타월','daily','test'),('라면','daily','train'),('컵라면','daily','train'),('간장','daily','train'),('된장','daily','train'),('고추장','daily','train'),
- ('식용유','daily','train'),('설탕','daily','train'),('소금','daily','train'),('참기름','daily','train'),('밀가루','daily','train'),('밀가리','daily','train'),
- ('비누','daily','train'),('샴푸','daily','train'),('치약','daily','train'),('칫솔','daily','train'),('고무장갑','daily','test'),('쓰레기봉투','daily','train'),
- ('통조림','daily','train'),('참치캔','daily','test'),('커피믹스','daily','train'),('과자','daily','train'),('국수','daily','test'),
- # 신선식품
- ('두부','fresh','train'),('계란','fresh','train'),('달걀','fresh','train'),('우유','fresh','train'),('치즈','fresh','train'),('요구르트','fresh','test'),
- ('콩나물','fresh','train'),('대파','fresh','train'),('양파','fresh','train'),('감자','fresh','train'),('사과','fresh','train'),('배추','fresh','train'),
- ('무','fresh','train'),('생선','fresh','train'),('고등어','fresh','test'),('돼지고기','fresh','train'),('소고기','fresh','train'),('닭고기','fresh','train'),
- ('어묵','fresh','train'),('부추','fresh','train'),('정구지','fresh','test'),('버섯','fresh','test'),('바나나','fresh','train'),('떡','fresh','train'),
- ('식빵','fresh','test'),('모짜렐라','fresh','test'),
- # 무거운 물건
- ('쌀','heavy','train'),('쌀 20키로','heavy','train'),('생수','heavy','train'),('생수 한 박스','heavy','train'),('부탄가스','heavy','train'),
- ('연탄','heavy','train'),('등유','heavy','test'),('밀가루 한 포대','heavy','train'),
- # 급한 물건
- ('건전지','urgent','train'),('전구','urgent','train'),('형광등','urgent','test'),('음료수','urgent','train'),('콜라','urgent','train'),('사이다','urgent','train'),
- ('담배','urgent','train'),('소주','urgent','train'),('막걸리','urgent','test'),('라이터','urgent','train'),
- # 농약·비료
- ('농약','agri','train'),('고추약','agri','train'),('살충제','agri','train'),('살균제','agri','train'),('제초제','agri','train'),('풀약','agri','test'),
- ('비료','agri','train'),('복합비료','agri','train'),('요소비료','agri','test'),('퇴비','agri','train'),('상토','agri','train'),
- # 종자·농자재
- ('종자','seed','train'),('씨앗','seed','train'),('볍씨','seed','train'),('고추 모종','seed','train'),('모종','seed','train'),('비닐','seed','train'),
- ('멀칭 비닐','seed','test'),('호미','seed','train'),('장화','seed','train'),('고무호스','seed','train'),('차광망','seed','test'),
- # 병해충 상담
- ('병해충','advice','train'),('탄저병','advice','train'),('진딧물','advice','test'),('벌레','advice','train'),('고추 병','advice','train'),('잎마름병','advice','train'),
- # 택배
- ('택배','pickup','train'),('소포','pickup','train'),('등기','pickup','test'),('주문한 물건','pickup','train'),
-]
-SHOPS = [('상리상회','train'),('덕곡슈퍼','train'),('구룡상회','train'),('하리농약사','train'),('새터상회','train'),('동네 가게','train'),('마을 가게','train'),
-         ('우리 동네 슈퍼','train'),('점빵','train'),('구판장','train'),('할매네 가게','train'),('농약방','train'),('농약사','train'),
-         ('솔메슈퍼','test'),('아랫마을 점방','test'),('김씨네 가게','test'),('새터농약방','test')]
-VILLAGES = [('상리','train'),('하리','train'),('덕곡리','train'),('구룡리','train'),('새터','train'),('솔메리','train'),('우리 마을','train'),
-            ('윗마을','train'),('아랫마을','train'),('읍내','train'),('신평리','test'),('월곡리','test'),('앞마을','test'),('봉동','test')]
+# ── 어휘 (lexicon/ 폴더에서 읽음) ─────────────────────────────────────
+# items.csv : item,cat,split   (split=test 인 물건은 학습에 절대 나오지 않음)
+# imsil_places.json : 임실군 1읍 11면 131리. test_myeon 의 읍면·리는 시험 전용
+import csv
+LEX = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lexicon')
+ITEMS = [(r['item'], r['cat'], r['split']) for r in csv.DictReader(open(os.path.join(LEX, 'items.csv'), encoding='utf-8'))]
+PL = json.load(open(os.path.join(LEX, 'imsil_places.json'), encoding='utf-8'))
+
+def _places():
+    vills, stems = [], []
+    for myeon, ris in PL['myeon'].items():
+        sp = 'test' if myeon in PL['test_myeon'] else 'train'
+        short = myeon[:-1]                                 # 관촌면 → 관촌
+        vills += [(myeon, sp), (short, sp)]
+        stems.append((short, sp))
+        for ri in ris:
+            vills.append((ri, sp))                         # 상월리
+            vills.append((f'{myeon} {ri}', sp))            # 관촌면 상월리
+            if len(ri) >= 3: stems.append((ri[:-1], sp))   # 상월
+    vills += [(x, 'train') for x in PL['common_train']] + [(x, 'test') for x in PL['common_test']]
+    return list(dict.fromkeys(vills)), list(dict.fromkeys(stems))
+VILLAGES, _STEMS = _places()
+
+# 가상 가게 이름 = 지명 앞부분 + 업종 꼬리 (상월상회, 오수농약사 …) + 동네에서 부르는 말
+SHOP_TAILS = ['상회', '슈퍼', '마트', '점방', '농약사', '농약방', '철물', '정육점', '약방', '떡집', '종묘사']
+def _shops(rng):
+    out = []
+    for stem, sp in _STEMS:
+        for tail in rng.sample(SHOP_TAILS, 3): out.append((stem + tail, sp))
+    out += [(x, 'train') for x in ['동네 가게', '마을 가게', '우리 동네 슈퍼', '점빵', '구판장', '할매네 가게', '농약방', '농약사', '철물점', '방앗간', '하나로마트']]
+    out += [(x, 'test') for x in ['아랫마을 점방', '김씨네 가게', '박씨 철물', '이장님네 가게']]
+    return list(dict.fromkeys(out))
+SHOPS = _shops(random.Random(SEED))
 
 # 의도별로 그럴듯한 물건 분류
+GOODS = ['grocery','fresh','produce','meat','seafood','bakery','drink','grain','fuel','hardware','household','pharmacy','agri_chem','agri_supply']
 INTENT_CATS = {
- 'buy': ['daily','fresh','heavy','urgent','agri','seed'], 'find': ['daily','fresh','heavy','urgent','agri','seed'],
- 'taxi': ['daily','fresh','heavy','urgent'], 'license': ['agri'], 'supply': ['agri','seed','daily','fresh'],
+ 'buy': GOODS, 'find': GOODS,
+ 'taxi': ['grocery','fresh','produce','meat','seafood','bakery','drink','grain','hardware','household','pharmacy','pickup'],
+ 'supply': GOODS,
+ # 실제로 판매 자격·신고가 필요한 업종 (농약판매업, 담배소매인·주류, 상비의약품, 식육판매업, LPG 판매)
+ 'license': ['agri_chem','drink','pharmacy','meat','fuel'],
 }
 
 # ── 문장 틀 ──────────────────────────────────────────────────────────
 # {S}=가게 {V}=마을 {I}=물건.  '#'으로 시작하는 틀은 시험 전용(학습에 안 씀)
 T = {
 'buy': [
+ '{I} 떨어졌는데 어디 가서 사', '{V}에는 {I} 파는 데가 없어', '{S} 닫으면 {I} 사러 읍내까지 가야 돼?', '{I} 사야 되는데 차가 없어',
  '{S} 문 닫으면 {I}는 어디서 사?', '{S} 없어지면 {I} 어떻게 사요', '{V}에서 {I} 이제 어디서 사야 돼?', '{S} 닫은 뒤에 {I} 살 데 있어?',
  '{I} 사려면 어떻게 해야 해', '{I} 어디서 사요?', '{S}가 없어지면 {I}는 누가 팔아?', '{V} 사는데 {I} 살 곳이 없어',
  '앞으로 {I} 어디서 구해야 돼요', '{S} 폐업하면 {I} 사러 어디 가?', '{I} 살라면 어디로 가야 되나', '{S} 그만두면 {I}는 어쩌나',
  '#{S} 장사 접으면 {I}는 뭐 어디 가서 사', '#{I} 구할 데가 이제 어디여', '#{V} 사람들은 {I} 어디서 사게 되나요',
 ],
 'find': [
+ '{I} 파는 데 찾아 줘', '{I} 어디 있어?', '500미터 안에 {I} 파는 가게', '걸어서 갈 만한 데 {I} 파는 곳', '{V} 근처 {I} 가게 알려 줘', '{I} 살 수 있는 가게 지도에 보여 줘', '지금 문 연 데 {I} 파는 곳', '{I} 파는 데 제일 가까운 거', '#{I} 어디 가믄 있을랑가', '#여기 근처 {I} 취급하는 데',
  '{I} 찾아줘', '근처에 {I} 파는 데 있어?', '{I} 파는 가게 알려줘', '주변에 {I} 살 수 있는 곳', '가까운 데 {I} 있나', '{V}에 {I} 파는 곳 있어?',
  '여기서 제일 가까운 {I} 파는 데', '{I} 어디 파는지 찾아 줘요', '내 근처 {I} 가게', '1키로 안에 {I} 파는 곳',
  '#{I} 파는 집 가까이 있능가', '#지금 있는 데서 {I} 살 만한 가게 좀', '#{I} 근방에 파는 데 없나',
 ],
 'taxi': [
+ '{I} 좀 사다 주실 분', '장 보러 가는 사람 {I} 부탁해요', '{I} 사 올 사람 구해요', '#{V} 가는 길에 {I} 좀 들려 줄 사람',
  '{I} 좀 사다 줘', '{I} 사다 줄 사람 있어?', '읍내 가는 사람 {I} 좀 부탁해요', '{I} 배달 부탁할게', '{I} 하나만 대신 사다 주세요',
  '{V}로 {I} 좀 갖다 줄 수 있어?', '돌아오는 길에 {I} 사다 줄 수 있나', '행복택시로 {I} 부탁해', '{I} 심부름 해 줄 사람',
  '#{I} 좀 대신 사 오면 수고비 드릴게', '#나가는 김에 {I} 하나 사다 주쇼', '#{I} 사서 {V}까지 좀 가져다줘',
@@ -97,11 +100,13 @@ T = {
  '#{V} 쪽에 들어오는 차나 배달 뭐 있소', '#{V}에서 쓸 만한 시설',
 ],
 'supply': [
+ '{I} 도매로 어디서 받아', '#{I} 대 주던 데가 어디랑가',
  '{S} 유통망 알려줘', '{S} 거래처 어디야', '{S} 공급처는 누가 이어받아?', '{S}는 {I} 어디서 받아 왔어?', '{S} 도매상 어디야',
  '{S} 물건 들여오던 데', '{S} 납품 받던 곳 이어받으려면', '{S} 유통망 누가 이어받으면 좋아', '{I} 공급처 알려줘', '{S} 거래하던 대리점',
  '#{S} 사장님이 {I} 떼 오던 데가 어디여', '#{S} 물건 받던 길 그대로 하려면',
 ],
 'license': [
+ '{I} 팔려면 신고해야 돼?', '{I} 판매하려면 뭐가 필요해', '#{I} 받아다 팔면 허가 있어야 되나',
  '{I} 팔려면 무슨 자격 필요해?', '{S} 이어받으려면 어떤 자격이 필요해', '{I} 판매 등록 어떻게 해', '{I} 가게 하려면 허가 필요해?',
  '{S} 인수하려면 등록해야 돼?', '{I} 판매관리인 교육 받아야 해?', '{S} 이어서 하려면 인허가 뭐 필요해', '{I} 장사 시작하려면 뭐 해야 돼',
  '#{I} 장사하려면 신고해야 되나', '#{S} 내가 맡아서 하면 서류 뭐 필요해',
@@ -193,8 +198,6 @@ def build(split_mode, n_per_tpl, rng):
                 cats = INTENT_CATS.get(intent)
                 if intent in ('gap','loss','plan','resources','process','other') or '{I}' not in tpl:
                     pool = items
-                elif intent == 'license':
-                    pool = [x for x in items if x[1] in ('agri',)] or items
                 else:
                     pool = [x for x in items if (cats is None or x[1] in cats)]
                 it = rng.choice(pool)
@@ -212,6 +215,15 @@ def build(split_mode, n_per_tpl, rng):
         for _ in range(n_per_tpl):
             it = rng.choice(adv); text, spans = render(tpl, {'I':(it[0],'ITEM')}); text, spans = vary(josa_fix(text, spans), spans, rng)
             rows.append({'text':text,'intent':'buy','entities':[{'start':s,'end':e,'label':l} for s,e,l in spans],'item_cat':'advice'})
+    # 택배·우편: 받거나 부칠 곳을 묻는 질문 (예: 상월상회 닫으면 택배는 어디서 받아?)
+    pk = [x for x in items if x[1]=='pickup']
+    pk_t = ['{S} 닫으면 {I}는 어디서 받아?', '{I} 맡아 줄 데 없어?', '{I} 어디서 부쳐', '{I} 받을 데가 없어', '{V}에 {I} 받아 주는 곳 있어?', '{I} 보내려면 어디 가'] \
+        if split_mode!='unseen' else ['{I} 오면 누가 받아 주능가', '{S} 없어지믄 {I}는 어디로 오나']
+    for tpl in pk_t:
+        for _ in range(n_per_tpl):
+            it = rng.choice(pk); fill = {'S': (rng.choice(shops)[0], 'SHOP'), 'V': (rng.choice(vills)[0], 'VILLAGE'), 'I': (it[0], 'ITEM')}
+            text, spans = render(tpl, fill); text, spans = vary(josa_fix(text, spans), spans, rng)
+            rows.append({'text':text,'intent':'buy','entities':[{'start':s,'end':e,'label':l} for s,e,l in spans],'item_cat':'pickup'})
     return rows
 
 def dedup(rows):
@@ -224,13 +236,13 @@ def dedup(rows):
 def main():
     rng = random.Random(SEED)
     os.makedirs(OUT, exist_ok=True)
-    seen_rows = dedup(build('seen', 70, rng)); rng.shuffle(seen_rows)
+    seen_rows = dedup(build('seen', 95, rng)); rng.shuffle(seen_rows)
     n = len(seen_rows); n_val = n_test = int(n*.08)
     splits = {'train': seen_rows[n_val+n_test:], 'valid': seen_rows[:n_val], 'test_seen': seen_rows[n_val:n_val+n_test]}
     tr = set(r['text'] for r in splits['train'])
     splits['valid'] = [r for r in splits['valid'] if r['text'] not in tr]
     splits['test_seen'] = [r for r in splits['test_seen'] if r['text'] not in tr]
-    unseen = dedup(build('unseen', 12, rng)); rng.shuffle(unseen)
+    unseen = dedup(build('unseen', 14, rng)); rng.shuffle(unseen)
     splits['test_unseen'] = [r for r in unseen if r['text'] not in tr]
     for k,v in splits.items():
         with open(os.path.join(OUT, f'{k}.jsonl'),'w',encoding='utf-8') as f:

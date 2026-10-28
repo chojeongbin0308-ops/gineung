@@ -4,10 +4,12 @@
 import json, re, os, collections
 D = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-ITEM_KW = [(r'농약|살충|살균|제초', 'agri'), (r'비료|상토|퇴비', 'agri'), (r'종자|씨앗|모종|비닐|농자재', 'seed'),
-           (r'두부|계란|달걀|우유|채소|야채|과일|콩나물|신선', 'fresh'), (r'쌀|생수|부탄|가스|연탄|무거운', 'heavy'),
-           (r'휴지|세제|라면|조미료|생필품|통조림|생활용품', 'daily'), (r'건전지|전구|급한|담배|음료', 'urgent'),
-           (r'택배|소포|주문품', 'pickup'), (r'병해충|병이|벌레|처방|어떤 약|무슨 약', 'advice')]
+# 사이트의 키워드 규칙을 schema v0.2 분류로 옮긴 것 (키워드 수준은 v0.1과 같게 유지 — 공정한 기준선)
+ITEM_KW = [(r'농약|살충|살균|제초|비료|상토|퇴비', 'agri_chem'), (r'종자|씨앗|모종|비닐|농자재', 'agri_supply'),
+           (r'병해충|병이|벌레|처방|어떤 약|무슨 약', 'advice'), (r'택배|소포|주문품', 'pickup'),
+           (r'두부|계란|달걀|우유|치즈|신선', 'fresh'), (r'채소|야채|과일|콩나물', 'produce'), (r'고기|정육', 'meat'), (r'생선|수산', 'seafood'),
+           (r'쌀|잡곡', 'grain'), (r'부탄|가스|연탄|등유', 'fuel'), (r'생수|음료|담배|술', 'drink'),
+           (r'건전지|전구', 'hardware'), (r'휴지|세제|라면|조미료|생필품|통조림|생활용품', 'grocery'), (r'약국|상비약|파스', 'pharmacy')]
 def item_of(q):
     for pat, cat in ITEM_KW:
         if re.search(pat, q): return cat

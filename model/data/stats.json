@@ -1,66 +1,66 @@
 {
  "train": {
-  "n": 4737,
+  "n": 9130,
   "intents": {
-   "buy": 853,
-   "supply": 460,
-   "loss": 368,
-   "process": 266,
-   "license": 375,
-   "find": 554,
-   "plan": 452,
-   "taxi": 475,
-   "gap": 343,
-   "resources": 405,
-   "other": 186
+   "find": 1400,
+   "license": 732,
+   "buy": 1824,
+   "resources": 698,
+   "process": 408,
+   "taxi": 945,
+   "plan": 795,
+   "other": 203,
+   "loss": 622,
+   "supply": 885,
+   "gap": 618
   }
  },
  "valid": {
-  "n": 451,
+  "n": 869,
   "intents": {
-   "find": 63,
-   "license": 30,
-   "taxi": 51,
-   "loss": 28,
-   "supply": 39,
-   "buy": 73,
-   "process": 29,
-   "plan": 48,
-   "resources": 39,
-   "gap": 34,
-   "other": 17
+   "find": 141,
+   "buy": 188,
+   "plan": 63,
+   "resources": 66,
+   "taxi": 84,
+   "license": 90,
+   "supply": 70,
+   "loss": 58,
+   "process": 33,
+   "other": 17,
+   "gap": 59
   }
  },
  "test_seen": {
-  "n": 451,
+  "n": 869,
   "intents": {
-   "find": 53,
-   "process": 33,
-   "resources": 36,
-   "plan": 38,
-   "buy": 75,
-   "gap": 32,
-   "other": 10,
-   "taxi": 52,
-   "license": 43,
-   "loss": 34,
-   "supply": 45
+   "taxi": 85,
+   "plan": 76,
+   "other": 26,
+   "find": 132,
+   "supply": 76,
+   "gap": 59,
+   "resources": 71,
+   "process": 40,
+   "buy": 169,
+   "loss": 61,
+   "license": 74
   }
  },
  "test_unseen": {
-  "n": 254,
+  "n": 434,
   "intents": {
-   "taxi": 33,
-   "find": 33,
-   "buy": 45,
-   "license": 19,
-   "resources": 21,
-   "loss": 18,
-   "process": 15,
-   "supply": 18,
-   "gap": 20,
-   "plan": 20,
-   "other": 12
+   "gap": 28,
+   "buy": 78,
+   "resources": 28,
+   "supply": 41,
+   "plan": 27,
+   "license": 39,
+   "taxi": 56,
+   "loss": 27,
+   "find": 70,
+   "process": 21,
+   "other": 19
   }
  }
 }
