@@ -1,0 +1,56 @@
+{
+ "test_seen": {
+  "n": 451,
+  "intent_acc": 0.5765,
+  "item_cat_acc": 0.4811,
+  "per_intent": {
+   "buy": 0.413,
+   "find": 0.0,
+   "gap": 0.875,
+   "license": 0.721,
+   "loss": 0.882,
+   "other": 1.0,
+   "plan": 0.816,
+   "process": 0.788,
+   "resources": 1.0,
+   "supply": 0.822,
+   "taxi": 0.0
+  }
+ },
+ "test_unseen": {
+  "n": 254,
+  "intent_acc": 0.122,
+  "item_cat_acc": 0.124,
+  "per_intent": {
+   "buy": 0.156,
+   "find": 0.0,
+   "gap": 0.0,
+   "license": 0.0,
+   "loss": 1.0,
+   "other": 0.5,
+   "plan": 0.0,
+   "process": 0.0,
+   "resources": 0.0,
+   "supply": 0.0,
+   "taxi": 0.0
+  }
+ },
+ "human_test": {
+  "n": 30,
+  "intent_acc": 0.4333,
+  "item_cat_acc": 0.6875,
+  "per_intent": {
+   "buy": 0.5,
+   "find": 0.0,
+   "gap": 0.0,
+   "license": 0.5,
+   "loss": 1.0,
+   "other": 1.0,
+   "plan": 0.5,
+   "process": 0.0,
+   "resources": 0.667,
+   "supply": 0.5,
+   "taxi": 0.0
+  }
+ }
+}

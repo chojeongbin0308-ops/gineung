@@ -1,0 +1,451 @@
+{"text": "저기 내 근처 콜라 가게", "intent": "find", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "우리살균제팔려면 무슨자격 필요해?", "intent": "license", "entities": [{"start": 2, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "농약 파는 가게 알려주세요", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "솔메리로소금 좀갖다줄 수있어", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "새터상회가 하던역할이뭐야", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구판장 유통망 누가 이어받으면 좋아..", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "나앞으로닭고기어디서구해야 돼요", "intent": "buy", "entities": [{"start": 4, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "그 행복택시로 칫솔부탁하쇼", "intent": "taxi", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "상리상회가하던역할이뭐야", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "저기 기능상속 순서가 어떻게 돼", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "우리 새터상회 폐업 대책 뭐 있어", "intent": "plan", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "내근처 연탄가게", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "할매네 가게 문 닫으면 생기는 문제", "intent": "loss", "entities": [{"start": 0, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매가 1키로 안에 소고기 파는 곳", "intent": "find", "entities": [{"start": 11, "end": 14, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "콩나물심부름해 줄사람", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "근데 마을 가게 거래하던 대리점", "intent": "supply", "entities": [{"start": 3, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "윗마을에서 이용할 수 있는 거 뭐 있어..", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "농약사 문 닫으면 라면은 어디서 사?", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 10, "end": 12, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "좀 농약방 문 닫으면 어떻게 이어가?", "intent": "plan", "entities": [{"start": 2, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "1키로 안에 라이터 파는 곳", "intent": "find", "entities": [{"start": 7, "end": 10, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "하리에 배송 되는 데 어디야?", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "근데 돌아오는 길에 된장 사다 줄 수 있나", "intent": "taxi", "entities": [{"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "윗마을 근처 콜택시 돼?", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "앞으로 고추 모종 어디서 구해야 돼요", "intent": "buy", "entities": [{"start": 4, "end": 9, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "우리구룡리 복지관 서비스있나.", "intent": "resources", "entities": [{"start": 2, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "점빵 기능상속 절차", "intent": "process", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상리상회 거래처 어디야~", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "좀 돌아오는길에배추사다 줄수 있나", "intent": "taxi", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "구판장 폐업하면 솔메리에 뭐가 없어지나", "intent": "loss", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 9, "end": 12, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "혹시 벌레 생겼는데 어떻게 혀", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "이봐 구룡상회닫으면 주민들뭐가 불편해져?", "intent": "loss", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "동네 가게 상속 방안 짜 줄래", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "솔메리 상속안 보여 줄래", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "읍내기존자원으로안되는 거.", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "농약사 문 닫으면어떻게 이어가?", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매네 가게가없어지면 칫솔은누가 팔아?", "intent": "buy", "entities": [{"start": 0, "end": 6, "label": "SHOP"}, {"start": 12, "end": 14, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "새터 마을회관 있어요?", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "아이고 행복택시로 사과 부탁해요", "intent": "taxi", "entities": [{"start": 10, "end": 12, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "앞으로 과자 어디서 구해야 돼요~", "intent": "buy", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "구판장 닫으면 주민들 뭐가 불편해져?", "intent": "loss", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "하리농약사 닫은 뒤에 종자 살 데 있소?", "intent": "buy", "entities": [{"start": 0, "end": 5, "label": "SHOP"}, {"start": 12, "end": 14, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "근데 상리상회 폐업하면 쓰레기봉투 사러 어디 가?", "intent": "buy", "entities": [{"start": 3, "end": 7, "label": "SHOP"}, {"start": 13, "end": 18, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "농약방 대신할 방법 추천", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "근데콜라배달 부탁할게", "intent": "taxi", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "근데 구판장 공백 위험 알려주쇼", "intent": "gap", "entities": [{"start": 3, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡슈퍼 공급처는 누가 이어받아?", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "새터상회대신할방법추천~", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "통조림 사다 줄 사람 있어", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "할매가 농약사 없어지면 어떻게 해결하쇼", "intent": "plan", "entities": [{"start": 4, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상토 판매 등록 어떻게 혀", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "우리 읍내에서 두부 이제 어디서 사야 돼?", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}, {"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "농약사 이어서 하려면 인허가 뭐 필요해", "intent": "license", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "여기서제일가까운 칫솔 파는데", "intent": "find", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "그 비료 판매 등록 어떻게 해 줘", "intent": "license", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "근데내근처통조림가게.", "intent": "find", "entities": [{"start": 5, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "주변에 고추장 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 7, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "점빵이하던 역할이뭐야", "intent": "loss", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 마을 상속안 보여 줘..", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "좀 구룡리에서 이용할 수 있는 거 뭐 있어", "intent": "resources", "entities": [{"start": 2, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리 동네 슈퍼 기능 누가 이어받아?", "intent": "plan", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "돌아오는 길에 떡 사다 줄 수 있나", "intent": "taxi", "entities": [{"start": 8, "end": 9, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "설탕 파는 가게 알려줘", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "새터 공백 생기는거뭐야", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리새터근처이동장터있어요?", "intent": "resources", "entities": [{"start": 2, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "마을 가게가 없어지면 상토는 누가 팔아?", "intent": "buy", "entities": [{"start": 0, "end": 5, "label": "SHOP"}, {"start": 12, "end": 14, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "여기서제일가까운 모종 파는데", "intent": "find", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "아랫마을에서 부족한 게 뭐야", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "기능상속절차 알려줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "좀 근처에 칫솔 파는 데 있어?", "intent": "find", "entities": [{"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "아이고 도움말..", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "상리상회 그만두면 고추 모종은어쩌나.", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "SHOP"}, {"start": 10, "end": 15, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "우리 마을근처 이동장터 있나~", "intent": "resources", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "이봐 하리농약사 기능상속 절차", "intent": "process", "entities": [{"start": 3, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "마을 가게 그만두면 어떤 생활기능이 없어지나요", "intent": "loss", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 마을에 배송되는데 어디야", "intent": "resources", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "아랫마을 생활기능 어떻게 유지해?", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "어떻게 진행되는지알려 줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "솔메리 마을회관 있소?", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "할매가할매네 가게 인수하려면등록해야 된당가", "intent": "license", "entities": [{"start": 3, "end": 9, "label": "SHOP"}], "item_cat": "none"}
+{"text": "주변에 어묵 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "아이고 새터로 비누 좀 갖다 줄 수 있어요?", "intent": "taxi", "entities": [{"start": 4, "end": 6, "label": "VILLAGE"}, {"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "혹시 읍내 사는데 밀가리 살 곳이 없어?", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}, {"start": 10, "end": 13, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐 기능상속 순서가 어떻게 돼", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "여기서 제일가까운 세제파는데", "intent": "find", "entities": [{"start": 10, "end": 12, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "내 근처 무 가게", "intent": "find", "entities": [{"start": 5, "end": 6, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "부추 사려면 어떻게해야해.", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "하리 생활서비스 빈 곳.", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "기능상속 절차 알려줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "진행 과정 설명해 주쇼", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "상리상회 물건 들여오던 데", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "잎마름병잡는 약살데~", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "구룡상회가 하던 역할이 뭐야?", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "된장 어디 파는지 찾아 줘요", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "상리상회 대신할 방법 추천.", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "저기 하리농약사 없어지면 밀가루 어떻게 사요~", "intent": "buy", "entities": [{"start": 3, "end": 8, "label": "SHOP"}, {"start": 14, "end": 17, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "구룡리사는데양파 살 곳이 없어", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "치즈 심부름 해 줄 사람", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "구룡리로 전구 좀 갖다 줄 수 있소?", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "윗마을 주변에 쓸 수 있는 자원 알려 주쇼", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "농약사 폐업하면 새터에 뭐가없어지나", "intent": "loss", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 9, "end": 11, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "마을가게상속 방안 짜 줘", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 마을에 배송 되는 데 어디야.", "intent": "resources", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "내 근처 농약 가게..", "intent": "find", "entities": [{"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "덕곡슈퍼 상속 방안짜주랑께", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리동네 슈퍼 도매상 어디야", "intent": "supply", "entities": [{"start": 0, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "내 근처 쌀 20키로 가게", "intent": "find", "entities": [{"start": 5, "end": 11, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "하리에 오는이동장터 언제야", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리 마을에 계란 파는 곳 있나", "intent": "find", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}, {"start": 7, "end": 9, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "기능상속절차 알려주세요", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "새터상회는 세제 어디서 받아 왔어?", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}, {"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "밀가루 한 포대 하나만 대신 사다 주세요..", "intent": "taxi", "entities": [{"start": 0, "end": 8, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "돌아오는 길에 바나나 사다 줄 수 있나..", "intent": "taxi", "entities": [{"start": 8, "end": 11, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "가까운 데 고추 모종있나", "intent": "find", "entities": [{"start": 6, "end": 11, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "혹시 읍내에 오는 이동장터 언제야", "intent": "resources", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "구룡상회 닫으면 못 잇는 기능", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매가 농약방 닫으면 못 잇는 기능.", "intent": "gap", "entities": [{"start": 4, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시 비료 판매관리인 교육 받아야 해", "intent": "license", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "감자 좀 사다 줘", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "이봐 덕곡슈퍼 대안알려주랑께", "intent": "plan", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "기능상속절차알려줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "구판장 유통망 알려줘요", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "벌레잡는약 살데", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "앞으로 사과어디서구해야돼요", "intent": "buy", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "덕곡슈퍼 대안 알려줄래~", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시 농약방 물건 들여오던 데", "intent": "supply", "entities": [{"start": 3, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "아이고 처음이야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "혹시 가까운 데 가루세제 있나", "intent": "find", "entities": [{"start": 9, "end": 13, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "나 새터상회 인수하려면 등록해야 돼?", "intent": "license", "entities": [{"start": 2, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "솔메리로 계란 좀 갖다 줄 수 있어요?", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "두루마리휴지 심부름해 줄 사람", "intent": "taxi", "entities": [{"start": 0, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "상리상회 공급처는 누가 이어받아", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡슈퍼는 어디가 공백이야", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "이봐 새터상회 닫은 뒤에 부추 살 데 있나.", "intent": "buy", "entities": [{"start": 3, "end": 7, "label": "SHOP"}, {"start": 14, "end": 16, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "농약사 공급처는 누가이어받아?", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시 우리 마을에 오는 이동장터 언제야", "intent": "resources", "entities": [{"start": 3, "end": 8, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "저기 덕곡슈퍼 폐업하면 하리에 뭐가 없어지나", "intent": "loss", "entities": [{"start": 3, "end": 7, "label": "SHOP"}, {"start": 13, "end": 15, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "구판장 거래하던 대리점.", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구판장 폐업하면 구룡리에뭐가 없어지나~", "intent": "loss", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 9, "end": 12, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "점빵 상속 방안 짜 주쇼", "intent": "plan", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "그 할매네 가게 이어서 하려면 인허가 뭐 필요해요~", "intent": "license", "entities": [{"start": 2, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "기능상속은 어떻게 진행된당가", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "컵라면좀 사다줄래", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "행복택시로 휴지 부탁해", "intent": "taxi", "entities": [{"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "근데 마을 가게 그만두면 어떤 생활기능이 없어지나요", "intent": "loss", "entities": [{"start": 3, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "아랫마을 주변에 쓸 수 있는자원 알려 주쇼", "intent": "resources", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "근처에 비닐파는데 있어?", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "농약방 도매상 어디야", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "근데 읍내생활기능 어떻게유지해", "intent": "plan", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "농약사없어지면감자 어떻게 사요", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 7, "end": 9, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "나 하리농약사 닫은 뒤에 계란 살 데 있어요?", "intent": "buy", "entities": [{"start": 2, "end": 7, "label": "SHOP"}, {"start": 14, "end": 16, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "우리 마을 복지관 서비스 있나", "intent": "resources", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "이봐농약방 이어받으려면 어떤자격이 필요해 줘", "intent": "license", "entities": [{"start": 2, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "좀 솔메리에 오는 이동장터 언제야", "intent": "resources", "entities": [{"start": 2, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "좀 치즈 사다 줄 사람 있어?", "intent": "taxi", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "혹시 기능상속 순서가 어떻게 돼", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "벌레 생기면 무슨 약 사야 돼요", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "할매가 커피믹스 심부름 해 줄 사람..", "intent": "taxi", "entities": [{"start": 4, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "새터 근처이동장터있어?", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "점빵 문 닫으면 뭐가 문제야?", "intent": "loss", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "점빵 문 닫으면 뭐가 문제야", "intent": "loss", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매네가게 그만두면쌀 20키로는 어쩌나", "intent": "buy", "entities": [{"start": 0, "end": 5, "label": "SHOP"}, {"start": 10, "end": 16, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "잎마름병 잡는 약 살 데", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "나 가까운 데 소금 있나", "intent": "find", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "혹시 구룡상회 대안 알려주랑께", "intent": "plan", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "하리 근처 이동장터 있나..", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "어떻게 진행되는지 알려 주세요", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "농약방 폐업 대책 뭐있어", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "솔메리 생활기능어떻게유지해?", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "나새터상회 상속방안짜 주쇼", "intent": "plan", "entities": [{"start": 1, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 마을에 오는 이동장터언제야", "intent": "resources", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "밀가루사려면 어떻게해야해요", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "상리생활기능어떻게유지해?", "intent": "plan", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "나상리상회가없어지면 세제는누가 팔아?", "intent": "buy", "entities": [{"start": 1, "end": 5, "label": "SHOP"}, {"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "마을 가게는 살균제어디서 받아 왔어?", "intent": "supply", "entities": [{"start": 0, "end": 5, "label": "SHOP"}, {"start": 7, "end": 10, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "내 근처 샴푸가게", "intent": "find", "entities": [{"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "솔메리 공백 생기는 거 뭐야.", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "이봐 사용법 알려줘", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "마을 가게 이어서 하려면 인허가 뭐 필요하쇼", "intent": "license", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "쓰레기봉투 사려면어떻게 해야 하쇼", "intent": "buy", "entities": [{"start": 0, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "여기서 제일 가까운 배추 파는 데", "intent": "find", "entities": [{"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "좀 마을 가게 납품 받던 곳 이어받으려면", "intent": "supply", "entities": [{"start": 2, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "주변에 고추 모종 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 9, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "나 하리농약사 문 닫으면 생기는 문제", "intent": "loss", "entities": [{"start": 2, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상토 사려면 어떻게 해야 해", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "근데 1키로 안에 살균제 파는 곳", "intent": "find", "entities": [{"start": 10, "end": 13, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "내 근처 살충제 가게", "intent": "find", "entities": [{"start": 5, "end": 8, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "농약사는 대파 어디서 받아 왔어?", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}, {"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "점빵 그만두면 살충제는 어쩌나", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "SHOP"}, {"start": 8, "end": 11, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "근데 아랫마을 사는데 두부 살 곳이 없어", "intent": "buy", "entities": [{"start": 3, "end": 7, "label": "VILLAGE"}, {"start": 12, "end": 14, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "살충제 어디서 사요?", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "할매네 가게 폐업하면 두루마리 휴지 사러 어디 가?", "intent": "buy", "entities": [{"start": 0, "end": 6, "label": "SHOP"}, {"start": 12, "end": 19, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "샴푸 공급처 알려주세요", "intent": "supply", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "그 덕곡리 상속안 보여 주쇼", "intent": "plan", "entities": [{"start": 2, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "읍내 가는 사람 생수 좀 부탁해요", "intent": "taxi", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "구룡리 기존 자원으로 안 되는 거", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리할매네가게닫은 뒤에 생수 한 박스살 데 있당가?", "intent": "buy", "entities": [{"start": 2, "end": 7, "label": "SHOP"}, {"start": 13, "end": 20, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "좀너는 누구야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "상리상회 상속 방안 짜 주세요", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "나 할매네 가게 닫으면 못 잇는 기능", "intent": "gap", "entities": [{"start": 2, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "양파 살라면 어디로 가야 되나", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "읍내가는사람 생수 좀부탁해요", "intent": "taxi", "entities": [{"start": 7, "end": 9, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "근데 상토 팔려면 무슨 자격 필요해?", "intent": "license", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "저기 사과어디서 사요?", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "혹시 배추좀사다 줘요", "intent": "taxi", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "연탄배달부탁할게", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "동네가게 거래처 어디야", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "여기서제일 가까운사과파는 데?", "intent": "find", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "우리 동네 슈퍼 이어서 하려면 인허가 뭐 필요하쇼", "intent": "license", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매가 상리상회 닫은 뒤에 쓰레기봉투 살 데 있소?", "intent": "buy", "entities": [{"start": 4, "end": 8, "label": "SHOP"}, {"start": 15, "end": 20, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐 너는누구야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "설탕공급처 알려줘요", "intent": "supply", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "윗마을 가게없어지면 뭐가사라져요", "intent": "loss", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "혹시 상토 찾아주세요?", "intent": "find", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "점빵 닫으면 못 잇는 기능", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡슈퍼그만두면어떤생활기능이 없어지나요", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "계란 파는 가게 알려줘", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "통조림 공급처 알려주랑께", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "나 모종 파는 가게 알려주랑께", "intent": "find", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "저기 어떻게 진행되는지 갈쳐 줘~", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "좀 구룡상회 닫은 뒤에 라면 살 데 있당가", "intent": "buy", "entities": [{"start": 2, "end": 6, "label": "SHOP"}, {"start": 13, "end": 15, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "행복택시로 콜라 부탁해 줘", "intent": "taxi", "entities": [{"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "비료 판매 등록 어떻게 혀.", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "아이고 잎마름병 생기면 무슨 약 사야 되능가", "intent": "buy", "entities": [{"start": 4, "end": 8, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "새터생활서비스 빈곳", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "그 새터상회 납품 받던 곳 이어받으려면~", "intent": "supply", "entities": [{"start": 2, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "그샴푸사려면어떻게 해야해 줘", "intent": "buy", "entities": [{"start": 1, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "살균제 장사시작하려면뭐 해야 돼", "intent": "license", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "행복택시로 식용유부탁해", "intent": "taxi", "entities": [{"start": 6, "end": 9, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "그 솔메리 기존자원으로 안되는거.", "intent": "gap", "entities": [{"start": 2, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "고추병 생겼는데 어떻게해", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "나 마을가게 폐업하면 컵라면사러 어디 가?", "intent": "buy", "entities": [{"start": 2, "end": 6, "label": "SHOP"}, {"start": 12, "end": 15, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "사이다 심부름 해 줄 사람", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "우리구룡상회없어지면 어떻게해결해", "intent": "plan", "entities": [{"start": 2, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "어떻게 진행되는지 알려 줘요..", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "근데 라면 배달 부탁할게", "intent": "taxi", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐 퇴비 팔려면 무슨 자격 필요해", "intent": "license", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "할매가 할매네 가게 없어지면 어떤 기능이 사라져", "intent": "loss", "entities": [{"start": 4, "end": 10, "label": "SHOP"}], "item_cat": "none"}
+{"text": "그 진행 과정 설명해 줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "구룡상회 대신할 방법 추천", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "나너는 누구야~", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "그 읍내 가는 사람 칫솔 좀 부탁해요", "intent": "taxi", "entities": [{"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "컵라면하나만대신사다주세요.", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "동네 가게닫으면 주민들 뭐가 불편해져?", "intent": "loss", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "주변에 살균제 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 7, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "앞으로 콩나물 어디서 구해야 돼요", "intent": "buy", "entities": [{"start": 4, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "새터상회 유통망 누가 이어받으면 좋아?", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "동네 가게 상속 절차 어떻게 돼요..", "intent": "process", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "바나나 배달 부탁할게", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "구판장이어받으려면어떤 자격이필요해", "intent": "license", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구판장 이어받으려면 어떤 자격이 필요해 줘", "intent": "license", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "퇴비 팔려면 무슨 자격 필요해?", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "윗마을 생활서비스 빈 곳", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "병해충 생기면 무슨 약 사야 되나", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "혹시 새터상회 없어지면 해결 안 되는 부분", "intent": "gap", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 덕곡슈퍼 대안 알려줘", "intent": "plan", "entities": [{"start": 3, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "기능상속은어떻게진행돼", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "내 근처 음료수가게..", "intent": "find", "entities": [{"start": 5, "end": 8, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "아이고 비료 가게하려면 허가 필요해?", "intent": "license", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "좀 기능상속 절차알려줘요", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "하리 마을회관 있소?", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "상리상회 문 닫으면 어떻게 이어가?", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "하리농약사 공급처는 누가 이어받아?", "intent": "supply", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "저기행복택시로치약 부탁해", "intent": "taxi", "entities": [{"start": 7, "end": 9, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "고추 병잡는약 살 데", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "상리상회 공급처는 누가 이어받아?", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "행복택시로 우유 부탁해요", "intent": "taxi", "entities": [{"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "소금 배달 부탁할게", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "나 잎마름병 잡는 약 살 데", "intent": "buy", "entities": [{"start": 2, "end": 6, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "비누 사다 줄 사람 있어요", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "여기서제일 가까운호미파는데", "intent": "find", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "저기 너는 누구야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "상리 생활기능 어떻게 유지해?", "intent": "plan", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "된장 공급처 알려주랑께", "intent": "supply", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "연탄사다줄 사람있능가", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "덕곡슈퍼 문 닫으면 생기는문제", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "뭐 할 수 있당가?", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "상토 팔려면 무슨 자격 필요해", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "동네 가게 거래하던 대리점", "intent": "supply", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시새터근처 콜택시돼", "intent": "resources", "entities": [{"start": 2, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리 마을 상속안 보여 줘", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리 동네 슈퍼 대안 알려주세요", "intent": "plan", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "새터상회는 우유 어디서 받아 왔어", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}, {"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "하리농약사 문닫으면 어떻게이어가?", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구룡리 기존 자원으로 안 되는 거?", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "잎마름병 약 어디서 사", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "동네 가게 문 닫으면 생기는 문제", "intent": "loss", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "바나나 어디서 사요?", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "그 치즈사다 줄사람있어요", "intent": "taxi", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "혹시 너는 누구야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "우리 동네 슈퍼 문 닫으면 뭐가 문제이당가", "intent": "loss", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 동네 슈퍼 없어지면 해결 안 되는 부분?", "intent": "gap", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "윗마을 근처 이동장터 있나..", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "할매가 주변에 씨앗 살 수 있는 곳", "intent": "find", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "그 생수 찾아주랑께", "intent": "find", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "치즈 사려면 어떻게해야해요", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "윗마을에배송 되는데어디야", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "고마워?", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "소고기 사려면 어떻게 해야 해 줘", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "좀커피믹스하나만대신사다 주세요", "intent": "taxi", "entities": [{"start": 1, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "구룡상회 공백 위험 알려주쇼", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "여기서제일 가까운상토파는데..", "intent": "find", "entities": [{"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "내근처 비료 가게", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "농약방 공백 위험 알려주세요~", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "비닐 찾아주쇼", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "나 우리 마을로 두루마리 휴지 좀 갖다 줄 수 있어요?", "intent": "taxi", "entities": [{"start": 2, "end": 7, "label": "VILLAGE"}, {"start": 9, "end": 16, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "그 라이터 좀 사다 주세요", "intent": "taxi", "entities": [{"start": 2, "end": 5, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "주변에 농약 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "하리에서 이용할 수 있는 거 뭐 있어", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "앞으로 가루세제 어디서 구해야 돼요", "intent": "buy", "entities": [{"start": 4, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "혹시 하리 상속안 보여 주세요", "intent": "plan", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리마을공백 생기는거 뭐야", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "동네 가게 없어지면 어떻게 해결해", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "좀 치즈 파는 가게 알려주쇼", "intent": "find", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "우리 동네 슈퍼 문 닫으면 뭐가 문제야?", "intent": "loss", "entities": [{"start": 0, "end": 8, "label": "SHOP"}], "item_cat": "none"}
+{"text": "소주 사다 줄 사람 있당가", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "마을 가게 대신할 방법 추천", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시 상리 근처 콜택시 돼?", "intent": "resources", "entities": [{"start": 3, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "바나나 사다 줄사람 있당가~", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "근처에 생수 한 박스 파는 데 있소?", "intent": "find", "entities": [{"start": 4, "end": 11, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "고추장 살라면 어디로 가야 되나", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐 커피믹스 어디 파는지 찾아 줘요", "intent": "find", "entities": [{"start": 3, "end": 7, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "쌀20키로 어디 파는지찾아 줘요", "intent": "find", "entities": [{"start": 0, "end": 5, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "저기 오늘날씨어때", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "저기 병해충 생기면 무슨 약 사야 돼", "intent": "buy", "entities": [{"start": 3, "end": 6, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "새터 생활서비스빈 곳", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "할매네가게상속 절차 어떻게돼요", "intent": "process", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "새터 가게 없어지면 뭐가 사라져요..", "intent": "loss", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "커피믹스 좀 사다 줄래", "intent": "taxi", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "설탕 찾아주쇼", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "우리 마을 공백 생기는 거 뭐야", "intent": "gap", "entities": [{"start": 0, "end": 5, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "마을 가게 상속 방안 짜 주세요?", "intent": "plan", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "하리농약사 없어지면 우유어떻게 사요", "intent": "buy", "entities": [{"start": 0, "end": 5, "label": "SHOP"}, {"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "이봐 휴지 공급처 알려주쇼", "intent": "supply", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "나 농약사 없어지면 해결 안 되는 부분", "intent": "gap", "entities": [{"start": 2, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구룡리에 오는이동장터 언제야", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "주변에 커피믹스 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 8, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "상리상회 그만두면 어떤 생활기능이 없어지나요", "intent": "loss", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시농약방문닫으면어떻게 이어가?", "intent": "plan", "entities": [{"start": 2, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "이봐 안녕하세요", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "솔메리로 감자 좀갖다 줄수 있어?", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 5, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "하리 근처 이동장터있어?", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "할매가 간장 파는 가게 알려주랑께", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "소고기 사려면 어떻게 해야 해", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "이봐 샴푸 어디서 사요", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "우리동네 슈퍼대신할 방법 추천..", "intent": "plan", "entities": [{"start": 0, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 벌레 생기면 무슨 약 사야 되능가", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "근데 두루마리 휴지 찾아줘", "intent": "find", "entities": [{"start": 3, "end": 10, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "좀 농약방 인수하려면 등록해야 돼?", "intent": "license", "entities": [{"start": 2, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "좀 비누 하나만 대신 사다 주세요?", "intent": "taxi", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "아랫마을에오는 이동장터언제야", "intent": "resources", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "아랫마을에 오는이동장터언제야", "intent": "resources", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "복합비료판매관리인교육받아야해?", "intent": "license", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "비료 팔려면 무슨 자격 필요해", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "우리 배추 살라면 어디로 가야 되나", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "윗마을 생활기능 어떻게 유지해", "intent": "plan", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "근데 아랫마을 근처 콜택시 돼요", "intent": "resources", "entities": [{"start": 3, "end": 7, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "1키로 안에 퇴비 파는 곳", "intent": "find", "entities": [{"start": 7, "end": 9, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "점빵 닫으면 주민들 뭐가 불편해져?", "intent": "loss", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "기능상속절차 갈쳐줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "우리 커피믹스 어디서 사요", "intent": "buy", "entities": [{"start": 3, "end": 7, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "설탕배달 부탁할게", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "읍내에오는이동장터 언제야..", "intent": "resources", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "이봐 감사합니다", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "저기 처음이야", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "아이고퇴비장사시작하려면뭐 해야 돼", "intent": "license", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "상리에퇴비 파는곳 있어요?", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}, {"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "점빵닫으면못 잇는 기능", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡리에서이용할수있는거 뭐 있어~", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "아랫마을 근처 이동장터 있어", "intent": "resources", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "나 오늘 날씨 어때.", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "좀 농약 장사 시작하려면 뭐 해야 돼", "intent": "license", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "나읍내에 오는 이동장터 언제야", "intent": "resources", "entities": [{"start": 1, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "그오늘 날씨 어때", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "할매네가게 닫으면 못 잇는기능", "intent": "gap", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡슈퍼문닫으면비료는어디서사", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "SHOP"}, {"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "할매가 마을 가게 이어서 하려면 인허가 뭐 필요혀", "intent": "license", "entities": [{"start": 4, "end": 9, "label": "SHOP"}], "item_cat": "none"}
+{"text": "1키로 안에 제초제 파는 곳", "intent": "find", "entities": [{"start": 7, "end": 10, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "병해충 잡는약 살데", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "할매가우리동네슈퍼 유통망알려주세요", "intent": "supply", "entities": [{"start": 3, "end": 9, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상토 판매 등록어떻게해..", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "커피믹스 어디서 사요?", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "구룡리 주변 생활자원", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "우리 동네슈퍼는밀가루 어디서받아왔어?", "intent": "supply", "entities": [{"start": 0, "end": 7, "label": "SHOP"}, {"start": 8, "end": 11, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "양파 어디서 사요?", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "아이고 새터 기존 자원으로 안 되는 거", "intent": "gap", "entities": [{"start": 4, "end": 6, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "덕곡리에서 감자 이제 어디서 사야 돼요?", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}, {"start": 6, "end": 8, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "상리상회 유통망 알려 주쇼", "intent": "supply", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "혹시 하리농약사 폐업하면 상리에 뭐가 없어지나", "intent": "loss", "entities": [{"start": 3, "end": 8, "label": "SHOP"}, {"start": 14, "end": 16, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "기능상속이뭐야", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "아이고 근처에 설탕 파는 데 있능가", "intent": "find", "entities": [{"start": 8, "end": 10, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "바나나 심부름 해 줄 사람", "intent": "taxi", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "할매가 콩나물 사려면 어떻게 해야 해", "intent": "buy", "entities": [{"start": 4, "end": 7, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "벌레 생겼는데 어떻게 혀", "intent": "buy", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "여기서 제일 가까운 식용유 파는데", "intent": "find", "entities": [{"start": 11, "end": 14, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐병해충 생겼는데어떻게하쇼", "intent": "buy", "entities": [{"start": 2, "end": 5, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "우리마을기존자원으로안되는 거", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "살충제살라면 어디로가야되나", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "점빵 공백 위험 좀 알려줘", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "근처에 감자 파는 데 있당가?", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "새터상회 기능상속 절차", "intent": "process", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "점빵 유통망누가 이어받으면좋아", "intent": "supply", "entities": [{"start": 0, "end": 2, "label": "SHOP"}], "item_cat": "none"}
+{"text": "마을 가게는 어디가 공백이예요?", "intent": "gap", "entities": [{"start": 0, "end": 5, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매가 기능상속 절차 알려줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "간장공급처 알려줘", "intent": "supply", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "병해충 잡는 약 살 데", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "우리동네슈퍼 거래하던대리점", "intent": "supply", "entities": [{"start": 0, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "저기읍내에서 이용할 수있는 거 뭐있어~", "intent": "resources", "entities": [{"start": 2, "end": 4, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "쓰레기봉투 공급처 알려줄래..", "intent": "supply", "entities": [{"start": 0, "end": 5, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "새터상회 기능상속절차", "intent": "process", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "주변에 설탕 살 수 있는 곳", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "덕곡슈퍼 공백 위험 알려주랑께", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상리상회 문 닫으면 어떻게 이어가", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "할매가 농약사 문 닫으면 어떻게 이어가?", "intent": "plan", "entities": [{"start": 4, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "된장파는가게알려주랑께", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "가까운 데 참기름 있나", "intent": "find", "entities": [{"start": 6, "end": 9, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "그 치약 어디 파는지 찾아 줘요", "intent": "find", "entities": [{"start": 2, "end": 4, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "덕곡슈퍼 상속안추천해 줘~", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "생수 하나만 대신 사다 주세요", "intent": "taxi", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "heavy"}
+{"text": "전구 파는 가게 알려줄래", "intent": "find", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "urgent"}
+{"text": "상리상회 문 닫으면 비료는 어디서 사?", "intent": "buy", "entities": [{"start": 0, "end": 4, "label": "SHOP"}, {"start": 11, "end": 13, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "농약사 이어받으려면 어떤 자격이 필요해 줘", "intent": "license", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리마을 가게납품 받던곳이어받으려면", "intent": "supply", "entities": [{"start": 2, "end": 7, "label": "SHOP"}], "item_cat": "none"}
+{"text": "읍내 기존 자원으로 안 되는 거..", "intent": "gap", "entities": [{"start": 0, "end": 2, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "내 근처비누가게", "intent": "find", "entities": [{"start": 4, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "우리 우리 동네 슈퍼 없어지면 장화 어떻게 사요", "intent": "buy", "entities": [{"start": 3, "end": 11, "label": "SHOP"}, {"start": 17, "end": 19, "label": "ITEM"}], "item_cat": "seed"}
+{"text": "저기 행복택시로 소고기 부탁해", "intent": "taxi", "entities": [{"start": 9, "end": 12, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "우리 구판장 상속안 추천해 주세요", "intent": "plan", "entities": [{"start": 3, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "우리 벌레 약어디서 사~", "intent": "buy", "entities": [{"start": 3, "end": 5, "label": "ITEM"}], "item_cat": "advice"}
+{"text": "밀가루 어디서 사요?", "intent": "buy", "entities": [{"start": 0, "end": 3, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "두루마리 휴지 파는 가게 알려줘", "intent": "find", "entities": [{"start": 0, "end": 7, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "아이고우리 동네 슈퍼 폐업 대책뭐 있어", "intent": "plan", "entities": [{"start": 3, "end": 11, "label": "SHOP"}], "item_cat": "none"}
+{"text": "새터상회 상속 방안 짜 줄래", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "두루마리휴지 좀 사다 줘", "intent": "taxi", "entities": [{"start": 0, "end": 6, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "구룡리 공백 생기는 거 뭐야.", "intent": "gap", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "1키로 안에 쓰레기봉투 파는 곳..", "intent": "find", "entities": [{"start": 7, "end": 12, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "이봐 기능상속절차 알려줘", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "아이고 기능상속 절차 알려 주세요", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "그 새터상회 유통망 누가 이어받으면 좋아~", "intent": "supply", "entities": [{"start": 2, "end": 6, "label": "SHOP"}], "item_cat": "none"}
+{"text": "상토 가게 하려면 허가 필요해?", "intent": "license", "entities": [{"start": 0, "end": 2, "label": "ITEM"}], "item_cat": "agri"}
+{"text": "상리상회닫으면 못잇는 기능", "intent": "gap", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "구룡리에 오는이동장터언제야", "intent": "resources", "entities": [{"start": 0, "end": 3, "label": "VILLAGE"}], "item_cat": "none"}
+{"text": "농약사 물건 들여오던 데", "intent": "supply", "entities": [{"start": 0, "end": 3, "label": "SHOP"}], "item_cat": "none"}
+{"text": "덕곡슈퍼폐업대책 뭐 있어", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "좀기능상속 하려면 어떻게혀", "intent": "process", "entities": [], "item_cat": "none"}
+{"text": "여기서 제일 가까운 컵라면 파는 데", "intent": "find", "entities": [{"start": 11, "end": 14, "label": "ITEM"}], "item_cat": "daily"}
+{"text": "혹시점빵닫은 뒤에생선살데있당가", "intent": "buy", "entities": [{"start": 2, "end": 4, "label": "SHOP"}, {"start": 9, "end": 11, "label": "ITEM"}], "item_cat": "fresh"}
+{"text": "덕곡슈퍼 이어서 하려면 인허가 뭐 필요해요", "intent": "license", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "동네가게대안알려줘요", "intent": "plan", "entities": [{"start": 0, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "그농약사 납품받던곳이어받으려면", "intent": "supply", "entities": [{"start": 1, "end": 4, "label": "SHOP"}], "item_cat": "none"}
+{"text": "안녕", "intent": "other", "entities": [], "item_cat": "none"}
+{"text": "혹시 기능상속 하려면 어떻게 해", "intent": "process", "entities": [], "item_cat": "none"}
