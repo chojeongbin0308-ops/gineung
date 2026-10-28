@@ -1,10 +1,11 @@
 @echo off
 REM === Gineung AI server: one-time setup (Windows + NVIDIA) ===
 cd /d "%~dp0"
-set PY=python
-where python >nul 2>nul || set PY=
-if "%PY%"=="" if exist "%USERPROFILE%\anaconda3\python.exe" set PY="%USERPROFILE%\anaconda3\python.exe"
+REM Prefer Anaconda (the "python" on PATH can be the Microsoft Store stub)
+set PY=
+if exist "%USERPROFILE%\anaconda3\python.exe" set PY="%USERPROFILE%\anaconda3\python.exe"
 if "%PY%"=="" if exist "%ProgramData%\anaconda3\python.exe" set PY="%ProgramData%\anaconda3\python.exe"
+if "%PY%"=="" (python -c "import sys" >nul 2>nul && set PY=python)
 if "%PY%"=="" (echo [!] Python not found. Install Python 3.11 from python.org and CHECK "Add python.exe to PATH", then run this again. & pause & exit /b 1)
 echo Using Python: %PY%
 set VENV=%USERPROFILE%\gineung-venv
