@@ -4,3 +4,4 @@ data/cache_*.npz
 bin/
 current_url.txt
 models/*/
+gpu_check.txt
