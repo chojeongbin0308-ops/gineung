@@ -2267,7 +2267,7 @@ async function aiAnswer(text){
       <br><span class="addr">${esc(s.address || s.dong)}</span>
       ${(s.functions||[]).length ? `<span class="xi">제공: ${esc(s.functions.join(', '))}</span>` : ''}${s.hours ? `<span class="xi">운영: ${esc(s.hours)}</span>` : ''}${s.docs ? `<span class="xi">발급: ${esc(s.docs)}</span>` : ''}
       ${tel(s.phone) ? `<span class="xi">전화 <a href="tel:${tel(s.phone)}">${esc(s.phone)}</a></span>` : ''}
-      <span class="ev">근거: ${esc(s.evidence || '')}${s.approx ? ` · 위치는 ${esc(s.approx)}` : ''}</span></div>
+      ${s.evidence || s.approx ? `<span class="ev">${s.evidence ? '근거: ' + esc(s.evidence) : ''}${s.approx ? ` · 위치는 ${esc(s.approx)}` : ''}</span>` : ''}</div>
       <span class="d">${s.approx ? '약 ' : ''}${kmText(s.d)}</span><a class="btn sm" href="https://map.kakao.com/link/to/${encodeURIComponent(String(s.name).replace(/,/g,' '))},${s.lat},${s.lng}" target="_blank" rel="noopener">길찾기</a></div>`;
   const progs = (res.programs || []).map(p=>`<div class="aiprog"><b>관련 제도 · ${esc(p.name)}</b><ul>${p.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${/^https:\/\//.test(p.url||'') ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">공식 안내 보기</a>` : ''}</div>`).join('');
   return `<p>찾으시는 건 <b>${esc(top)}</b> 쪽으로 보입니다. ${usingGps ? '지금 계신 곳' : '임실군청'}에서 가까운 순으로 알려 드릴게요.</p>
