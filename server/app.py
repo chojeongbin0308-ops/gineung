@@ -177,14 +177,14 @@ class Engine:
         pub = lambda it: {k: v for k, v in it.items() if not k.startswith('_')}
         return {
             'categories': [{'name': self.cat_display[self.cats[i]], 'path': self.cats[i], 'score': round(float(cs[i]), 4)} for i in top_c],
-            'stores': [{**pub(self.items[i]), 'score': round(float(score[i]), 4)} for i in top_s],
+            'stores': [{**pub(self.items[i]), 'idx': int(i), 'score': round(float(score[i]), 4)} for i in top_s],
             'programs': [{'name': p['name'], 'items': p['items'][:4], 'url': p.get('url', '')} for p in progs],
         }
 
 
 engine = None
 started = time.time()
-stats = {'total': 0, 'today': 0, 'day': datetime.date.today().isoformat(), 'ms': collections.deque(maxlen=200)}
+stats = {'total': 0, 'today': 0, 'day': datetime.date.today().isoformat(), 'ms': collections.deque(maxlen=200), 'ans': 0, 'ans_ok': 0, 'ans_ms': collections.deque(maxlen=100)}
 hits = collections.defaultdict(collections.deque)
 lock = threading.Lock()
 
@@ -196,7 +196,7 @@ app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=['GET', 
 @app.middleware('http')
 async def guard(request: Request, call_next):
     # 열린 주소는 /health, /search 두 개뿐. 큰 요청은 본문을 읽기 전에 거절
-    if request.url.path not in ('/health', '/search'):
+    if request.url.path not in ('/health', '/search', '/answer'):
         from fastapi.responses import JSONResponse
         return JSONResponse({'detail': 'not found'}, status_code=404)
     try:
@@ -214,8 +214,33 @@ async def guard(request: Request, call_next):
 
 @app.on_event('startup')
 def _load():
-    global engine
+    global engine, llm, all_names
     engine = Engine()
+    all_names = sorted({__import__('re').sub(r'\s+', '', i['name']) for i in engine.items}, key=len, reverse=True)
+    if os.getenv('GINEUNG_NO_LLM'):
+        return
+    import rag
+    llm = rag.LLM()
+    if llm.model:
+        print(f'[RAG] 생성 모델 {llm.model} 준비 중…'); llm.warmup(); print(f'[RAG] 준비 완료 ({llm.model})')
+    else:
+        print(f'[RAG] 생성 단계 꺼짐: {llm.error}')
+
+
+llm = None
+all_names = []
+ans_hits = collections.defaultdict(collections.deque)
+
+
+def ans_rate_ok(ip, per_min=int(os.getenv('GINEUNG_ANSWER_RATE', '10'))):
+    now = time.time()
+    with lock:
+        q = ans_hits[ip]
+        while q and now - q[0] > 60: q.popleft()
+        if len(q) >= per_min: return False
+        q.append(now)
+        if len(ans_hits) > 5000: ans_hits.clear()
+        return True
 
 
 def client_ip(req: Request):
@@ -247,6 +272,11 @@ class Ask(BaseModel):
     text: str = Field(..., min_length=1, max_length=MAX_CHARS)
 
 
+class AnswerReq(BaseModel):
+    text: str = Field(..., min_length=1, max_length=MAX_CHARS)
+    ids: list[int] = Field(default_factory=list, max_length=5)
+
+
 @app.get('/health')
 def health():
     ms = list(stats['ms'])
@@ -255,7 +285,9 @@ def health():
             'device': engine.device if engine else '', 'gpu': engine.gpu if engine else '', 'region': REGION,
             'stores': engine.n_store if engine else 0, 'facilities': engine.n_facility if engine else 0, 'categories': len(engine.cats) if engine else 0,
             'uptime_s': int(time.time() - started), 'requests_total': stats['total'], 'requests_today': stats['today'],
-            'avg_ms': round(sum(ms) / len(ms), 1) if ms else None}
+            'avg_ms': round(sum(ms) / len(ms), 1) if ms else None,
+            'llm': (llm.model if llm and llm.model else ''), 'llm_note': (llm.error if llm else '꺼짐'),
+            'rag': {'answers': stats.get('ans', 0), 'verified': stats.get('ans_ok', 0), 'avg_ms': round(sum(stats['ans_ms']) / len(stats['ans_ms'])) if stats.get('ans_ms') else None}}
 
 
 @app.post('/search')
@@ -273,4 +305,30 @@ def search(body: Ask, req: Request):
             stats['day'], stats['today'] = today, 0
         stats['total'] += 1; stats['today'] += 1; stats['ms'].append(dt)
     out['ms'] = round(dt, 1)
+    return out
+
+
+@app.post('/answer')
+def answer(body: AnswerReq, req: Request):
+    """검색으로 고른 자원(ids, 방문자 기기가 거리순으로 고른 것)만 근거로 LLM이 답을 쓴다. 검증을 통과한 답만 돌려준다."""
+    if engine is None:
+        raise HTTPException(503, '준비 중')
+    if not llm or not llm.model:
+        raise HTTPException(503, '생성 모델 꺼짐')
+    if not ans_rate_ok(client_ip(req)) or not rate_ok(client_ip(req)):
+        raise HTTPException(429, '요청이 너무 많습니다')
+    import rag
+    ids = [i for i in body.ids if 0 <= i < len(engine.items)][:3]
+    found = engine.search(body.text.strip())
+    if not ids:
+        ids = [s['idx'] for s in found['stores'][:3]]
+    items = [{k: v for k, v in engine.items[i].items() if not k.startswith('_')} for i in ids]
+    try:
+        out = rag.answer(llm, body.text.strip(), items, found['programs'], found['categories'], all_names)
+    except TimeoutError:
+        raise HTTPException(503, '다른 답변을 만드는 중')
+    except Exception as e:
+        raise HTTPException(502, f'생성 실패 ({e.__class__.__name__})')
+    with lock:
+        stats['ans'] += 1; stats['ans_ok'] += int(out['verified']); stats['ans_ms'].append(out['ms'])
     return out

@@ -520,6 +520,10 @@ button.status{border:0;cursor:pointer}
 .aistore .xi{display:block;font-size:12px;color:var(--ink)}.aistore .xi a{color:var(--sage-d);font-weight:600}.aistore .ev{display:block;font-size:11px;color:var(--faint);margin-top:2px}
 .aiprog{background:var(--b-bg);border-radius:12px;padding:10px 14px;font-size:13px;margin:8px 0}.aiprog ul{margin:4px 0;padding-left:18px;color:var(--muted)}.aiprog a{font-size:12px;color:var(--b);font-weight:600}
 .cmmore summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--sage-d);padding:10px 14px}
+.airag{background:var(--sage-soft);border-radius:12px;padding:10px 14px;margin:0 0 10px}.airag p{margin:0 0 4px;font-size:15px;line-height:1.65}.airag .lbl{font-size:11px;color:var(--sage-d)}
+.airag.wait{background:var(--soft)}.airag .cite{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:700;margin-left:1px}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid var(--line2);border-top-color:var(--sage-d);border-radius:50%;margin-right:6px;vertical-align:-1px}
+@media (prefers-reduced-motion:no-preference){.spin{animation:sp 0.8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}}
 .aiwhy{font-size:12px;color:var(--muted);margin:6px 0}.aiwhy summary{cursor:pointer;font-weight:600;color:var(--sage-d)}.aiwhy div{margin-top:6px;line-height:1.7}
 .stgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .stmain{grid-column:span 2;grid-row:span 2;padding:28px;display:flex;gap:20px;align-items:center}
@@ -1887,7 +1891,8 @@ async function sendChat(text){
     try { const a = await askServer(); html = esc(a).replace(/\n/g,'<br>'); setStatus('ok'); }
     catch(e){ html = `<p class="cnote">모델 서버에 연결하지 못해 시연 모드로 답합니다. (${esc(e.name==='AbortError'?'응답 시간 초과':(e.message||'연결 실패'))})</p>` + demoAnswer(text); setStatus('fail'); }
   } else { await wait(450 + Math.random()*500); html = demoAnswer(text); }
-  typing.remove(); addMsg('bot', html);
+  typing.remove(); const botEl = addMsg('bot', html);
+  if (AISRV.ragJob){ const job = AISRV.ragJob; AISRV.ragJob = null; runRag(botEl, job); }
   const tmp = document.createElement('div'); tmp.innerHTML = html; chatLog.push({role:'assistant', content:tmp.innerText.slice(0,2000)});
   chatBusy = false; $('chat-send').disabled = false;
 }
@@ -2325,6 +2330,7 @@ async function aiAnswer(text){
   const tel = p => String(p||'').replace(/[^0-9-]/g,'');
   const addr = a => String(a||'').replace(/^전북(특별자치도)?\s*/,'');
   const top3 = near.slice(0,3);
+  AISRV.ragJob = AISRV.info && AISRV.info.llm ? {text, ids: top3.map(s=>s.idx).filter(Number.isInteger)} : null;
   const card = (s,i) => `<div class="aistore"><span class="n">${i+1}</span><div><b>${esc(s.name)}</b> <small>${esc(s.category)}</small>${s.voucher ? ' <span class="vb">상품권</span>' : ''}
       <br><span class="addr">${esc(addr(s.address) || s.dong)}${s.hours ? ' · ' + esc(s.hours) : ''}</span></div>
       <span class="d">${s.approx ? '약 ' : ''}${kmText(s.d)}</span>
@@ -2332,7 +2338,7 @@ async function aiAnswer(text){
   const prog = (res.programs || [])[0];
   const more = top3.map((s,i)=>`<li><b>${esc(s.name)}</b> — ${[(s.functions||[]).length ? '제공: ' + s.functions.join(', ') : '', s.docs ? '발급: ' + s.docs : '', s.evidence, s.approx ? '위치: ' + s.approx : ''].filter(Boolean).map(esc).join(' · ')}</li>`).join('')
     + (res.programs || []).map(p=>`<li><b>${esc(p.name)}</b> — ${p.items.map(esc).join(' / ')}${/^https:\/\//.test(p.url||'') ? ` <a href="${esc(p.url)}" target="_blank" rel="noopener">공식 안내</a>` : ''}</li>`).join('');
-  return `<p><b>${esc(top)}</b>에 가시면 돼요. ${usingGps ? '가까운' : '임실군청에서 가까운'} 곳이에요.</p>
+  return `${AISRV.ragJob ? '<div class="airag wait"><span class="lbl"><i class="spin"></i>AI가 자료를 보고 답을 쓰는 중…</span></div>' : ''}<p><b>${esc(top)}</b>에 가시면 돼요. ${usingGps ? '가까운' : '임실군청에서 가까운'} 곳이에요.</p>
     <div class="aistores">${top3.map(card).join('')}</div>
     ${prog ? `<p class="aitip">ℹ️ <b>${esc(prog.name)}</b> · ${esc(prog.items[0])}</p>` : ''}
     <p class="aiact">직접 가기 어려우세요? <button class="textlink" type="button" data-ask="응">“응”이라고 하시면 행복택시에 부탁을 올려 드려요 →</button></p>
@@ -2361,6 +2367,19 @@ document.addEventListener('click', async e=>{
 });
 if (window.claude) aiStart();
 
+// RAG: 검색으로 고른 3곳만 근거로 서버의 LLM이 쓴 답. 서버가 근거 검증을 통과한 답만 돌려준다.
+async function runRag(el, job){
+  const box = el.querySelector('.airag'); if (!box) return;
+  try {
+    const r = await aiFetch('/answer', {method:'POST', body:JSON.stringify(job)}, 35000);
+    if (!r.verified || !r.answer){ box.remove(); return; }
+    const html = esc(r.answer).replace(/\[(\d)\]/g, (m, n)=>`<sup class="cite" title="${n}번 장소">${n}</sup>`);
+    box.className = 'airag'; box.innerHTML = `<p>${html}</p><span class="lbl">AI 답변 · ${esc(r.model)} · 근거 확인됨 ✓ · ${(r.ms/1000).toFixed(1)}초</span>`;
+    chatLog.push({role:'assistant', content:r.answer});
+    $('msgs').scrollTop = $('msgs').scrollHeight;
+  } catch(_){ box.remove(); }
+}
+
 /* 상태 페이지 */
 function renderStatus(){
   const el = $('status-body'); if (!el || $('status').hidden) return;
@@ -2374,6 +2393,7 @@ function renderStatus(){
     <div class="card stm"><span class="lbl">켜진 지</span><b>${aiOn() ? fmtDur(i.uptime_s) : '-'}</b><small>서버 기준</small></div>
     <div class="card stm"><span class="lbl">오늘 처리한 질문</span><b>${aiOn() ? (i.requests_today ?? 0)+'건' : '-'}</b><small>누적 ${aiOn() ? (i.requests_total ?? 0) : '-'}건 · 평균 ${aiOn() && i.avg_ms!=null ? i.avg_ms+'ms' : '-'}</small></div>
     <div class="card stm"><span class="lbl">모델 ${aiOn() && i.model_version ? '· '+esc(i.model_version) : ''}</span><b class="sm">${esc(i.model || '-')}</b><small>${aiOn() ? (i.device==='cuda' ? 'GPU · '+esc(i.gpu) : 'CPU') : ''}${aiOn() && i.model_score && i.model_score.top1!=null ? ` · 시험 정확도 ${Math.round(i.model_score.top1*100)}%` : ''}</small></div>
+    <div class="card stm"><span class="lbl">생성 모델 (RAG)</span><b class="sm">${aiOn() ? esc(i.llm || '꺼짐') : '-'}</b><small>${aiOn() && i.rag ? (i.llm ? `근거 검증 통과 ${i.rag.answers ? Math.round(i.rag.verified/i.rag.answers*100) + '%' : '-'} (${i.rag.verified}/${i.rag.answers}) · 평균 ${i.rag.avg_ms ? (i.rag.avg_ms/1000).toFixed(1)+'초' : '-'}` : esc(i.llm_note || '')) : ''}</small></div>
     <div class="card stm"><span class="lbl">검색 자료</span><b>${aiOn() ? esc(i.region)+' '+((i.stores||0)+(i.facilities||0)).toLocaleString('ko-KR')+'곳' : '-'}</b><small>${aiOn() ? `상가 ${(i.stores||0).toLocaleString('ko-KR')} · 시설·서비스 ${(i.facilities||0).toLocaleString('ko-KR')} · 검색 대상 ${i.categories}개` : ''}</small></div>
   </div>
   <div class="card sthist"><div class="hd"><span class="lbl">이 화면을 연 뒤 기록 (15초마다 확인)</span><span class="lbl">${n ? `가동률 ${Math.round(ok/n*100)}% · 마지막 확인 ${tAgo(AISRV.last)}` : ''}</span></div>
@@ -2382,6 +2402,7 @@ function renderStatus(){
     <form id="st-form" class="arow"><input type="text" id="st-q" maxlength="200" placeholder="예: 세재가튼거 피료헌디 엇다 팔어" ${aiOn() ? '' : 'disabled'}><button class="btn dark" type="submit" ${aiOn() ? '' : 'disabled'}>분석</button></form>
     <div id="st-out">${AISRV.lastResult ? stResultHTML(AISRV.lastResult) : ''}</div></div>
   <div class="card starch"><h3>동작 구조</h3><ol>
+    <li><b>RAG 생성:</b> 검색기가 고른 가까운 3곳의 자료만 PC의 LLM(Ollama)에 주고 2~3문장 답을 쓰게 합니다. 자료에 없는 가게·시간·전화번호·금액을 말하거나 인용 번호가 틀리면 답을 버리고 정해진 안내만 보여 줍니다.</li>
     <li><b>서버가 켜져 있으면</b> 질문 문장만 전용 PC의 AI 서버(ko-sroberta 문장 임베딩, GPU)로 보내 임실군 상가의 업종·상호와 의미가 가까운 순으로 찾습니다.</li>
     <li><b>거리 계산은 방문자 기기에서</b> 합니다. 위치는 서버로 보내지 않고, 서버는 질문을 저장하지 않습니다.</li>
     <li><b>서버가 꺼져 있으면</b> 사이트가 자동으로 기기 안 방식으로 답해 멈추지 않습니다.</li></ol></div>`;
