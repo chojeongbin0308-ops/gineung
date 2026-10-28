@@ -25,9 +25,14 @@ def main():
             url = m.group(0)
             open(os.path.join(HERE, 'current_url.txt'), 'w', encoding='utf-8').write(url)
             print('\n' + '=' * 60 + f'\n  공개 주소: {url}\n' + '=' * 60)
-            if os.name == 'nt':
-                subprocess.run('clip', input=url, text=True, shell=True)
+            try:
+                if os.name == 'nt':
+                    subprocess.run('clip', input=url, text=True, shell=True)
+                elif sys.platform == 'darwin':
+                    subprocess.run(['pbcopy'], input=url, text=True)
                 print('  주소를 클립보드에 복사했습니다.')
+            except Exception:
+                pass
             print('  관리자 페이지가 열리면 [서버 주소 저장]을 누르세요. 이 창은 닫지 마세요.\n')
             time.sleep(8)  # 모델·터널이 준비될 시간
             webbrowser.open(SITE + '?server=' + urllib.parse.quote(url, safe='') + '#admin')

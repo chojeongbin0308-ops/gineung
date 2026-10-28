@@ -2,7 +2,10 @@
 
 ko-sroberta 문장 임베딩으로 임실군 상가를 **의미 검색**하는 서버입니다. 사이트(AI 상담·상태 페이지)가 이 서버를 부르고, 서버가 꺼져 있으면 사이트는 자동으로 기기 안 방식으로 답합니다.
 
-## 처음 한 번
+## 맥북에서
+터미널에서 `bash setup_server.sh` → `data` 폴더에 CSV → `bash start_server.sh` (켜져 있는 동안 맥이 잠들지 않음, 끄기 Ctrl+C). 애플 칩 GPU(MPS)를 자동으로 씁니다.
+
+## 처음 한 번 (Windows 전용 PC)
 1. Python 3.11 설치 (python.org, 설치 화면에서 **Add python.exe to PATH** 체크)
 2. `setup_server.bat` 더블클릭 — 가상환경, PyTorch(CUDA), 서버 패키지, cloudflared 설치. 마지막 줄에 `GPU: True`가 나오면 성공
 3. `data` 폴더에 `소상공인시장진흥공단_상가(상권)정보_전북_*.csv` 넣기 (GitHub에 올리지 않습니다)

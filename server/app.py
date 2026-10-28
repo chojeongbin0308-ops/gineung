@@ -96,8 +96,9 @@ class Engine:
         from sentence_transformers import SentenceTransformer
         import torch
         self.df, files = load_stores()
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.gpu = torch.cuda.get_device_name(0) if self.device == 'cuda' else ''
+        mps = getattr(torch.backends, 'mps', None)
+        self.device = 'cuda' if torch.cuda.is_available() else ('mps' if mps is not None and mps.is_available() else 'cpu')
+        self.gpu = torch.cuda.get_device_name(0) if self.device == 'cuda' else ('Apple Silicon (MPS)' if self.device == 'mps' else '')
         print(f'[모델] {MODEL_VER} · {MODEL_NAME} 불러오는 중 ({self.device}{" · " + self.gpu if self.gpu else ""})')
         self.model = SentenceTransformer(MODEL_NAME, device=self.device)
         self.cats = sorted(self.df['cat'].unique().tolist())
