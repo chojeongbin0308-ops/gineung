@@ -63,7 +63,7 @@ section.page-first{padding-top:48px;min-height:70vh}
 .mcard .n{font-size:13px;color:var(--muted)}
 .mcard h3{margin:0;font-size:18px}
 .mcard p{margin:0;color:var(--muted);font-size:14px}
-@media (max-width:480px){nav.top .btn:not(.dark){display:none}}
+@media (max-width:480px){nav.top .btn:not(.dark):not(.navlogin){display:none}nav.top .navlogin{padding:6px 12px;font-size:13px}}
 
 /* hero */
 .hero{position:relative;overflow:hidden;background:var(--bg)}
@@ -470,6 +470,42 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
 .realmap .ovmap .mapwrap{grid-template-columns:minmax(0,1fr) auto}
 @media (max-width:600px){.ovmap .hd{flex-direction:column;align-items:flex-start}.ovmap .mapwrap,.realmap .ovmap .mapwrap{grid-template-columns:minmax(0,1fr)}.mlegend{flex-direction:row;flex-wrap:wrap;gap:8px 14px}.lmap{aspect-ratio:4/3.4}}
 @media (prefers-reduced-motion:no-preference){.track>span{transition:width .4s ease}}
+/* 로그인 · 동의 · 관리자 */
+.navlogin{display:inline-flex;align-items:center;gap:8px}
+.navlogin .av{width:24px;height:24px;border-radius:50%;background:var(--sage-soft);color:var(--sage-d);display:inline-grid;place-items:center;font-size:12px;font-weight:700;margin-left:-8px}
+dialog.adlg{border:0;padding:0;border-radius:20px;width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 40px);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(30,42,51,.25)}
+dialog.adlg::backdrop{background:rgba(30,42,51,.45)}
+.adlg .ab{padding:28px;display:flex;flex-direction:column;gap:14px}
+.adlg h3{margin:0;font-size:21px;letter-spacing:-.02em}
+.adlg p{margin:0;color:var(--muted);font-size:14px}
+.adlg .x{position:absolute;top:14px;right:14px;border:0;background:var(--soft);border-radius:50%;width:34px;height:34px;font-size:18px;line-height:1}
+.policy{background:var(--soft);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--ink);max-height:38vh;overflow:auto}
+.policy dt{font-weight:700;margin-top:8px} .policy dt:first-child{margin-top:0} .policy dd{margin:2px 0 0;color:var(--muted)}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:600;cursor:pointer}
+.agree input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--sage-d);flex:none}
+.agree small{display:block;font-weight:400;color:var(--muted)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:999px;padding:13px 20px;font-size:15px;font-weight:600;border:1px solid var(--line2);background:#fff;color:#1F1F1F}
+.gbtn:disabled{opacity:.4;cursor:default}
+.gbtn svg{width:20px;height:20px}
+.aerr{color:var(--gap);font-size:13px;min-height:1em;margin:0}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;font-size:14px;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.arow{display:flex;gap:8px;flex-wrap:wrap}
+.livebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;background:var(--sage-soft);border-radius:14px;padding:12px 16px;margin:-8px 0 20px;font-size:14px}
+.livebar .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--faint);margin-right:8px;vertical-align:middle}
+.livebar.on .dot{background:var(--ok);box-shadow:0 0 0 4px rgba(62,127,79,.18)}
+.admgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:800px){.admgrid{grid-template-columns:minmax(0,1fr)}}
+.admgrid .card{padding:24px;display:flex;flex-direction:column;gap:12px}
+.admgrid h3{margin:0;font-size:18px}
+.admgrid p{margin:0;color:var(--muted);font-size:14px}
+.admgrid input[type=password],.admgrid input[type=file]{width:100%;font:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;background:var(--card);color:var(--ink)}
+.vtable{width:100%;border-collapse:collapse;font-size:13px}
+.vtable th,.vtable td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.vtable th{color:var(--muted);font-weight:600;white-space:nowrap}
+.vwrap{overflow-x:auto;margin-top:16px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;overflow-wrap:anywhere}
+.flink{border:0;background:none;padding:0;color:inherit;text-decoration:underline;font-size:inherit}
 </style>
 </head>
 <body>
@@ -483,6 +519,7 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
     <button type="button" data-go="supply">유통망 노트</button>
     <button type="button" data-go="method">AI 방식</button>
   </div>
+  <button class="btn navlogin" type="button" id="nav-login">로그인</button>
   <button class="btn dark" type="button" data-go="chat">AI 상담 시작</button>
 </div></nav>
 
@@ -704,6 +741,8 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
     </div>
   </div>
 
+  <div class="livebar" id="taxi-live"></div>
+
   <div id="taxi-ask" class="tgrid">
     <form class="card tcard" id="taxi-form">
       <h3>무엇이 필요하세요?</h3>
@@ -745,7 +784,7 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
     </div>
   </div>
 
-  <p class="fine2">시연용 화면입니다. 이름과 요청은 예시이며, 부탁·수락 내용은 이 기기에만 저장됩니다. 실제 서비스에서는 서버로 주민과 기사를 실시간 연결하고, 기사는 지자체에 등록한 이웃으로 운영합니다.</p>
+  <p class="fine2">‘예시’ 표시가 붙은 부탁은 시연용입니다. 로그인하지 않으면 부탁·수락 내용이 이 기기에만 저장되고, 구글로 로그인하면 로그인한 이웃끼리 실시간으로 연결됩니다. 실제 운영에서는 기사를 지자체에 등록한 이웃으로 한정합니다.</p>
 </div></section>
 
 <section class="sec page-first" id="method" data-page="method" hidden><div class="in">
@@ -754,8 +793,15 @@ pre.code{white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace
   <div class="rowact" style="margin-top:28px"><button class="btn dark" type="button" data-go="demo" data-step="1">직접 분석해 보기 →</button><button class="btn" type="button" data-go="supply">유통망 노트 보기</button></div>
 </div></section>
 
+<section class="sec page-first" id="admin" data-page="admin" hidden><div class="in">
+  <div class="sec-head"><div><p class="k">관리자</p><h2>개인정보 금고</h2><p>회원의 이름·이메일은 관리자 공개키로 암호화되어 따로 보관됩니다. 열쇠 파일(비밀키)과 비밀번호가 있어야 이 기기 안에서만 열어 볼 수 있고, 비밀키는 서버에 올라가지 않습니다.</p></div></div>
+  <div id="admin-body"></div>
+</div></section>
+
+<dialog class="adlg" id="auth-dlg" aria-labelledby="auth-title"><div class="ab" id="auth-body"></div></dialog>
+
 <footer id="foot"><div class="in">
-  <p class="fine">© 2026 기능상속 팀. All rights reserved. 이 사이트의 코드·디자인·내용은 허락 없이 복제하거나 사용할 수 없습니다.<br>2026 AI 라이프 솔루션 챌린지 시연용 프로토타입 · 법령 안내는 요약이며 세부 요건은 관할 기관 확인이 필요합니다.</p>
+  <p class="fine">© 2026 기능상속 팀. All rights reserved. 이 사이트의 코드·디자인·내용은 허락 없이 복제하거나 사용할 수 없습니다.<br>2026 AI 라이프 솔루션 챌린지 시연용 프로토타입 · 법령 안내는 요약이며 세부 요건은 관할 기관 확인이 필요합니다. · <button class="flink" type="button" id="foot-policy">개인정보 처리방침</button></p>
 </div></footer>
 
 <script>
@@ -1321,8 +1367,8 @@ const resetDecisions = () => { for (const k in decisions) delete decisions[k]; }
 const custom = () => { state.preset = ''; };
 
 /* ---------- 이벤트 ---------- */
-const PAGE_OF = {top:'home', intro:'home', chat:'chat', taxi:'taxi', demo:'analyze', supply:'supply', method:'method', foot:'method'};
-const PAGES = ['home','chat','taxi','analyze','supply','method'];
+const PAGE_OF = {top:'home', intro:'home', chat:'chat', taxi:'taxi', demo:'analyze', supply:'supply', method:'method', foot:'method', admin:'admin'};
+const PAGES = ['home','chat','taxi','analyze','supply','method','admin'];
 function showPage(pg, anchor){
   if (!PAGES.includes(pg)) pg = 'home';
   document.querySelectorAll('[data-page]').forEach(el=>el.hidden = el.dataset.page !== pg);
@@ -1330,6 +1376,7 @@ function showPage(pg, anchor){
   document.body.classList.toggle('page-chat', pg==='chat');
   if (pg==='supply') renderSupply();
   if (pg==='taxi' && typeof renderTaxi==='function') renderTaxi();
+  if (pg==='admin' && typeof renderAdmin==='function') renderAdmin();
   if (pg==='chat') setTimeout(()=>{ try { $('chat-input').focus({preventScroll:true}); } catch(_){} }, 0);
   if (anchor==='intro') $('intro').scrollIntoView({block:'start', behavior:'instant'}); else window.scrollTo({top:0, behavior:'instant'});
 }
@@ -1798,6 +1845,330 @@ initChat();
 
 
 /* ---------- 행복택시 : 이웃 장보기 배달 ---------- */
+/* ---------- 로그인(구글 전용) · 개인정보 동의 · 암호화 금고 · 관리자 ---------- */
+const CONSENT_VER = '2026-10-28.v1';
+const SITE_URL = 'https://chojeongbin0308-ops.github.io/gineung/';
+const IN_APP = /KAKAOTALK|NAVER\(|Instagram|FBAN|FBAV|Line\/|DaumApps/i.test(navigator.userAgent);
+const AU = {user:null, prof:null, admin:false, keyInfo:null, needConsent:false, busy:false, remote:[], unsub:null, priv:null, privKid:'', rows:null, delStep:0};
+const TE = new TextEncoder(), TD = new TextDecoder();
+const b64 = buf => { const b = new Uint8Array(buf); let s = ''; for (let i=0; i<b.length; i+=0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i+0x8000)); return btoa(s); };
+const unb64 = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+const fbOn = () => !!window.FB;
+
+// 공개키 봉투 암호화: 내용은 AES-256-GCM, 그 열쇠는 관리자 RSA-OAEP-3072 공개키로 잠금. 회원 UID를 추가 인증값으로 묶어 다른 회원 칸으로 옮겨 붙일 수 없게 함.
+const CK = {
+  async pwKey(pw, salt, iter){
+    const base = await crypto.subtle.importKey('raw', TE.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({name:'PBKDF2', hash:'SHA-256', salt, iterations:iter}, base, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
+  },
+  async genKeys(pw){
+    const kp = await crypto.subtle.generateKey({name:'RSA-OAEP', modulusLength:3072, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256'}, true, ['encrypt','decrypt']);
+    const pub = await crypto.subtle.exportKey('jwk', kp.publicKey);
+    const pk8 = await crypto.subtle.exportKey('pkcs8', kp.privateKey);
+    const kid = b64(await crypto.subtle.digest('SHA-256', TE.encode(pub.n))).replace(/[^A-Za-z0-9]/g,'').slice(0,12);
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12)), iter = 310000;
+    const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, await CK.pwKey(pw, salt, iter), pk8);
+    const file = {format:'gineung.admin-key/1', kid, alg:'RSA-OAEP-3072/SHA-256', kdf:{name:'PBKDF2', hash:'SHA-256', iter, salt:b64(salt)}, iv:b64(iv), ct:b64(ct),
+      createdAt:new Date().toISOString(), note:'기능상속 개인정보 금고 열쇠. 비밀번호로 잠겨 있습니다. 잃어버리면 금고를 열 수 없고, 유출되면 비밀번호만으로 열 수 있으니 안전한 곳에 보관하세요.'};
+    return {pub:{kty:pub.kty, n:pub.n, e:pub.e, alg:pub.alg}, kid, file};
+  },
+  async openKeyFile(f, pw){
+    if (!f || f.format!=='gineung.admin-key/1') throw new Error('기능상속 열쇠 파일이 아닙니다.');
+    let pk8; try { pk8 = await crypto.subtle.decrypt({name:'AES-GCM', iv:unb64(f.iv)}, await CK.pwKey(pw, unb64(f.kdf.salt), f.kdf.iter), unb64(f.ct)); }
+    catch(_){ throw new Error('비밀번호가 맞지 않습니다.'); }
+    return crypto.subtle.importKey('pkcs8', pk8, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['decrypt']);
+  },
+  async seal(jwk, obj, uid){
+    const pub = await crypto.subtle.importKey('jwk', {...jwk, ext:true}, {name:'RSA-OAEP', hash:'SHA-256'}, false, ['encrypt']);
+    const k = await crypto.subtle.generateKey({name:'AES-GCM', length:256}, true, ['encrypt']);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv, additionalData:TE.encode(uid)}, k, TE.encode(JSON.stringify(obj)));
+    const ek = await crypto.subtle.encrypt({name:'RSA-OAEP'}, pub, await crypto.subtle.exportKey('raw', k));
+    return {alg:'RSA-OAEP-3072+A256GCM', iv:b64(iv), ek:b64(ek), ct:b64(ct)};
+  },
+  async open(priv, box, uid){
+    const raw = await crypto.subtle.decrypt({name:'RSA-OAEP'}, priv, unb64(box.ek));
+    const k = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+    return JSON.parse(TD.decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:unb64(box.iv), additionalData:TE.encode(uid)}, k, unb64(box.ct))));
+  }
+};
+
+const ERRS = {'auth/popup-closed-by-user':'로그인 창이 닫혔습니다.', 'auth/cancelled-popup-request':'로그인 창이 닫혔습니다.', 'auth/unauthorized-domain':'이 주소는 로그인 허용 목록에 없습니다.',
+  'auth/network-request-failed':'인터넷 연결을 확인해 주세요.', 'permission-denied':'권한이 없습니다.', 'auth/too-many-requests':'시도가 너무 많습니다. 잠시 뒤 다시 해 주세요.'};
+const errText = e => ERRS[e?.code] || (e?.message || String(e)).replace(/^Firebase:\s*/,'');
+const fmtTime = t => { const d = t?.toDate ? t.toDate() : (t ? new Date(t) : null); return d && !isNaN(d) ? d.toLocaleString('ko-KR', {dateStyle:'medium', timeStyle:'short'}) : '-'; };
+const setPending = () => { AU.pending = {ver:CONSENT_VER, at:Date.now()}; try { sessionStorage.setItem('gineung.consent', JSON.stringify(AU.pending)); } catch(_){} };
+const getPending = () => { if (AU.pending) return AU.pending; try { const p = JSON.parse(sessionStorage.getItem('gineung.consent')||'null'); return p && p.ver===CONSENT_VER && Date.now()-p.at < 30*60000 ? p : null; } catch(_){ return null; } };
+const clearPending = () => { AU.pending = null; try { sessionStorage.removeItem('gineung.consent'); } catch(_){} };
+
+function policyHTML(){
+  return `<dl class="policy">
+    <dt>수집 항목</dt><dd>필수: 구글 계정 이름, 이메일 주소, 회원 고유번호(UID), 동의 일시 · 선택: 표시 이름(별명), 사는 마을</dd>
+    <dt>이용 목적</dt><dd>회원 확인, 행복택시 부탁·배달 연결, 문의 응대</dd>
+    <dt>보유 기간</dt><dd>회원 탈퇴 시까지. 탈퇴하면 회원 정보·금고·행복택시 요청을 바로 삭제합니다.</dd>
+    <dt>보호 방법</dt><dd>이름·이메일은 관리자 공개키로 암호화해 일반 회원 정보와 따로 보관합니다. 여는 열쇠(비밀키)는 서버에 두지 않고 지정된 관리자·담당자만 비밀번호로 잠근 파일로 보관합니다.</dd>
+    <dt>다른 이용자에게 보이는 정보</dt><dd>행복택시를 쓰면 표시 이름·마을·부탁 내용이 로그인한 이웃에게 보입니다. 실명과 이메일은 보이지 않습니다.</dd>
+    <dt>처리 위탁·국외 처리</dt><dd>로그인 인증과 저장은 Google LLC의 Firebase(인증·Firestore)를 이용하며, 데이터가 국외 서버에서 처리될 수 있습니다.</dd>
+    <dt>동의 거부 권리</dt><dd>동의하지 않을 수 있습니다. 동의하지 않으면 로그인과 실시간 행복택시를 쓸 수 없고, 둘러보기·분석·AI 상담은 로그인 없이 쓸 수 있습니다.</dd>
+    <dt>문의</dt><dd>기능상속 팀 (시연용 프로토타입) · 처리방침 버전 ${CONSENT_VER}</dd>
+  </dl>`;
+}
+const G_ICON = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.9 6.2C12.4 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z"/><path fill="#FBBC05" d="M10.5 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.6 10.7l7.9-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.3 0-11.6-4.2-13.5-10l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>';
+
+function openAuth(mode){
+  const d = $('auth-dlg'), b = $('auth-body'), u = AU.user, p = AU.prof || {};
+  const close = '<button class="x" type="button" data-auth="close" aria-label="닫기">×</button>';
+  let h = '';
+  if (mode==='consent'){
+    if (!fbOn()) h = `<h3 id="auth-title">로그인</h3><p>${window.claude ? '로그인은 공개 사이트에서 이용할 수 있습니다.' : '로그인 기능을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.'}</p><p class="mono">${SITE_URL}</p>`;
+    else if (IN_APP) h = `<h3 id="auth-title">다른 브라우저로 열어 주세요</h3><p>카카오톡·네이버 같은 앱 안의 브라우저에서는 구글이 로그인을 막습니다. 오른쪽 위 메뉴에서 ‘다른 브라우저로 열기’를 눌러 크롬이나 사파리로 열어 주세요.</p><p class="mono">${SITE_URL}</p>`;
+    else h = `<h3 id="auth-title">${AU.needConsent ? '개인정보 동의가 필요합니다' : '구글로 로그인'}</h3>
+      <p>${AU.needConsent ? '아래 내용에 동의해야 계속 쓸 수 있습니다. 동의하지 않고 닫으면 로그아웃됩니다.' : '로그인은 구글 계정으로만 할 수 있습니다. 먼저 아래 내용을 확인해 주세요.'}</p>
+      ${policyHTML()}
+      <label class="agree"><input type="checkbox" id="ag-pi"><span>[필수] 개인정보 수집·이용에 동의합니다</span></label>
+      <label class="agree"><input type="checkbox" id="ag-14"><span>[필수] 만 14세 이상입니다<small>만 14세 미만은 법정대리인 동의가 필요해 가입할 수 없습니다.</small></span></label>
+      <button class="gbtn" type="button" id="g-login" disabled>${G_ICON}${AU.needConsent ? '동의하고 계속하기' : 'Google 계정으로 로그인'}</button>
+      <p class="aerr" id="auth-err" role="alert"></p>`;
+  } else if (mode==='policy'){
+    h = `<h3 id="auth-title">개인정보 처리방침</h3>${policyHTML()}`;
+  } else if (mode==='profile'){
+    const opts = VILLAGES.map(v=>`<option${v.name===p.village?' selected':''}>${esc(v.name)}</option>`).join('');
+    h = `<h3 id="auth-title">이웃에게 보일 정보</h3><p>행복택시에서 이웃에게 보일 이름과 사는 마을입니다. 실명이 아니어도 됩니다.</p>
+      <div class="field"><label for="pf-nick">표시 이름</label><input type="text" id="pf-nick" maxlength="12" value="${esc(p.nick || '')}" placeholder="예: 상리 김씨"></div>
+      <div class="field"><label for="pf-village">사는 마을</label><select id="pf-village"><option value="">선택 안 함</option>${opts}</select></div>
+      <div class="arow"><button class="btn dark" type="button" data-auth="save-profile">저장</button><button class="btn" type="button" data-auth="close">나중에</button></div>
+      <p class="aerr" id="auth-err" role="alert"></p>`;
+  } else if (mode==='account'){
+    h = `<h3 id="auth-title">내 정보</h3>
+      <dl class="kv"><dt>표시 이름</dt><dd>${esc(p.nick || '-')}</dd><dt>마을</dt><dd>${esc(p.village || '-')}</dd>
+      <dt>구글 계정</dt><dd>${esc(u.displayName || '')} · ${esc(u.email || '')}<small style="display:block;font-weight:400;color:var(--muted)">이 화면에만 보이며, 서버에는 암호화해서 보관합니다</small></dd>
+      <dt>동의</dt><dd>${fmtTime(p.consentAt)} (버전 ${esc(p.consentVer || '-')})</dd>
+      <dt>금고</dt><dd>${AU.keyInfo ? (p.vaultKid===AU.keyInfo.kid ? '암호화 보관됨' : '암호화 대기') : '관리자 열쇠 준비 전 · 이름·이메일을 아직 보관하지 않음'}</dd></dl>
+      <div class="arow"><button class="btn sm" type="button" data-auth="edit">정보 수정</button>${AU.admin ? '<button class="btn sm" type="button" data-auth="admin">관리자 페이지</button>' : ''}<button class="btn sm" type="button" data-auth="policy">처리방침</button><button class="btn sm dark" type="button" data-auth="logout">로그아웃</button></div>
+      <div class="arow" style="margin-top:6px"><button class="textlink" type="button" data-auth="delete" style="color:var(--gap)">${AU.delStep ? '정말 탈퇴할까요? 한 번 더 누르면 모든 정보가 삭제됩니다' : '회원 탈퇴 (정보 모두 삭제)'}</button></div>
+      <p class="aerr" id="auth-err" role="alert"></p>`;
+  }
+  b.innerHTML = close + h;
+  b.dataset.mode = mode;
+  if (!d.open){ try { d.showModal(); } catch(_){ d.setAttribute('open',''); } }
+}
+function closeAuth(){
+  const d = $('auth-dlg'); AU.delStep = 0;
+  if (d.open) d.close();
+}
+const authErr = e => { const el = $('auth-err'); if (el) el.textContent = errText(e); else console.warn(e); };
+
+function renderAuth(){
+  const b = $('nav-login'), u = AU.user;
+  if (u && AU.prof){ const n = AU.prof.nick || u.displayName || '나'; b.innerHTML = `<span class="av" aria-hidden="true">${esc([...n][0])}</span>내 정보`; b.setAttribute('aria-label','내 정보'); }
+  else { b.textContent = '로그인'; b.removeAttribute('aria-label'); }
+  if (u && AU.prof){ $('t-name').value = AU.prof.nick || ''; if ([...$('t-village').options].some(o=>o.value===AU.prof.village)) $('t-village').value = AU.prof.village; tFeePreview(); }
+}
+
+async function googleLogin(){
+  const A = FB.A, prov = new A.GoogleAuthProvider(); prov.setCustomParameters({prompt:'select_account'});
+  try { await A.signInWithPopup(FB.auth, prov); }
+  catch(e){ if (e.code==='auth/popup-blocked' || e.code==='auth/operation-not-supported-in-this-environment') await A.signInWithRedirect(FB.auth, prov); else throw e; }
+}
+
+async function onUser(u){
+  stopTaxiSync();
+  Object.assign(AU, {user:u, prof:null, admin:false, priv:null, privKid:'', rows:null, delStep:0});
+  if (!u){ AU.needConsent = false; renderAuth(); renderTaxi(); renderAdmin(); return; }
+  const {doc, getDoc, setDoc, serverTimestamp} = FB.F;
+  const ref = doc(FB.db, 'users', u.uid);
+  let prof = (await getDoc(ref)).data() || null;
+  if (!prof || prof.consentVer !== CONSENT_VER){
+    const pc = getPending();
+    if (!pc){ AU.needConsent = true; renderAuth(); openAuth('consent'); return; }
+    await setDoc(ref, {consentVer:CONSENT_VER, consentAt:serverTimestamp(), consentClientAt:new Date(pc.at).toISOString(), age14:true,
+      nick: prof?.nick || '', village: prof?.village || '', createdAt: prof?.createdAt || serverTimestamp(), updatedAt:serverTimestamp()}, {merge:true});
+    clearPending();
+    prof = (await getDoc(ref)).data();
+  }
+  AU.prof = prof; AU.needConsent = false;
+  try { AU.admin = (await getDoc(doc(FB.db, 'admins', u.uid))).exists(); } catch(_){ AU.admin = false; }
+  try { await syncVault(false); } catch(e){ console.warn('vault', e); }
+  renderAuth(); renderAdmin(); startTaxiSync();
+  const d = $('auth-dlg');
+  if (!prof.nick) openAuth('profile'); else if (d.open && $('auth-body').dataset.mode==='consent') closeAuth();
+}
+
+async function loadKeyInfo(){
+  const s = await FB.F.getDoc(FB.F.doc(FB.db, 'config', 'publicKey'));
+  AU.keyInfo = s.exists() ? s.data() : null; return AU.keyInfo;
+}
+async function syncVault(force){
+  const u = AU.user, {doc, setDoc, updateDoc, serverTimestamp} = FB.F;
+  const k = await loadKeyInfo(); if (!k || !k.jwk) return;
+  if (!force && AU.prof.vaultKid === k.kid) return;
+  const box = await CK.seal(k.jwk, {name:u.displayName || '', email:u.email || '', nick:AU.prof.nick || '', village:AU.prof.village || '', savedAt:new Date().toISOString()}, u.uid);
+  await setDoc(doc(FB.db, 'vault', u.uid), {...box, kid:k.kid, v:1, updatedAt:serverTimestamp()});
+  await updateDoc(doc(FB.db, 'users', u.uid), {vaultKid:k.kid, updatedAt:serverTimestamp()});
+  AU.prof.vaultKid = k.kid;
+}
+
+async function deleteAccount(){
+  const u = AU.user, {doc, deleteDoc, collection, query, where, getDocs} = FB.F;
+  stopTaxiSync();
+  const qs = await getDocs(query(collection(FB.db, 'taxiRequests'), where('requester', '==', u.uid)));
+  for (const d of qs.docs) await deleteDoc(d.ref);
+  await deleteDoc(doc(FB.db, 'vault', u.uid));
+  await deleteDoc(doc(FB.db, 'users', u.uid));
+  try { await FB.A.deleteUser(u); }
+  catch(e){ if (e.code !== 'auth/requires-recent-login') throw e; await FB.A.reauthenticateWithPopup(u, new FB.A.GoogleAuthProvider()); await FB.A.deleteUser(u); }
+}
+
+document.addEventListener('click', async e=>{
+  if (e.target.closest('#nav-login')){ AU.user && AU.prof ? openAuth('account') : openAuth('consent'); return; }
+  if (e.target.closest('#foot-policy')){ openAuth('policy'); return; }
+  if (e.target.closest('[data-login]')){ openAuth('consent'); return; }
+  const a = e.target.closest('[data-auth]'); if (!a || AU.busy) return;
+  const act = a.dataset.auth;
+  if (act==='close'){ if (AU.needConsent && AU.user){ await FB.A.signOut(FB.auth); } closeAuth(); return; }
+  if (act==='policy'){ openAuth('policy'); return; }
+  if (act==='edit'){ openAuth('profile'); return; }
+  if (act==='admin'){ closeAuth(); go('admin'); return; }
+  AU.busy = true; a.disabled = true;
+  try {
+    if (act==='logout'){ await FB.A.signOut(FB.auth); closeAuth(); }
+    else if (act==='save-profile'){
+      const nick = $('pf-nick').value.trim().slice(0,12), village = $('pf-village').value;
+      if (!nick) throw new Error('표시 이름을 적어 주세요.');
+      await FB.F.updateDoc(FB.F.doc(FB.db, 'users', AU.user.uid), {nick, village, updatedAt:FB.F.serverTimestamp()});
+      Object.assign(AU.prof, {nick, village});
+      await syncVault(true);
+      renderAuth(); renderTaxi(); closeAuth();
+    }
+    else if (act==='delete'){
+      if (!AU.delStep){ AU.delStep = 1; openAuth('account'); }
+      else { await deleteAccount(); closeAuth(); }
+    }
+  } catch(err){ authErr(err); }
+  finally { AU.busy = false; a.disabled = false; }
+});
+document.addEventListener('change', e=>{
+  if (e.target.id==='ag-pi' || e.target.id==='ag-14') $('g-login').disabled = !($('ag-pi').checked && $('ag-14').checked);
+});
+document.addEventListener('click', async e=>{
+  if (!e.target.closest('#g-login')) return;
+  const btn = $('g-login'); if (btn.disabled) return;
+  setPending(); btn.disabled = true; $('auth-err').textContent = '';
+  try { if (AU.needConsent && AU.user) await onUser(AU.user); else await googleLogin(); }
+  catch(err){ authErr(err); btn.disabled = false; }
+});
+$('auth-dlg').addEventListener('cancel', async e=>{ if (AU.needConsent && AU.user && fbOn()) await FB.A.signOut(FB.auth); AU.delStep = 0; });
+
+/* 관리자 페이지 */
+function renderAdmin(){
+  const el = $('admin-body'); if (!el || $('admin').hidden) return;
+  if (!fbOn()){ el.innerHTML = `<div class="card" style="padding:24px"><p>관리자 기능은 공개 사이트에서만 쓸 수 있습니다.</p><p class="mono">${SITE_URL}#admin</p></div>`; return; }
+  if (!AU.user){ el.innerHTML = `<div class="card" style="padding:24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start"><p>관리자 계정으로 로그인해 주세요.</p><button class="btn dark" type="button" data-login>구글로 로그인</button></div>`; return; }
+  if (!AU.admin){
+    el.innerHTML = `<div class="card" style="padding:24px;display:flex;flex-direction:column;gap:12px">
+      <h3 style="margin:0">관리자로 등록되지 않은 계정입니다</h3>
+      <p>관리자 등록은 사이트에서 할 수 없고, Firebase 콘솔에서만 할 수 있습니다. 아래 UID를 콘솔의 Firestore <b>admins</b> 컬렉션에 문서 ID로 추가하면 관리자가 됩니다.</p>
+      <dl class="kv"><dt>내 UID</dt><dd class="mono" id="my-uid">${esc(AU.user.uid)}</dd></dl>
+      <div class="arow"><button class="btn sm" type="button" id="copy-uid">UID 복사</button></div></div>`; return;
+  }
+  const k = AU.keyInfo;
+  el.innerHTML = `<div class="admgrid">
+    <div class="card"><h3>1. 금고 열쇠</h3>
+      <p>${k ? `현재 열쇠 <b class="mono">${esc(k.kid)}</b> · ${fmtTime(k.createdAt)} 만듦` : '아직 열쇠가 없습니다. 열쇠를 만들어야 회원 이름·이메일이 금고에 저장됩니다.'}</p>
+      <p>열쇠를 만들면 비밀키 파일이 내려받아지고, 공개키만 서버에 올라갑니다. 파일과 비밀번호를 잃으면 금고를 열 수 없습니다.</p>
+      <input type="password" id="k-pw" placeholder="열쇠 비밀번호 (10자 이상)" autocomplete="new-password">
+      <input type="password" id="k-pw2" placeholder="비밀번호 확인" autocomplete="new-password">
+      ${k ? '<label class="agree" style="font-weight:500"><input type="checkbox" id="k-replace"><span>열쇠를 바꿉니다<small>예전 열쇠로 잠긴 정보는 예전 파일로 열 수 있고, 회원이 다음에 로그인하면 새 열쇠로 다시 잠깁니다.</small></span></label>' : ''}
+      <button class="btn dark" type="button" id="k-gen">${k ? '새 열쇠 만들기' : '열쇠 만들기'}</button>
+      <p class="aerr" id="k-msg" role="status"></p></div>
+    <div class="card"><h3>2. 금고 열기</h3>
+      <p>열쇠 파일과 비밀번호로 이 기기 안에서만 엽니다. 연 내용은 저장되지 않고, 페이지를 떠나거나 잠그면 사라집니다.</p>
+      <input type="file" id="v-file" accept=".json,application/json">
+      <input type="password" id="v-pw" placeholder="열쇠 비밀번호" autocomplete="current-password">
+      <div class="arow"><button class="btn dark" type="button" id="v-open">금고 열기</button>${AU.priv ? '<button class="btn" type="button" id="v-lock">잠그기</button>' : ''}</div>
+      <p class="aerr" id="v-msg" role="status"></p></div>
+  </div>
+  <div class="vwrap" id="v-out">${AU.rows ? vaultTable(AU.rows) : ''}</div>`;
+}
+function vaultTable(rows){
+  if (!rows.length) return '<div class="empty2">회원 정보가 없습니다.</div>';
+  return `<table class="vtable"><thead><tr><th>표시 이름</th><th>이름</th><th>이메일</th><th>마을</th><th>동의 일시</th><th>열쇠</th><th>UID</th></tr></thead><tbody>${rows.map(r=>`<tr>
+    <td>${esc(r.nick || '-')}</td><td>${esc(r.name ?? '')}</td><td>${esc(r.email ?? '')}</td><td>${esc(r.village || '-')}</td><td>${fmtTime(r.consentAt)}</td><td>${r.state}</td><td class="mono">${esc(r.uid)}</td></tr>`).join('')}</tbody></table>`;
+}
+document.addEventListener('click', async e=>{
+  const t = e.target;
+  if (t.id==='copy-uid'){ try { await navigator.clipboard.writeText(AU.user.uid); t.textContent = '복사했습니다'; } catch(_){ const r = document.createRange(); r.selectNodeContents($('my-uid')); getSelection().removeAllRanges(); getSelection().addRange(r); t.textContent = '선택했습니다 · 복사하세요'; } return; }
+  if (t.id==='v-lock'){ AU.priv = null; AU.rows = null; renderAdmin(); return; }
+  if (t.id==='k-gen'){
+    const pw = $('k-pw').value, msg = $('k-msg');
+    if (pw.length < 10) { msg.textContent = '비밀번호는 10자 이상으로 해 주세요.'; return; }
+    if (pw !== $('k-pw2').value) { msg.textContent = '비밀번호 확인이 다릅니다.'; return; }
+    if (AU.keyInfo && !$('k-replace').checked) { msg.textContent = '‘열쇠를 바꿉니다’에 체크해 주세요.'; return; }
+    t.disabled = true; msg.textContent = '열쇠를 만드는 중…';
+    try {
+      const g = await CK.genKeys(pw);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(g.file, null, 2)], {type:'application/json'}));
+      a.download = `gineung-admin-key-${g.kid}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      await FB.F.setDoc(FB.F.doc(FB.db, 'config', 'publicKey'), {jwk:g.pub, kid:g.kid, alg:'RSA-OAEP-3072/SHA-256', createdAt:FB.F.serverTimestamp(), by:AU.user.uid});
+      await loadKeyInfo(); await syncVault(true).catch(()=>{});
+      renderAdmin(); $('k-msg').textContent = `열쇠 ${g.kid}를 만들었습니다. 내려받은 파일을 안전한 곳(USB 등)에 보관하세요.`;
+    } catch(err){ msg.textContent = errText(err); t.disabled = false; }
+    return;
+  }
+  if (t.id==='v-open'){
+    const f = $('v-file').files[0], msg = $('v-msg');
+    if (!f){ msg.textContent = '열쇠 파일을 골라 주세요.'; return; }
+    t.disabled = true; msg.textContent = '여는 중…';
+    try {
+      const kf = JSON.parse(await f.text());
+      AU.priv = await CK.openKeyFile(kf, $('v-pw').value); AU.privKid = kf.kid;
+      const {collection, getDocs} = FB.F;
+      const [vs, us] = await Promise.all([getDocs(collection(FB.db, 'vault')), getDocs(collection(FB.db, 'users'))]);
+      const users = Object.fromEntries(us.docs.map(d=>[d.id, d.data()]));
+      const rows = [];
+      for (const d of vs.docs){
+        const v = d.data(), uinfo = users[d.id] || {};
+        let r = {uid:d.id, nick:uinfo.nick, village:uinfo.village, consentAt:uinfo.consentAt, state:esc(v.kid)};
+        if (v.kid !== AU.privKid) r = {...r, name:'(다른 열쇠)', email:''};
+        else { try { r = {...r, ...(await CK.open(AU.priv, v, d.id)), state:'열림'}; } catch(_){ r = {...r, name:'(열 수 없음)', email:''}; } }
+        rows.push(r);
+      }
+      for (const [uid, uinfo] of Object.entries(users)) if (!vs.docs.some(d=>d.id===uid)) rows.push({uid, nick:uinfo.nick, village:uinfo.village, consentAt:uinfo.consentAt, name:'(금고 없음)', email:'', state:'-'});
+      AU.rows = rows; renderAdmin(); $('v-msg').textContent = `${rows.length}명을 불러왔습니다.`;
+    } catch(err){ AU.priv = null; msg.textContent = errText(err); t.disabled = false; }
+  }
+});
+window.addEventListener('hashchange', ()=>{ if (location.hash !== '#admin' && AU.rows){ AU.priv = null; AU.rows = null; } });
+
+/* 행복택시 실시간 연결 (로그인한 이웃끼리) */
+function startTaxiSync(){
+  if (!AU.user || AU.unsub) return;
+  const {collection, query, orderBy, limit, onSnapshot} = FB.F, uid = AU.user.uid;
+  AU.unsub = onSnapshot(query(collection(FB.db, 'taxiRequests'), orderBy('at', 'desc'), limit(80)), s=>{
+    const before = new Set(AU.remote.map(r=>r.id));
+    AU.remote = s.docs.map(d=>{ const x = d.data(); return {id:'f:'+d.id, docId:d.id, remote:true, name:x.nick || '주민', village:x.village, items:x.items || [], etc:x.etc || '',
+      due:x.due, drop:x.drop, price:x.price || 0, fee:x.fee || 0, status:x.status || 'open', mine:x.requester===uid,
+      driver: x.driver ? (x.driver===uid ? '나' : (x.driverNick || '이웃')) : null, at:x.at || Date.now(), fresh: before.size>0 && !before.has('f:'+d.id)}; });
+    renderTaxi();
+  }, e=>{ console.warn('taxi sync', e); AU.unsub = null; });
+}
+function stopTaxiSync(){ if (AU.unsub){ AU.unsub(); AU.unsub = null; } AU.remote = []; }
+const tLive = () => !!(AU.user && AU.prof);
+const tReqs = () => tLive() ? [...taxi.reqs.filter(r=>r.sample), ...AU.remote] : taxi.reqs;
+async function tRemote(id, patch){
+  const r = AU.remote.find(x=>x.id===id); if (!r) return;
+  const {doc, updateDoc, deleteDoc} = FB.F, ref = doc(FB.db, 'taxiRequests', r.docId);
+  try { patch==='delete' ? await deleteDoc(ref) : await updateDoc(ref, patch); }
+  catch(e){ $('t-msg').textContent = e.code==='permission-denied' ? '이미 다른 이웃이 수락한 부탁입니다.' : errText(e); }
+}
+function renderTaxiLive(){
+  const el = $('taxi-live'); if (!el) return;
+  el.className = 'livebar' + (tLive() ? ' on' : '');
+  el.innerHTML = tLive() ? `<span><span class="dot"></span><b>${esc(AU.prof.nick)}</b>님, 실시간 연결 중입니다. 로그인한 이웃의 부탁이 바로 보입니다.</span>`
+    : fbOn() ? `<span><span class="dot"></span>지금은 이 기기 안에서만 동작합니다. 로그인하면 다른 휴대폰과 실시간으로 연결됩니다.</span><button class="btn sm dark" type="button" data-login>구글로 로그인</button>`
+    : `<span><span class="dot"></span>시연 모드입니다. 실시간 연결은 공개 사이트에서 로그인하면 쓸 수 있습니다.</span>`;
+}
+
 const T_KEY = 'gineung.taxi.v1';
 const T_ITEMS = ['세제','휴지','라면','두부','계란','우유','채소','쌀 10kg','생수','부탄가스','건전지','비료','농약'];
 const TOWN = '솔메리';                                   // 읍내(상점이 모인 곳)
@@ -1860,10 +2231,11 @@ function tFeePreview(){
 }
 
 function renderTaxi(){
+  renderTaxiLive(); const ALL = tReqs();
   document.querySelectorAll('#taxi-role [data-role]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.role===taxi.role));
   $('taxi-ask').hidden = taxi.role!=='ask'; $('taxi-drive').hidden = taxi.role!=='drive';
   // 내 요청
-  const mine = taxi.reqs.filter(r=>r.mine).sort((a,b)=>b.at-a.at);
+  const mine = ALL.filter(r=>r.mine).sort((a,b)=>b.at-a.at);
   $('t-mine').innerHTML = mine.length ? mine.map(r=>`<div class="card call">
       <div class="who"><b>${esc(tItemsText(r))}</b> 부탁</div>
       ${tStepsHTML(r.status)}
@@ -1874,7 +2246,7 @@ function renderTaxi(){
     </div>`).join('') : '<div class="empty2">아직 부탁한 물건이 없습니다. 왼쪽에서 필요한 물건을 골라 이웃에게 부탁해 보세요.</div>';
   // 기사 화면
   const from = V(taxi.route.from), to = V(taxi.route.to);
-  const open = taxi.reqs.filter(r=>r.status==='open').map(r=>{ const v = V(r.village); const det = Math.max(0, road(from,v) + road(v,to) - road(from,to)); return {r, det}; }).sort((a,b)=>a.det-b.det);
+  const open = ALL.filter(r=>r.status==='open' && !r.mine).map(r=>{ const v = V(r.village); const det = Math.max(0, road(from,v) + road(v,to) - road(from,to)); return {r, det}; }).sort((a,b)=>a.det-b.det);
   $('d-open').textContent = open.length ? `${open.length}건 · 돌아오는 길에 가까운 순` : '';
   $('d-calls').innerHTML = open.length ? open.map(({r,det})=>`<div class="card call${r.fresh?' new':''}">
       ${r.sample?'<span class="ex">예시</span>':''}
@@ -1883,7 +2255,7 @@ function renderTaxi(){
       <div class="buy">구매처 추천: ${esc(buyPlace(r.items))} · 물건값 약 ${won(r.price)}${r.items.includes('농약')?' · 농약 구매자 정보 필요':''}</div>
       <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span><button class="btn dark" type="button" data-taccept="${r.id}">수락하기</button></div>
     </div>`).join('') : '<div class="empty2">지금 들어온 부탁이 없습니다.</div>';
-  const my = taxi.reqs.filter(r=>r.driver==='나' && r.status!=='open').sort((a,b)=>T_STATUS[a.status]-T_STATUS[b.status]);
+  const my = ALL.filter(r=>r.driver==='나' && r.status!=='open').sort((a,b)=>T_STATUS[a.status]-T_STATUS[b.status]);
   $('d-mine').innerHTML = my.length ? my.map(r=>`<div class="card call">
       <div class="who"><b>${esc(r.name)}</b>님 · ${esc(tItemsText(r))}</div>
       ${tStepsHTML(r.status)}
@@ -1891,9 +2263,9 @@ function renderTaxi(){
       <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span>
         ${r.status==='accepted'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">구매 완료</button>`:r.status==='bought'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">배달 완료</button>`:'<span class="badge ok">완료</span>'}</div>
     </div>`).join('') : '<div class="empty2">수락한 배달이 없습니다. 오른쪽 부탁 중 돌아오는 길에 있는 것을 수락해 보세요.</div>';
-  const doneMine = taxi.reqs.filter(r=>r.driver==='나' && r.status==='done');
+  const doneMine = ALL.filter(r=>r.driver==='나' && r.status==='done');
   $('d-count').textContent = `${doneMine.length}건`; $('d-earn').textContent = won(doneMine.reduce((s,r)=>s+r.fee,0));
-  taxi.reqs.forEach(r=>{ delete r.fresh; });
+  ALL.forEach(r=>{ delete r.fresh; });
 }
 function tSimulateAccept(id){
   setTimeout(()=>{ const r = taxi.reqs.find(x=>x.id===id); if (!r || r.status!=='open') return;
@@ -1906,6 +2278,16 @@ $('taxi-form').addEventListener('submit', e=>{
   const items = tPicked(), etc = $('t-etc').value.trim(), name = $('t-name').value.trim() || '주민';
   if (!items.length && !etc){ $('t-msg').textContent = '필요한 물건을 하나 이상 골라 주세요.'; return; }
   const v = $('t-village').value, f = tFee(v, items);
+  if (tLive()){
+    const btn = $('t-submit'); btn.disabled = true;
+    FB.F.addDoc(FB.F.collection(FB.db, 'taxiRequests'), {requester:AU.user.uid, nick:AU.prof.nick, village:v, items, etc, due:$('t-due').value, drop:$('t-drop').value,
+      price:tPrice(items)+(etc?5000:0), fee:f.total, status:'open', driver:null, at:Date.now()})
+      .then(()=>{ document.querySelectorAll('#t-items input').forEach(i=>i.checked=false); $('t-etc').value = ''; tFeePreview();
+        $('t-msg').textContent = `${v} 쪽으로 돌아가는 이웃에게 실시간으로 알렸습니다.`; })
+      .catch(err=>{ $('t-msg').textContent = errText(err); })
+      .finally(()=>{ btn.disabled = false; });
+    return;
+  }
   const r = {id:'m'+(taxi.seq++), name, village:v, items, etc, due:$('t-due').value, drop:$('t-drop').value, price:tPrice(items)+(etc?5000:0), fee:f.total, status:'open', mine:true, fresh:true, at:Date.now()};
   taxi.reqs.push(r); tSave();
   document.querySelectorAll('#t-items input').forEach(i=>i.checked=false); $('t-etc').value = ''; tFeePreview();
@@ -1919,6 +2301,13 @@ $('taxi').addEventListener('change', e=>{
 });
 $('taxi').addEventListener('click', e=>{
   const rb = e.target.closest('[data-role]'); if (rb){ taxi.role = rb.dataset.role; tSave(); renderTaxi(); return; }
+  const rid = e.target.closest('[data-taccept],[data-tnext],[data-tcancel]');
+  if (rid && tLive()){ const id = rid.dataset.taccept || rid.dataset.tnext || rid.dataset.tcancel;
+    if (id.startsWith('f:')){ const r = AU.remote.find(x=>x.id===id); if (!r) return;
+      if (rid.dataset.taccept) tRemote(id, {driver:AU.user.uid, driverNick:AU.prof.nick, status:'accepted'});
+      else if (rid.dataset.tnext) tRemote(id, {status: r.status==='accepted' ? 'bought' : 'done'});
+      else tRemote(id, 'delete');
+      return; } }
   const a = e.target.closest('[data-taccept]'); if (a){ const r = taxi.reqs.find(x=>x.id===a.dataset.taccept); if (r){ r.status='accepted'; r.driver='나'; tSave(); renderTaxi(); } return; }
   const n = e.target.closest('[data-tnext]'); if (n){ const r = taxi.reqs.find(x=>x.id===n.dataset.tnext); if (r){ r.status = r.status==='accepted' ? 'bought' : 'done'; tSave(); renderTaxi(); } return; }
   const c = e.target.closest('[data-tcancel]'); if (c){ taxi.reqs = taxi.reqs.filter(x=>x.id!==c.dataset.tcancel); tSave(); renderTaxi(); }
@@ -1927,6 +2316,21 @@ tLoad(); renderTaxiForm(); renderTaxi();
 setInterval(()=>{ if (!$('taxi').hidden) renderTaxi(); }, 60000);
 
 fromHash();
+</script>
+<script type="module">
+// Firebase(구글 로그인·Firestore)는 공개 사이트에서만 불러온다. 설정값은 공개용 식별자이며, 보안은 Firestore 보안 규칙이 담당한다.
+if (!window.claude){
+  const base = 'https://www.gstatic.com/firebasejs/10.12.2/';
+  Promise.all([import(base+'firebase-app.js'), import(base+'firebase-auth.js'), import(base+'firebase-firestore.js')]).then(([app, A, F])=>{
+    const fa = app.initializeApp({apiKey:'AIzaSyABuBLGjQzQmmCJ0IKBQcACpFuNCtCIWaY', authDomain:'gineung.firebaseapp.com', projectId:'gineung',
+      storageBucket:'gineung.firebasestorage.app', messagingSenderId:'282529661431', appId:'1:282529661431:web:30722d83c5b456a5592ef2'});
+    const auth = A.getAuth(fa); auth.languageCode = 'ko';
+    window.FB = {auth, db:F.getFirestore(fa), A, F};
+    A.getRedirectResult(auth).catch(e=>console.warn(e));
+    A.onAuthStateChanged(auth, u=>{ onUser(u).catch(e=>{ console.warn(e); authErr(e); }); });
+    renderTaxi(); renderAdmin();
+  }).catch(e=>console.warn('Firebase 불러오기 실패', e));
+}
 </script>
 
 </body>
