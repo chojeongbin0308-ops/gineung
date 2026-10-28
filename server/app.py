@@ -47,7 +47,9 @@ def pick_model():
 MODEL_NAME, MODEL_VER, MODEL_META = pick_model()
 REGION = os.getenv('GINEUNG_REGION', '임실군')
 ORIGINS = ['https://chojeongbin0308-ops.github.io', 'http://localhost:8787', 'http://127.0.0.1:8787']
-RATE_PER_MIN = int(os.getenv('GINEUNG_RATE', '30'))
+RATE_PER_MIN = int(os.getenv('GINEUNG_RATE', '30'))          # 접속지 하나당 분당
+GLOBAL_PER_MIN = int(os.getenv('GINEUNG_GLOBAL_RATE', '300'))  # 서버 전체 분당 (PC 보호)
+MAX_BODY = 2048                                               # 요청 크기 상한(바이트)
 MAX_CHARS = 200
 VERSION = '1.0'
 
@@ -148,6 +150,25 @@ app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=['GET', 
                    allow_headers=['Content-Type', 'ngrok-skip-browser-warning'], max_age=600)
 
 
+@app.middleware('http')
+async def guard(request: Request, call_next):
+    # 열린 주소는 /health, /search 두 개뿐. 큰 요청은 본문을 읽기 전에 거절
+    if request.url.path not in ('/health', '/search'):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({'detail': 'not found'}, status_code=404)
+    try:
+        if int(request.headers.get('content-length') or 0) > MAX_BODY:
+            from fastapi.responses import JSONResponse
+            return JSONResponse({'detail': 'too large'}, status_code=413)
+    except ValueError:
+        pass
+    resp = await call_next(request)
+    resp.headers['X-Content-Type-Options'] = 'nosniff'
+    resp.headers['Cache-Control'] = 'no-store'
+    resp.headers['Referrer-Policy'] = 'no-referrer'
+    return resp
+
+
 @app.on_event('startup')
 def _load():
     global engine
@@ -158,15 +179,22 @@ def client_ip(req: Request):
     return req.headers.get('cf-connecting-ip') or (req.headers.get('x-forwarded-for') or '').split(',')[0].strip() or (req.client.host if req.client else '?')
 
 
+allq = collections.deque()
+
+
 def rate_ok(ip):
     now = time.time()
     with lock:
+        while allq and now - allq[0] > 60:
+            allq.popleft()
+        if len(allq) >= GLOBAL_PER_MIN:
+            return False
         q = hits[ip]
         while q and now - q[0] > 60:
             q.popleft()
         if len(q) >= RATE_PER_MIN:
             return False
-        q.append(now)
+        q.append(now); allq.append(now)
         if len(hits) > 5000:
             hits.clear()
         return True
