@@ -2084,7 +2084,7 @@ function renderAdmin(){
 function vaultTable(rows){
   if (!rows.length) return '<div class="empty2">회원 정보가 없습니다.</div>';
   return `<table class="vtable"><thead><tr><th>표시 이름</th><th>이름</th><th>이메일</th><th>마을</th><th>동의 일시</th><th>열쇠</th><th>UID</th></tr></thead><tbody>${rows.map(r=>`<tr>
-    <td>${esc(r.nick || '-')}</td><td>${esc(r.name ?? '')}</td><td>${esc(r.email ?? '')}</td><td>${esc(r.village || '-')}</td><td>${fmtTime(r.consentAt)}</td><td>${r.state}</td><td class="mono">${esc(r.uid)}</td></tr>`).join('')}</tbody></table>`;
+    <td>${esc(r.nick || '-')}</td><td>${esc(r.name ?? '')}</td><td>${esc(r.email ?? '')}</td><td>${esc(r.village || '-')}</td><td>${fmtTime(r.consentAt)}</td><td>${esc(r.state)}</td><td class="mono">${esc(r.uid)}</td></tr>`).join('')}</tbody></table>`;
 }
 document.addEventListener('click', async e=>{
   const t = e.target;
@@ -2119,9 +2119,9 @@ document.addEventListener('click', async e=>{
       const rows = [];
       for (const d of vs.docs){
         const v = d.data(), uinfo = users[d.id] || {};
-        let r = {uid:d.id, nick:uinfo.nick, village:uinfo.village, consentAt:uinfo.consentAt, state:esc(v.kid)};
+        let r = {uid:d.id, nick:uinfo.nick, village:uinfo.village, consentAt:uinfo.consentAt, state:String(v.kid ?? '')};
         if (v.kid !== AU.privKid) r = {...r, name:'(다른 열쇠)', email:''};
-        else { try { r = {...r, ...(await CK.open(AU.priv, v, d.id)), state:'열림'}; } catch(_){ r = {...r, name:'(열 수 없음)', email:''}; } }
+        else { try { const o = await CK.open(AU.priv, v, d.id); r = {...r, name:String(o?.name ?? '').slice(0,80), email:String(o?.email ?? '').slice(0,120), state:'열림'}; } catch(_){ r = {...r, name:'(열 수 없음)', email:''}; } }
         rows.push(r);
       }
       for (const [uid, uinfo] of Object.entries(users)) if (!vs.docs.some(d=>d.id===uid)) rows.push({uid, nick:uinfo.nick, village:uinfo.village, consentAt:uinfo.consentAt, name:'(금고 없음)', email:'', state:'-'});
@@ -2137,9 +2137,13 @@ function startTaxiSync(){
   const {collection, query, orderBy, limit, onSnapshot} = FB.F, uid = AU.user.uid;
   AU.unsub = onSnapshot(query(collection(FB.db, 'taxiRequests'), orderBy('at', 'desc'), limit(80)), s=>{
     const before = new Set(AU.remote.map(r=>r.id));
-    AU.remote = s.docs.map(d=>{ const x = d.data(); return {id:'f:'+d.id, docId:d.id, remote:true, name:x.nick || '주민', village:x.village, items:x.items || [], etc:x.etc || '',
-      due:x.due, drop:x.drop, price:x.price || 0, fee:x.fee || 0, status:x.status || 'open', mine:x.requester===uid,
-      driver: x.driver ? (x.driver===uid ? '나' : (x.driverNick || '이웃')) : null, at:x.at || Date.now(), fresh: before.size>0 && !before.has('f:'+d.id)}; });
+    // 다른 사람이 쓴 데이터이므로 형식을 검사하고, 맞지 않는 요청은 화면에 올리지 않는다
+    const str = (v, n) => typeof v==='string' ? v.slice(0, n) : '', num = v => Number.isFinite(v) && v >= 0 && v < 1e7 ? v : 0;
+    AU.remote = s.docs.map(d=>{ const x = d.data();
+      if (!V(x.village) || x.village===TOWN || !(x.status in T_STATUS) || !/^[A-Za-z0-9_-]{1,40}$/.test(d.id)) return null;
+      return {id:'f:'+d.id, docId:d.id, remote:true, name:str(x.nick,12) || '주민', village:x.village, items:Array.isArray(x.items) ? x.items.filter(i=>typeof i==='string').slice(0,20).map(i=>i.slice(0,20)) : [], etc:str(x.etc,60),
+      due:str(x.due,20), drop:str(x.drop,20), price:num(x.price), fee:num(x.fee), status:x.status, mine:x.requester===uid,
+      driver: x.driver ? (x.driver===uid ? '나' : (str(x.driverNick,12) || '이웃')) : null, at:num(x.at) || Date.now(), fresh: before.size>0 && !before.has('f:'+d.id)}; }).filter(Boolean);
     renderTaxi();
   }, e=>{ console.warn('taxi sync', e); AU.unsub = null; });
 }
@@ -2233,7 +2237,7 @@ function renderTaxi(){
       <div class="meta"><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(r.due)}</span><span>${tAgo(r.at)}</span></div>
       <div class="row2"><span>${r.status==='open' ? '근처 이웃이 확인하는 중이에요' : r.status==='done' ? '배달이 끝났어요. 물건값과 수수료를 전달해 주세요' : `<b>${esc(r.driver)}</b>님이 ${r.status==='accepted'?'수락했어요. 읍내에서 사서 갈게요':'물건을 샀어요. 곧 도착해요'}`}</span>
         <span class="fee">${won(r.fee)}<small>수수료</small></span></div>
-      ${r.status==='open' ? `<div class="rowact"><button class="btn sm" type="button" data-tcancel="${r.id}">요청 취소</button></div>` : ''}
+      ${r.status==='open' ? `<div class="rowact"><button class="btn sm" type="button" data-tcancel="${esc(r.id)}">요청 취소</button></div>` : ''}
     </div>`).join('') : '<div class="empty2">아직 부탁한 물건이 없습니다. 왼쪽에서 필요한 물건을 골라 이웃에게 부탁해 보세요.</div>';
   // 기사 화면
   const from = V(taxi.route.from), to = V(taxi.route.to);
@@ -2244,7 +2248,7 @@ function renderTaxi(){
       <div class="who"><b>${esc(r.name)}</b>님이 <b>${esc(tItemsText(r))}</b> 배달을 요청하셨습니다</div>
       <div class="meta"><span class="${det<1.5?'route-ok':'route-far'}">${det<0.1?'가는 길 그대로':det<1.5?`돌아오는 길 +${det.toFixed(1)}km`:`${det.toFixed(1)}km 돌아감`}</span><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(r.due)}</span><span>${tAgo(r.at)}</span></div>
       <div class="buy">구매처 추천: ${esc(buyPlace(r.items))} · 물건값 약 ${won(r.price)}${r.items.includes('농약')?' · 농약 구매자 정보 필요':''}</div>
-      <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span><button class="btn dark" type="button" data-taccept="${r.id}">수락하기</button></div>
+      <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span><button class="btn dark" type="button" data-taccept="${esc(r.id)}">수락하기</button></div>
     </div>`).join('') : '<div class="empty2">지금 들어온 부탁이 없습니다.</div>';
   const my = ALL.filter(r=>r.driver==='나' && r.status!=='open').sort((a,b)=>T_STATUS[a.status]-T_STATUS[b.status]);
   $('d-mine').innerHTML = my.length ? my.map(r=>`<div class="card call">
@@ -2252,7 +2256,7 @@ function renderTaxi(){
       ${tStepsHTML(r.status)}
       <div class="meta"><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(buyPlace(r.items))}에서 구매</span></div>
       <div class="row2"><span class="fee">${won(r.fee)}<small>수수료</small></span>
-        ${r.status==='accepted'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">구매 완료</button>`:r.status==='bought'?`<button class="btn dark sm" type="button" data-tnext="${r.id}">배달 완료</button>`:'<span class="badge ok">완료</span>'}</div>
+        ${r.status==='accepted'?`<button class="btn dark sm" type="button" data-tnext="${esc(r.id)}">구매 완료</button>`:r.status==='bought'?`<button class="btn dark sm" type="button" data-tnext="${esc(r.id)}">배달 완료</button>`:'<span class="badge ok">완료</span>'}</div>
     </div>`).join('') : '<div class="empty2">수락한 배달이 없습니다. 오른쪽 부탁 중 돌아오는 길에 있는 것을 수락해 보세요.</div>';
   const doneMine = ALL.filter(r=>r.driver==='나' && r.status==='done');
   $('d-count').textContent = `${doneMine.length}건`; $('d-earn').textContent = won(doneMine.reduce((s,r)=>s+r.fee,0));

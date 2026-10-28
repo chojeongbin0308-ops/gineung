@@ -1,3 +1,7 @@
 __pycache__/
 runs/
 *.pt
+
+# 관리자 열쇠 파일은 절대 올리지 않음
+gineung-admin-key-*.json
+*admin-key*.json
