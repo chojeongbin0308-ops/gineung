@@ -51,7 +51,7 @@ RATE_PER_MIN = int(os.getenv('GINEUNG_RATE', '30'))          # 접속지 하나�
 GLOBAL_PER_MIN = int(os.getenv('GINEUNG_GLOBAL_RATE', '300'))  # 서버 전체 분당 (PC 보호)
 MAX_BODY = 2048                                               # 요청 크기 상한(바이트)
 MAX_CHARS = 200
-VERSION = '1.0'
+VERSION = '1.1'
 
 COLS = {'name': '상호명', 'big': '상권업종대분류명', 'mid': '상권업종중분류명', 'small': '상권업종소분류명',
         'addr': '도로명주소', 'lat': '위도', 'lng': '경도', 'gu': '시군구명', 'dong': '행정동명', 'id': '상가업소번호'}
@@ -93,31 +93,73 @@ def load_stores():
     return df, files
 
 
+def load_knowledge():
+    """train/build_knowledge.py 가 만든 data/knowledge.json (상가 외 생활기능·시설, 근거, 상품권, 제도). 없으면 상가만."""
+    p = os.path.join(DATA_DIR, 'knowledge.json')
+    if not os.path.exists(p):
+        return None, None
+    import json
+    return json.load(open(p, encoding='utf-8')), p
+
+
+_norm = lambda s: __import__('re').sub(r'[\s()\[\]·.\-]|주식회사|\(주\)', '', str(s or '')).lower()
+
+
 class Engine:
     def __init__(self):
         from sentence_transformers import SentenceTransformer
         import torch
-        self.df, files = load_stores()
+        df, files = load_stores()
+        kn, kn_path = load_knowledge()
+        vouchers = set(kn['vouchers']) if kn else set()
+        cs = (kn or {}).get('commerce_source', {})
+        # 상가 + 생활기능·시설을 하나의 목록으로
+        items = []
+        for _, r in df.iterrows():
+            items.append({'name': r[COLS['name']], 'category': r[COLS['small']], 'kind': '상가', 'address': r[COLS['addr']], 'dong': r[COLS['dong']],
+                          'lat': round(float(r['lat_f']), 6), 'lng': round(float(r['lng_f']), 6), 'approx': '', 'phone': '', 'hours': '', 'docs': '', 'functions': [],
+                          'voucher': f"{r[COLS['dong']]}|{_norm(r[COLS['name']])}" in vouchers,
+                          'evidence': f"{cs.get('name', '상가(상권)정보')} {cs.get('basis', '')} 등재 · {cs.get('caution', '현재 영업은 확인 필요')}",
+                          '_cat': r['cat'], '_desc': r['desc']})
+        cat_display = {r['cat']: r[COLS['small']] for _, r in df.iterrows()}
+        self.programs = []
+        if kn:
+            label_text = {l['name']: l['text'] for l in kn['labels']}
+            for t, n in ((v, k) for k, v in label_text.items()): cat_display[t] = n
+            small2cat = {v: k for k, v in cat_display.items()}
+            for r in kn['resources']:
+                t = label_text.get(r['label']) or small2cat.get(r['label'])
+                if not t: continue
+                items.append({'name': r['name'], 'category': r['label'], 'kind': '시설·서비스', 'address': r['address'], 'dong': r['emd'], 'lat': r['lat'], 'lng': r['lng'],
+                              'approx': r['approx'], 'phone': r['phone'], 'hours': r['hours'], 'docs': r['docs'], 'functions': r['functions'],
+                              'voucher': f"{r['emd']}|{_norm(r['name'])}" in vouchers,
+                              'evidence': ' · '.join(x for x in (f"{r['source']} ({r['basis']})" if r['basis'] else r['source'], r['caution']) if x), 'url': r.get('url', ''),
+                              '_cat': t, '_desc': f"{t} {r['name']}"})
+            self.programs = kn['programs']
+        self.items = items
+        self.cat_display = cat_display
+        self.n_store = sum(1 for i in items if i['kind'] == '상가'); self.n_facility = len(items) - self.n_store
         mps = getattr(torch.backends, 'mps', None)
         self.device = 'cuda' if torch.cuda.is_available() else ('mps' if mps is not None and mps.is_available() else 'cpu')
         self.gpu = torch.cuda.get_device_name(0) if self.device == 'cuda' else ('Apple Silicon (MPS)' if self.device == 'mps' else '')
         print(f'[모델] {MODEL_VER} · {MODEL_NAME} 불러오는 중 ({self.device}{" · " + self.gpu if self.gpu else ""})')
         self.model = SentenceTransformer(MODEL_NAME, device=self.device)
-        self.cats = sorted(self.df['cat'].unique().tolist())
-        key = hashlib.sha1((MODEL_NAME + REGION + '|'.join(f'{f}:{os.path.getmtime(f)}' for f in files)).encode()).hexdigest()[:12]
+        self.cats = sorted(cat_display)
+        srcs = files + ([kn_path] if kn_path else [])
+        key = hashlib.sha1((MODEL_NAME + MODEL_VER + REGION + '|'.join(f'{f}:{os.path.getmtime(f)}' for f in srcs)).encode()).hexdigest()[:12]
         cache = os.path.join(DATA_DIR, f'cache_{key}.npz')
         if os.path.exists(cache):
             z = np.load(cache)
             self.store_emb, self.cat_emb = z['store'], z['cat']
             print('[색인] 저장된 색인을 불러왔습니다.')
         else:
-            print(f'[색인] {REGION} 상가 {len(self.df)}곳, 업종 {len(self.cats)}개를 색인하는 중…')
-            self.store_emb = self.encode(self.df['desc'].tolist())
+            print(f'[색인] {REGION} 상가 {self.n_store}곳 + 생활기능·시설 {self.n_facility}곳, 검색 대상 {len(self.cats)}개를 색인하는 중…')
+            self.store_emb = self.encode([i['_desc'] for i in items])
             self.cat_emb = self.encode(self.cats)
             np.savez_compressed(cache, store=self.store_emb, cat=self.cat_emb)
         self.cat_index = {c: i for i, c in enumerate(self.cats)}
-        self.store_cat = np.array([self.cat_index[c] for c in self.df['cat']])
-        print(f'[준비 완료] 상가 {len(self.df)}곳 · 업종 {len(self.cats)}개')
+        self.store_cat = np.array([self.cat_index[i['_cat']] for i in items])
+        print(f'[준비 완료] 상가 {self.n_store}곳 · 생활기능·시설 {self.n_facility}곳 · 검색 대상 {len(self.cats)}개 · 제도 {len(self.programs)}개')
 
     def encode(self, texts):
         return self.model.encode(texts, batch_size=64, normalize_embeddings=True, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
@@ -126,16 +168,17 @@ class Engine:
         q = self.encode([text])[0]
         cs = self.cat_emb @ q
         ss = self.store_emb @ q
-        # 가게 점수 = 업종 의미 유사도 60% + 가게(상호 포함) 유사도 40% — 상호명에만 끌려가는 추천을 줄임
+        # 점수 = 업종·생활기능 의미 유사도 60% + 개별 자원(이름 포함) 유사도 40% — 이름에만 끌려가는 추천을 줄임
         score = 0.6 * cs[self.store_cat] + 0.4 * ss
         top_c = np.argsort(-cs)[:k_cat]
         top_s = np.argsort(-score)[:k_store]
-        d = self.df
+        names = [self.cat_display[self.cats[i]] for i in top_c[:2]]
+        progs = [p for p in self.programs if any(n in p['labels'] for n in names)][:2]
+        pub = lambda it: {k: v for k, v in it.items() if not k.startswith('_')}
         return {
-            'categories': [{'name': self.cats[i].split(' ')[-1], 'path': self.cats[i], 'score': round(float(cs[i]), 4)} for i in top_c],
-            'stores': [{'name': d.at[i, COLS['name']], 'category': d.at[i, COLS['small']], 'address': d.at[i, COLS['addr']],
-                        'dong': d.at[i, COLS['dong']], 'lat': round(float(d.at[i, 'lat_f']), 6), 'lng': round(float(d.at[i, 'lng_f']), 6),
-                        'score': round(float(score[i]), 4)} for i in top_s],
+            'categories': [{'name': self.cat_display[self.cats[i]], 'path': self.cats[i], 'score': round(float(cs[i]), 4)} for i in top_c],
+            'stores': [{**pub(self.items[i]), 'score': round(float(score[i]), 4)} for i in top_s],
+            'programs': [{'name': p['name'], 'items': p['items'][:4], 'url': p.get('url', '')} for p in progs],
         }
 
 
@@ -210,7 +253,7 @@ def health():
     return {'ok': engine is not None, 'service': 'gineung-ai', 'version': VERSION, 'model': BASE_MODEL if MODEL_VER == 'v1-base' else os.path.basename(MODEL_NAME), 'model_version': MODEL_VER,
             'model_score': {k: MODEL_META[k] for k in ('top1', 'top3', 'dialect_top1', 'test_set') if k in MODEL_META},
             'device': engine.device if engine else '', 'gpu': engine.gpu if engine else '', 'region': REGION,
-            'stores': len(engine.df) if engine else 0, 'categories': len(engine.cats) if engine else 0,
+            'stores': engine.n_store if engine else 0, 'facilities': engine.n_facility if engine else 0, 'categories': len(engine.cats) if engine else 0,
             'uptime_s': int(time.time() - started), 'requests_total': stats['total'], 'requests_today': stats['today'],
             'avg_ms': round(sum(ms) / len(ms), 1) if ms else None}
 

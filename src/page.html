@@ -505,6 +505,9 @@ button.status{border:0;cursor:pointer}
 .aistore .n{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
 .aistore small{color:var(--muted)} .aistore .addr{font-size:12px;color:var(--muted)} .aistore .d{font-weight:700;color:var(--sage-d);white-space:nowrap}
 @media (max-width:480px){.aistore{grid-template-columns:auto minmax(0,1fr) auto}.aistore .btn{grid-column:2/4;justify-self:start}}
+.aistore .kb,.aistore .vb{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 7px;vertical-align:1px}.aistore .kb{background:var(--p-bg);color:var(--p)}.aistore .vb{background:var(--g-bg);color:var(--g)}
+.aistore .xi{display:block;font-size:12px;color:var(--ink)}.aistore .xi a{color:var(--sage-d);font-weight:600}.aistore .ev{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+.aiprog{background:var(--b-bg);border-radius:12px;padding:10px 14px;font-size:13px;margin:8px 0}.aiprog ul{margin:4px 0;padding-left:18px;color:var(--muted)}.aiprog a{font-size:12px;color:var(--b);font-weight:600}
 .aiwhy{font-size:12px;color:var(--muted);margin:6px 0}.aiwhy summary{cursor:pointer;font-weight:600;color:var(--sage-d)}.aiwhy div{margin-top:6px;line-height:1.7}
 .stgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .stmain{grid-column:span 2;grid-row:span 2;padding:28px;display:flex;gap:20px;align-items:center}
@@ -2246,7 +2249,7 @@ function renderAiBadge(){
 }
 
 // 질문이 '물건·가게 찾기'인지 대략 판단 (서버가 켜져 있을 때만 의미 검색으로 보냄)
-const FIND_RE = /(어디|어딨|엇다|파는|팔어|팔아|팔고|사려|사야|살 ?수|살 ?데|살데|살곳|구하|구할|필요|피료|찾아|찾|근처|가까운|있능|있나|있어|있니|있을까|볼 ?곳|볼곳|아퍼|아파|약 )/;
+const FIND_RE = /(어디|어딨|워디|엇다|파는|팔어|팔아|팔고|사려|사야|사러|살 ?수|살 ?데|살데|살곳|살라|구하|구할|필요|피료|찾아|찾|근처|가까운|있능|있나|있어|있니|있을까|볼 ?곳|볼곳|아퍼|아파|약 |떼|발급|맡길|모실|돌봐|목욕|도와|배우|주사|고장|수리|빌릴|오나|와주|가야|해야|허는디|헌디|할 ?데|할 ?곳|싶|잡네|데$|곳$|디$)/;
 const NOT_FIND_RE = /(상속안|상속|공백|유통망|거래처|자격|인허가|절차|진행|행복택시|택시)/;
 const haversine = (a, b) => { const R = 6371, r = x=>x*Math.PI/180, dLa = r(b[0]-a[0]), dLo = r(b[1]-a[1]); const h = Math.sin(dLa/2)**2 + Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const kmText = d => d < 1 ? `${Math.round(d*1000/10)*10}m` : `${d.toFixed(1)}km`;
@@ -2259,14 +2262,21 @@ async function aiAnswer(text){
   const best = stores[0].score, near = stores.filter(s=>s.score >= best - 0.08).map(s=>({...s, d:haversine(here, [s.lat, s.lng])})).sort((a,b)=>a.d-b.d).slice(0,4);
   const cats = (res.categories || []).slice(0,3);
   const top = cats[0] ? cats[0].name : near[0].category;
+  const tel = p => String(p||'').replace(/[^0-9-]/g,'');
+  const card = (s,i) => `<div class="aistore"><span class="n">${i+1}</span><div><b>${esc(s.name)}</b> <small>${esc(s.category)}</small>${s.kind && s.kind!=='상가' ? ' <span class="kb">시설·서비스</span>' : ''}${s.voucher ? ' <span class="vb">임실사랑상품권</span>' : ''}
+      <br><span class="addr">${esc(s.address || s.dong)}</span>
+      ${(s.functions||[]).length ? `<span class="xi">제공: ${esc(s.functions.join(', '))}</span>` : ''}${s.hours ? `<span class="xi">운영: ${esc(s.hours)}</span>` : ''}${s.docs ? `<span class="xi">발급: ${esc(s.docs)}</span>` : ''}
+      ${tel(s.phone) ? `<span class="xi">전화 <a href="tel:${tel(s.phone)}">${esc(s.phone)}</a></span>` : ''}
+      <span class="ev">근거: ${esc(s.evidence || '')}${s.approx ? ` · 위치는 ${esc(s.approx)}` : ''}</span></div>
+      <span class="d">${s.approx ? '약 ' : ''}${kmText(s.d)}</span><a class="btn sm" href="https://map.kakao.com/link/to/${encodeURIComponent(String(s.name).replace(/,/g,' '))},${s.lat},${s.lng}" target="_blank" rel="noopener">길찾기</a></div>`;
+  const progs = (res.programs || []).map(p=>`<div class="aiprog"><b>관련 제도 · ${esc(p.name)}</b><ul>${p.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${/^https:\/\//.test(p.url||'') ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">공식 안내 보기</a>` : ''}</div>`).join('');
   return `<p>찾으시는 건 <b>${esc(top)}</b> 쪽으로 보입니다. ${usingGps ? '지금 계신 곳' : '임실군청'}에서 가까운 순으로 알려 드릴게요.</p>
-    <div class="aistores">${near.map((s,i)=>`<div class="aistore"><span class="n">${i+1}</span><div><b>${esc(s.name)}</b> <small>${esc(s.category)}</small><br><span class="addr">${esc(s.address || s.dong)}</span></div>
-      <span class="d">${kmText(s.d)}</span><a class="btn sm" href="https://map.kakao.com/link/to/${encodeURIComponent(String(s.name).replace(/,/g,' '))},${s.lat},${s.lng}" target="_blank" rel="noopener">길찾기</a></div>`).join('')}</div>
+    <div class="aistores">${near.map(card).join('')}</div>${progs}
     <p class="cnote">직접 가기 어려우시면 <button class="textlink" type="button" data-taxi-item="${esc(text.slice(0,40))}">행복택시로 이웃에게 부탁하기 →</button></p>
-    <details class="aiwhy"><summary>AI 분석 보기</summary><div>문장 의미 검색 · ${esc(AISRV.info?.model || 'ko-sroberta')} · ${res.ms ?? '-'}ms<br>
-      가까운 업종: ${cats.map(c=>`${esc(c.name)} <b>${Math.round(c.score*100)}%</b>`).join(' · ')}<br>
-      ${usingGps ? '거리는 이 기기에서 계산했고, 위치는 서버로 보내지 않았습니다.' : '위치 기능을 켜면 내 주변 기준으로 정렬합니다(위치는 서버로 보내지 않음).'} · 상가 데이터: 소상공인시장진흥공단 상가(상권)정보</div></details>
-    <p class="cnote">상가 데이터에는 재고 정보가 없어 ‘팔 가능성이 높은 곳’입니다. 가기 전에 전화로 확인해 주세요.</p>`;
+    <details class="aiwhy"><summary>AI 분석 보기</summary><div>문장 의미 검색 · ${esc(AISRV.info?.model || 'ko-sroberta')} ${esc(AISRV.info?.model_version || '')} · ${res.ms ?? '-'}ms<br>
+      가까운 업종·생활기능: ${cats.map(c=>`${esc(c.name)} <b>${Math.round(c.score*100)}%</b>`).join(' · ')}<br>
+      ${usingGps ? '거리는 이 기기에서 계산했고, 위치는 서버로 보내지 않았습니다.' : '위치 기능을 켜면 내 주변 기준으로 정렬합니다(위치는 서버로 보내지 않음).'} · 자료: 소상공인시장진흥공단 상가정보, 임실군 공개 명단(경로당·복지·의료·체육 등), 임실사랑상품권 가맹점</div></details>
+    <p class="cnote">목록 등재는 현재 영업·이용 가능을 뜻하지 않습니다. 가기 전에 전화로 확인해 주세요.</p>`;
 }
 document.addEventListener('click', e=>{
   const b = e.target.closest('[data-taxi-item]'); if (!b) return;
@@ -2302,7 +2312,7 @@ function renderStatus(){
     <div class="card stm"><span class="lbl">켜진 지</span><b>${aiOn() ? fmtDur(i.uptime_s) : '-'}</b><small>서버 기준</small></div>
     <div class="card stm"><span class="lbl">오늘 처리한 질문</span><b>${aiOn() ? (i.requests_today ?? 0)+'건' : '-'}</b><small>누적 ${aiOn() ? (i.requests_total ?? 0) : '-'}건 · 평균 ${aiOn() && i.avg_ms!=null ? i.avg_ms+'ms' : '-'}</small></div>
     <div class="card stm"><span class="lbl">모델 ${aiOn() && i.model_version ? '· '+esc(i.model_version) : ''}</span><b class="sm">${esc(i.model || '-')}</b><small>${aiOn() ? (i.device==='cuda' ? 'GPU · '+esc(i.gpu) : 'CPU') : ''}${aiOn() && i.model_score && i.model_score.top1!=null ? ` · 시험 정확도 ${Math.round(i.model_score.top1*100)}%` : ''}</small></div>
-    <div class="card stm"><span class="lbl">상가 데이터</span><b>${aiOn() ? esc(i.region)+' '+(i.stores||0).toLocaleString('ko-KR')+'곳' : '-'}</b><small>업종 ${aiOn() ? i.categories : '-'}개</small></div>
+    <div class="card stm"><span class="lbl">검색 자료</span><b>${aiOn() ? esc(i.region)+' '+((i.stores||0)+(i.facilities||0)).toLocaleString('ko-KR')+'곳' : '-'}</b><small>${aiOn() ? `상가 ${(i.stores||0).toLocaleString('ko-KR')} · 시설·서비스 ${(i.facilities||0).toLocaleString('ko-KR')} · 검색 대상 ${i.categories}개` : ''}</small></div>
   </div>
   <div class="card sthist"><div class="hd"><span class="lbl">이 화면을 연 뒤 기록 (15초마다 확인)</span><span class="lbl">${n ? `가동률 ${Math.round(ok/n*100)}% · 마지막 확인 ${tAgo(AISRV.last)}` : ''}</span></div>
     <div class="bars">${AISRV.hist.map(h=>`<i class="${h.st==='on'?'on':h.st==='off'?'off':'slow'}" title="${new Date(h.t).toLocaleTimeString('ko-KR')} · ${h.ms ?? '-'}ms"></i>`).join('') || '<span class="lbl">기록을 모으는 중…</span>'}</div></div>
