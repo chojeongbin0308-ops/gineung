@@ -14,9 +14,10 @@ PREFER = [m for m in [os.getenv('GINEUNG_LLM', '')] if m] + ['exaone3.5:7.8b', '
 SYSTEM = (
     "너는 전북 임실군 주민을 돕는 '기능상속' 안내원이다. 반드시 아래 [자료]에 적힌 내용만 사용해 답한다.\n"
     "- 자료에 없는 가게 이름, 전화번호, 운영시간, 가격, 품목을 절대 지어내지 않는다.\n"
-    "- 가게나 시설을 말할 때는 자료의 이름을 그대로 쓰고 바로 뒤에 [번호]를 붙인다. 자료 번호는 가까운 순서다.\n"
-    "- 2~3문장, 어르신이 알아듣기 쉬운 존댓말로 쓴다. 목록·표·굵은 글씨는 쓰지 않는다.\n"
-    "- 목록에 올라 있다고 지금 영업 중인 것은 아니므로, 필요하면 가기 전에 확인하시라고 짧게 덧붙인다.\n"
+    "- 가게나 시설을 말할 때는 자료의 이름을 그대로 쓰고 바로 뒤에 [번호]를 붙인다. 번호가 작을수록 가깝다.\n"
+    "- 가장 가까운 1곳을 먼저, 필요하면 1곳만 더 말한다. 상품권 가맹·운영시간·제공 기능처럼 자료에 있는 쓸모 있는 정보가 있으면 한 가지만 덧붙인다.\n"
+    "- 전체 2문장 이내, 어르신이 알아듣기 쉬운 짧은 존댓말. 같은 말을 되풀이하지 않는다. 목록·표·굵은 글씨는 쓰지 않는다.\n"
+    "- '가기 전에 전화로 확인해 보세요' 같은 확인 권유는 마지막에 한 번만, 짧게 쓴다.\n"
     "- 자료로 답할 수 없으면 '자료에서 찾지 못했어요'라고 말하고 행복택시(이웃 장보기 대행)를 권한다."
 )
 
@@ -57,7 +58,7 @@ class LLM:
             raise TimeoutError('다른 답변을 만드는 중')
         try:
             out = self._req('/api/chat', {'model': self.model, 'messages': messages, 'stream': False, 'keep_alive': '60m',
-                                          'options': {'temperature': 0.2, 'top_p': 0.9, 'num_predict': 220, 'num_ctx': 4096}}, timeout=timeout)
+                                          'options': {'temperature': 0.2, 'top_p': 0.9, 'num_predict': 160, 'num_ctx': 4096}}, timeout=timeout)
             return out.get('message', {}).get('content', '').strip()
         finally:
             self.sem.release()
@@ -88,7 +89,7 @@ def verify(answer, items, ctx, all_names):
     why = []
     a = answer.replace('**', '').strip()
     if not a: return False, ['빈 답변'], a
-    if len(a) > 350: why.append('너무 김')
+    if len(a) > 260: why.append('너무 김')
     na, nctx = _norm(a), _norm(ctx)
     ctx_names = {_norm(i['name']) for i in items}
     foreign = [n for n in all_names if len(n) >= 3 and n in na and n not in ctx_names and not any(n in c for c in ctx_names)]
