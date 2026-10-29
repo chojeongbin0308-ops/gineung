@@ -1665,9 +1665,13 @@ function intentOf(q){
   if (/유통|공급|도매|들여|거래처|납품|어디서 (사|받)|이어받|인수|물려/.test(q)) return 'supply';
   if (/공백|부족|위험|못 (잇|이어)|안 되|빈/.test(q)) return 'gap';
   if (/자원|주변|이동장터|배송|마을회관|복지|콜택시/.test(q)) return 'resources';
-  if (/상속|대안|어떻게|추천|대체|이어|방법|해결|유지율/.test(q)) return 'plan';
-  if (/사라|잃|문제|기능|폐업|문 닫|닫으면|없어지/.test(q)) return 'loss';
-  return 'help';
+  if (/취소|철회|포기|그만|안 ?받|불이익|위약|손해|패널티|벌금/.test(q)) return 'faq_cancel';
+  if (/부분|일부|몇 ?개만|하나만|골라서|선택해서|조금만/.test(q) && /상속|이어|받/.test(q)) return 'faq_partial';
+  if (/(어떤|무슨|뭐|무엇|어느).{0,6}(것|거|기능)?.{0,4}(상속|이어받)/.test(q) || /상속.{0,6}(되는|가능한|받을 수 있는).{0,4}(것|거|기능|뭐)/.test(q)) return 'faq_what';
+  if (/상속안|대안|추천|조합|유지율|대체|어떻게 이어|어떻게 잇|해결/.test(q) || (/상속|이어/.test(q) && findPreset(q))) return 'plan';
+  if (/사라|잃|문제|폐업|문 닫|닫으면|없어지/.test(q) || (/기능/.test(q) && findPreset(q))) return 'loss';
+  if (/^(안녕|하이|도움|도와|뭐 ?할 ?수|뭘 ?할 ?수|사용법|어떻게 써|누구)/.test(q.trim()) || q.trim().length <= 2) return 'help';
+  return 'unknown';
 }
 const act = (label, target, stepN) => `<button type="button" data-go="${target}"${stepN?` data-step="${stepN}"`:''}>${label}</button>`;
 
@@ -1745,6 +1749,13 @@ function demoAnswer(q){
   if (it==='buy') return buyAnswer(q);
   if (it==='process') return processAnswer(q);
   if (it==='help' && !p) return helpAnswer();
+  if (it==='unknown' && !p) return unknownAnswer(q);
+  if (it==='faq_partial') return `<p>네, <b>일부 기능만</b> 이어받을 수 있어요.</p><p>기능상속은 가게를 통째로 넘기는 게 아니라, 가게가 하던 일을 <b>생활기능 단위</b>(생필품 구매, 신선식품, 무거운 물건, 택배 받기 등)로 나눠서 기능마다 이어받을 곳을 정해요. 그래서 할 수 있는 기능만 골라 맡고, 나머지는 다른 기관이나 행복택시가 맡는 식으로 나눌 수 있어요.</p>
+      <div class="acts">${act('어떤 기능이 있는지','ask:어떤 것들을 기능 상속 받을 수 있어?')}${act('상속안 예시 보기','ask:상리상회 상속안 추천해 줘')}</div>`;
+  if (it==='faq_what') return `<p>이어받을 수 있는 생활기능은 이런 것들이에요.</p><div class="cm">${fold(Object.values(FUNCS).map(f=>`<div><b>${esc(f.name)}</b><span class="s">${esc(f.short||'')}</span></div>`), 5, '기능')}</div>
+      <p class="muted">가게마다 실제로 맡던 기능이 달라서, 어떤 가게인지 알려 주시면 그 가게 기준으로 나눠 드려요. 예: “상리상회 문 닫으면 뭐가 사라져?”</p>`;
+  if (it==='faq_cancel') return `<p>그 부분은 <b>여기서 정확히 답해 드리기 어려워요.</b></p><p>기능상속은 지자체 담당자가 가게·참여기관·주민과 협의해서 정하는 방식이라, 취소 조건이나 불이익이 있는지는 <b>실제로 맺은 협약 내용</b>에 따라 달라요. 이 서비스에는 협약·규정 자료가 없어서 지어내서 답하지 않을게요. 담당 부서나 협약서를 확인해 주세요.</p>
+      <div class="acts">${act('다른 상속안 보기','ask:상리상회 상속안 추천해 줘')}${act('진행 절차 보기','ask:기능상속은 어떻게 진행돼?')}</div>`;
   if (p && p.key !== state.preset) loadPreset(p.key);
   const {v, fns, baseline, plans} = cur; const P = plans[selectedPlan]; const nm = state.name;
   const head = `<p><b>${esc(nm)}</b> (${esc(v.name)}, ${FTYPE[state.type]}, ${md(state.date)} 폐업 예정) 기준으로 답할게요.</p>`;
@@ -1796,6 +1807,11 @@ function demoAnswer(q){
       <div class="acts">${act('따라하기 안내서 보기','supply')}${act('필요한 자격은?','ask:'+state.name+' 이어받으려면 어떤 자격이 필요해?')}</div>`;
   }
   return helpAnswer();
+}
+function unknownAnswer(q){
+  return `<p>죄송해요, <b>그 질문은 지금 가진 자료로는 답하기 어려워요.</b> 정확하지 않은 답을 드리는 것보다 모른다고 말씀드리는 게 낫다고 판단했어요.</p>
+    <p class="muted">여기서는 이런 걸 물어보실 수 있어요.</p>
+    <div class="chips2">${['두부 어디서 사?','농약 어디서 사?','등본 떼는 곳','세제 좀 사다 줘','상리상회 문 닫으면 뭐가 사라져?','기능상속은 어떻게 진행돼?'].map(s=>`<button type="button" data-ask="${esc(s)}">${esc(s)}</button>`).join('')}</div>`;
 }
 function helpAnswer(){
   return `<p>안녕하세요, 기능상속 AI입니다. 폐업 예정 가게를 기준으로 이런 걸 답할 수 있어요.</p>
@@ -2304,7 +2320,8 @@ function renderAiBadge(){
 
 // 질문이 '물건·가게 찾기'인지 대략 판단 (서버가 켜져 있을 때만 의미 검색으로 보냄)
 const FIND_RE = /(어디|어딨|워디|엇다|파는|팔어|팔아|팔고|사려|사야|사러|살 ?수|살 ?데|살데|살곳|살라|구하|구할|필요|피료|찾아|찾|근처|가까운|있능|있나|있어|있니|있을까|볼 ?곳|볼곳|아퍼|아파|약 |떼|발급|맡길|모실|돌봐|목욕|도와|배우|주사|고장|수리|빌릴|오나|와주|가야|해야|허는디|헌디|할 ?데|할 ?곳|싶|잡네|데$|곳$|디$)/;
-const NOT_FIND_RE = /(상속안|상속|공백|유통망|거래처|자격|인허가|절차|진행|행복택시|택시|폐업|문 ?닫|사라지|생활기능|자원)/;
+const NOT_FIND_RE = /(상속안|상속|공백|유통망|거래처|자격|인허가|절차|진행|행복택시|택시|폐업|문 ?닫|사라지|생활기능|자원|취소|불이익|철회|날씨|뉴스|몇 ?시|오늘 ?며칠)/;
+const AI_MIN_SCORE = 0.42;   // 검색기 확신도가 이보다 낮으면 '모르는 질문'으로 처리
 const GREET_RE = /^(안녕|하이|ㅎㅇ|고마워|감사|뭐 ?할 ?수|도움말|사용법|누구|너는)/;
 const haversine = (a, b) => { const R = 6371, r = x=>x*Math.PI/180, dLa = r(b[0]-a[0]), dLo = r(b[1]-a[1]); const h = Math.sin(dLa/2)**2 + Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h)); };
 const kmText = d => d < 1 ? `${Math.round(d*1000/10)*10}m` : `${d.toFixed(1)}km`;
@@ -2315,6 +2332,7 @@ async function aiAnswer(text){
   const here = myPos || IMSIL_HALL, usingGps = !!myPos;
   const stores = (res.stores || []).filter(s=>Number.isFinite(s.lat) && Number.isFinite(s.lng));
   if (!stores.length) return null;
+  if (!(res.categories||[]).length || res.categories[0].score < AI_MIN_SCORE) return null;   // 관련 업종이 뚜렷하지 않으면 지어내지 않고 기존 판단(모르면 모른다)으로
   const best = stores[0].score, near = stores.filter(s=>s.score >= best - 0.08).map(s=>({...s, d:haversine(here, [s.lat, s.lng])})).sort((a,b)=>a.d-b.d).slice(0,4);
   const cats = (res.categories || []).slice(0,3);
   const top = cats[0] ? cats[0].name : near[0].category;
