@@ -94,6 +94,23 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.requester == request.auth.uid;
     }
 
+    // 등록된 가게(시설): 누구나 읽기(분석·상담에 사용), 등록·수정·삭제는 관리자만
+    match /facilities/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'type', 'village', 'date', 'items', 'elderly', 'carless', 'decisions', 'lines', 'by', 'updatedAt'])
+        && shortStr(request.resource.data.name, 30) && request.resource.data.name.size() > 0
+        && request.resource.data.type in ['food', 'agri']
+        && shortStr(request.resource.data.village, 20) && shortStr(request.resource.data.date, 10)
+        && request.resource.data.items is list && request.resource.data.items.size() <= 30
+        && request.resource.data.elderly is number && request.resource.data.carless is number
+        && request.resource.data.decisions is map
+        && request.resource.data.lines is list && request.resource.data.lines.size() <= 30
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
     // 그 밖의 모든 데이터는 막음
     match /{document=**} {
       allow read, write: if false;

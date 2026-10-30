@@ -162,6 +162,9 @@ section.sec.white{background:var(--card);border-block:1px solid var(--line)}
 .tile{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0}
 .tile[aria-pressed="true"]{border-color:var(--sage-d);box-shadow:0 0 0 1px var(--sage-d) inset;background:#FBFDFA}
 .tile .tt{font-size:12px;color:var(--sage-d);font-weight:600}
+.tile .reg{align-self:flex-start;font-size:11px;font-weight:700;color:#fff;background:var(--navy);border-radius:999px;padding:1px 8px;margin-bottom:2px}
+.facbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.facbar .msg{font-size:13px;color:var(--muted,#6b7280)}.facbar .msg.ok{color:var(--ok)}.facbar .msg.err{color:var(--gap)}
+.facnote{font-size:13px;color:var(--muted,#6b7280);margin:0 0 10px}.seg button[disabled]{opacity:.55;cursor:not-allowed}
 .tile strong{font-size:17px}
 .tile span.d{font-size:12px;color:var(--muted)}
 details.more{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
@@ -634,6 +637,7 @@ button.status{border:0;cursor:pointer}
         </div>
       </div>
     </details>
+    <div class="facbar" id="facbar"></div>
   </div>
 
   <div class="card stage" data-stage="2" hidden>
@@ -662,7 +666,7 @@ button.status{border:0;cursor:pointer}
     <p class="sub">AI는 제안만 합니다. 승인한 항목만 주민 안내문에 들어갑니다.</p>
     <div class="split" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
       <div>
-        <div class="decs" id="decs"></div>
+        <p class="facnote" id="dec-note"></p><div class="decs" id="decs"></div>
         <details class="more">
           <summary>검토안 요약 (복사용)</summary>
           <div class="body">
@@ -713,7 +717,7 @@ button.status{border:0;cursor:pointer}
         <h4>이렇게 물어보세요</h4>
         <div class="sugs" id="sugs"></div>
       </div>
-      <details class="more" id="chat-settings" style="margin-top:0">
+      <details class="more" id="chat-settings" style="margin-top:0" hidden>
         <summary>모델 서버 연결 설정</summary>
         <div class="body">
           <div class="radio2" role="radiogroup" aria-label="동작 방식">
@@ -1213,12 +1217,12 @@ function compute(){
   const P = cur.plans[selectedPlan];
   fns.forEach((fn,k)=>{ const o = P?.picks[k]; if (!decisions[fn.f]) decisions[fn.f] = {v:(!o||o.s<.45)?'재검토':'승인', memo:''}; });
 }
-function renderAll(){ compute(); renderTiles(); renderS2(); renderS3(); renderS4(); renderOverview(); renderStepper(); }
+function renderAll(){ compute(); renderTiles(); renderS2(); renderS3(); renderS4(); renderOverview(); renderStepper(); renderFacBar(); }
 
 /* step 1 */
 function renderTiles(){
   $('tiles').innerHTML = PRESETS.map(p=>`<button type="button" class="tile" data-p="${p.key}" aria-pressed="${state.preset===p.key}">
-    <span class="tt">${FTYPE[p.type]}</span><strong>${esc(p.name)}</strong><span class="d">${esc(p.village)} · ${md(p.date)} 폐업 예정</span></button>`).join('');
+    ${p.fid?'<span class="reg">등록된 가게</span>':''}<span class="tt">${FTYPE[p.type]}</span><strong>${esc(p.name)}</strong><span class="d">${esc(p.village)} · ${md(p.date)} 폐업 예정</span></button>`).join('');
 }
 function renderForm(){
   $('f-name').value = state.name; $('f-date').value = state.date; $('f-type').value = state.type;
@@ -1313,7 +1317,10 @@ function renderS4(){
   if (!P){ $('decs').innerHTML=''; $('notice').innerHTML=''; $('summary').textContent=''; return; }
   $('decs').innerHTML = fns.map((fn,k)=>{ const o = P.picks[k], d = decisions[fn.f];
     return `<div class="dec"><span class="t">${FUNCS[fn.f].name}<span>${o?esc(o.r.name):'이어받을 곳 없음'}</span></span>
-      <div class="seg" role="group" aria-label="${FUNCS[fn.f].name} 결정">${['승인','보류','재검토'].map(x=>`<button type="button" data-dec="${fn.f}" data-val="${x}" aria-pressed="${d.v===x}">${x}</button>`).join('')}</div></div>`; }).join('');
+      <div class="seg" role="group" aria-label="${FUNCS[fn.f].name} 결정">${['승인','보류','재검토'].map(x=>`<button type="button" data-dec="${fn.f}" data-val="${x}" aria-pressed="${d.v===x}" ${canDecide()?'':'disabled'}>${x}</button>`).join('')}</div></div>`; }).join('');
+  $('dec-note').innerHTML = isAdmin() ? (state.fid ? '관리자 권한으로 결정 중이에요. 1단계의 <b>변경 저장</b>을 누르면 결정이 저장돼요.' : '관리자 권한으로 결정 중이에요.')
+    : state.decTrial ? '<b style="color:var(--adj)">체험 모드</b> · 바꾼 결정은 저장되지 않아요.'
+    : `🔒 지원 결정은 담당 관리자만 할 수 있어요. <button class="textlink sm2" type="button" data-dectrial>체험해 보기</button>`;
   const ok = fns.map((fn,k)=>({fn, o:P.picks[k], d:decisions[fn.f]})).filter(x=>x.o && x.o.s>=.45 && x.d.v==='승인');
   const how = x => { const r = x.o.r;
     if (r.kind==='market') return `이동장터 트럭이 ${x.o.when.replace(' (신설 검토)','')}에 마을에 옵니다`;
@@ -1343,7 +1350,7 @@ function supplyJSON(){
       return {...Object.fromEntries(SKEYS.map(k=>[k, k==='kind'?KINDS[l.kind]:k==='license'?LICS[l.license]:l[k]])), peakMonths:l.peak, completeness:pct(lineComplete(l)), successor:nm||null}; })};
 }
 function renderSupply(){
-  $('supfac').innerHTML = PRESETS.map(p=>`<button type="button" data-p="${p.key}" aria-pressed="${state.preset===p.key}">${esc(p.name)}</button>`).join('');
+  $('supfac').innerHTML = PRESETS.map(p=>`<button type="button" data-p="${p.key}" aria-pressed="${state.preset===p.key}">${esc(p.name)}${p.fid?' ·등록':''}</button>`).join('');
   renderLines(); renderDetail(); renderJSON();
 }
 function renderLines(){
@@ -1390,8 +1397,8 @@ function renderDetail(){
     <dl class="kv" style="margin:0">${kv.map(([t,k])=>`<div><dt>${t}</dt><dd class="${l[k]?'':'empty'}">${esc(l[k]||'미기록')}</dd></div>`).join('')}</dl>
     <div><span class="lbl">많이 팔리는 달</span><div class="months" style="margin-top:6px">${Array.from({length:12},(_,i)=>`<span class="${l.peak.includes(i+1)?'on':''}">${i+1}월</span>`).join('')}</div></div>
     ${miss.length?`<p class="missing" style="margin:0">아직 비어 있는 항목: ${miss.join(', ')}</p>`:''}
-    <div class="subcard"><h4>이어받을 곳<small>자격 보유 × 품목 적합 × 거리</small></h4>
-      ${ranks.length?`<div class="succ">${ranks.map((r,i)=>`<label><input type="radio" name="succ" id="succ-${i}" value="${esc(r.c.name)}" ${r.c.name===chosen?'checked':''}>
+    <div class="subcard"><h4>이어받을 곳<small>자격 보유 × 품목 적합 × 거리${role?'':' · 🔒 지정은 주인·관리자만'}</small></h4>
+      ${ranks.length?`<div class="succ">${ranks.map((r,i)=>`<label><input type="radio" name="succ" ${role||state.trial?'':'disabled'} id="succ-${i}" value="${esc(r.c.name)}" ${r.c.name===chosen?'checked':''}>
         <strong>${esc(r.c.name)}<em>${pct(r.s)}</em></strong><span>${esc(r.c.role)} · ${r.d?`약 ${r.d.toFixed(1)}km`:'마을 안'}</span>
         <span class="${r.need?(r.has?'y':'n'):''}">${r.need?(r.has?'자격 보유':'자격 새로 필요'):'자격 불필요'}</span></label>`).join('')}</div>`:'<p class="missing" style="margin:0">이 품목을 이어받을 후보가 등록되어 있지 않습니다.</p>'}
     </div>
@@ -1405,9 +1412,10 @@ function renderJSON(){ $('json').textContent = JSON.stringify(supplyJSON(), null
 /* ---------- 프리셋 ---------- */
 function loadPreset(key){
   const p = PRESETS.find(x=>x.key===key), v = V(p.village);
-  Object.assign(state, {preset:key, type:p.type, name:p.name, village:p.village, date:p.date, items:new Set(p.items), elderly:v.elderly, carless:v.carless, extra:[],
-    lines:structuredClone(SUPPLY[key]||[]), sel:0, succ:{}, edit:false, trial:false});
+  Object.assign(state, {preset:key, fid:p.fid||'', type:p.type, name:p.name, village:p.village, date:p.date, items:new Set(p.items), elderly:p.elderly ?? v.elderly, carless:p.carless ?? v.carless, extra:[],
+    lines:structuredClone(SUPPLY[key]||[]), sel:0, succ:{}, edit:false, trial:false, decTrial:false});
   selectedPlan = 0; for (const k in decisions) delete decisions[k];
+  if (p.decisions) for (const [f, val] of Object.entries(p.decisions)) decisions[f] = {v:val, memo:''};
   $('extract-out').textContent = ''; $('f-memo').value = ''; $('review-out').textContent = '';
   renderForm(); renderAll(); renderSupply();
 }
@@ -1447,11 +1455,12 @@ document.addEventListener('click', e=>{
   if (e.target.id==='prev'){ step = Math.max(1, step-1); renderStepper(); go('demo'); return; }
   if (e.target.id==='next'){ if (step<5){ step++; renderStepper(); go('demo'); } else go('supply'); return; }
   const pl = e.target.closest('[data-plan]'); if (pl){ selectedPlan = +pl.dataset.plan; resetDecisions(); renderAll(); return; }
-  const dc = e.target.closest('[data-dec]'); if (dc){ decisions[dc.dataset.dec].v = dc.dataset.val; renderS4(); return; }
+  const dt = e.target.closest('[data-dectrial]'); if (dt){ state.decTrial = true; renderS4(); return; }
+  const dc = e.target.closest('[data-dec]'); if (dc){ if (!canDecide()) return; decisions[dc.dataset.dec].v = dc.dataset.val; renderS4(); renderFacBar(); return; }
   const lc = e.target.closest('[data-line]'); if (lc){ state.sel = +lc.dataset.line; state.edit = false; renderLines(); renderDetail(); return; }
   if (e.target.id==='btn-add'){ state.trial = !supplyRole(); state.lines.push(blankLine()); state.sel = state.lines.length-1; state.edit = true; renderSupply(); renderAll(); $('sf-cat')?.focus(); return; }
   if (e.target.closest('[data-edit]')){ state.trial = !supplyRole() && !!e.target.closest('[data-trial]'); state.edit = true; renderDetail(); return; }
-  if (e.target.closest('[data-done]')){ state.edit = false; renderLines(); renderDetail(); renderJSON(); return; }
+  if (e.target.closest('[data-done]')){ state.edit = false; renderLines(); renderDetail(); renderJSON(); if (state.fid && isAdmin()) facSave('lines'); return; }
   const mb = e.target.closest('[data-month]');
   if (mb){ const l = state.lines[state.sel], m = +mb.dataset.month; l.peak = l.peak.includes(m) ? l.peak.filter(x=>x!==m) : [...l.peak, m].sort((a,b)=>a-b); mb.setAttribute('aria-pressed', l.peak.includes(m)); renderLines(); renderJSON(); return; }
   if (e.target.id==='btn-del'){ const b = e.target;
@@ -1468,7 +1477,7 @@ document.addEventListener('input', e=>{
 });
 document.addEventListener('change', e=>{
   const t = e.target;
-  if (t.name==='succ'){ state.succ[state.sel] = t.value; renderDetail(); renderJSON(); return; }
+  if (t.name==='succ'){ if (!supplyRole() && !state.trial) return; state.succ[state.sel] = t.value; renderDetail(); renderJSON(); return; }
   if (t.dataset.sf && t.tagName==='SELECT'){ state.lines[state.sel][t.dataset.sf] = t.value; renderLines(); renderJSON(); return; }
   if (t.dataset.it){ t.checked ? state.items.add(t.dataset.it) : state.items.delete(t.dataset.it); custom(); resetDecisions(); renderAll(); }
   else if (t.id==='f-type'){ state.type = t.value; state.items = new Set(ITEMS.filter(i=>i.t===t.value).slice(0,4).map(i=>i.id)); state.extra = []; custom(); resetDecisions(); renderForm(); renderAll(); }
@@ -1519,6 +1528,7 @@ $('btn-review').addEventListener('click', async ()=>{
 });
 $('btn-stop').addEventListener('click', ()=>ctl?.abort());
 $('btn-oral').addEventListener('click', async ()=>{
+  if (!supplyRole()) state.trial = true;   // 권한이 없으면 저장되지 않는 체험으로 처리
   const txt = $('f-oral').value.trim(); if (!txt){ $('oral-out').textContent = '먼저 내용을 붙여 넣어 주세요.'; return; }
   const btn = $('btn-oral'); btn.disabled = true; $('oral-out').textContent = '정리 중…';
   const keys = SFIELDS.filter(f=>f[0]!=='kind'&&f[0]!=='license').map(f=>`"${f[0]}": ${f[1]}`).join(', ');
@@ -2145,6 +2155,7 @@ function closeAuth(){
 }
 const authErr = e => { const el = $('auth-err'); if (el) el.textContent = errText(e); else console.warn(e); };
 
+function adminViews(){ renderAuth(); renderTaxi(); renderAdmin(); renderDetail(); renderS4(); renderFacBar(); $('chat-settings').hidden = !isAdmin(); }
 function renderAuth(){
   const b = $('nav-login'), u = AU.user;
   if (u && AU.prof){ const n = AU.prof.nick || u.displayName || '나'; b.innerHTML = `<span class="av" aria-hidden="true">${esc([...n][0])}</span>내 정보`; b.setAttribute('aria-label','내 정보'); }
@@ -2161,7 +2172,7 @@ async function googleLogin(){
 async function onUser(u){
   stopTaxiSync();
   Object.assign(AU, {user:u, prof:null, admin:false, priv:null, privKid:'', rows:null, delStep:0});
-  if (!u){ AU.needConsent = false; state.edit = false; state.trial = false; renderAuth(); renderTaxi(); renderAdmin(); renderDetail(); return; }
+  if (!u){ AU.needConsent = false; state.edit = false; state.trial = false; state.decTrial = false; FAC.msg = ''; adminViews(); return; }
   const {doc, getDoc, setDoc, serverTimestamp} = FB.F;
   const ref = doc(FB.db, 'users', u.uid);
   let prof = (await getDoc(ref)).data() || null;
@@ -2176,7 +2187,7 @@ async function onUser(u){
   AU.prof = prof; AU.needConsent = false;
   try { AU.admin = (await getDoc(doc(FB.db, 'admins', u.uid))).exists(); } catch(_){ AU.admin = false; }
   try { await syncVault(false); } catch(e){ console.warn('vault', e); }
-  renderAuth(); renderAdmin(); renderDetail(); startTaxiSync();
+  adminViews(); startTaxiSync();
   const d = $('auth-dlg');
   if (!prof.nick) openAuth('profile'); else if (d.open && $('auth-body').dataset.mode==='consent') closeAuth();
 }
@@ -2658,6 +2669,72 @@ $('taxi').addEventListener('click', e=>{
   const n = e.target.closest('[data-tnext]'); if (n){ const r = taxi.reqs.find(x=>x.id===n.dataset.tnext); if (r){ r.status = r.status==='accepted' ? 'bought' : 'done'; tSave(); renderTaxi(); } return; }
   const c = e.target.closest('[data-tcancel]'); if (c){ taxi.reqs = taxi.reqs.filter(x=>x.id!==c.dataset.tcancel); tSave(); renderTaxi(); }
 });
+/* ---------- 시설(가게) 등록: 관리자만 저장·수정·삭제, 모두가 보고 분석 ---------- */
+var FAC = {list:[], unsub:null, msg:'', msgCls:'', delArm:false, busy:false};
+function isAdmin(){ try { return !!AU.admin; } catch(_){ return false; } }
+function canDecide(){ return isAdmin() || !!state.decTrial; }
+function facSanitize(id, x){
+  const str = (v, n) => typeof v==='string' ? v.slice(0, n) : '';
+  const num = (v, d) => Number.isFinite(v) && v >= 0 && v <= 100 ? Math.round(v) : d;
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id) || !V(x.village) || x.village===TOWN || !(x.type in FTYPE) || !str(x.name,30).trim()) return null;
+  const ids = new Set(ITEMS.filter(it=>it.t===x.type).map(it=>it.id));
+  const decisions = {}; if (x.decisions && typeof x.decisions==='object') for (const [f, val] of Object.entries(x.decisions)) if (f in FUNCS && ['승인','보류','재검토'].includes(val)) decisions[f] = val;
+  const lines = (Array.isArray(x.lines) ? x.lines : []).slice(0, 30).map(l=>{ if (!l || typeof l!=='object') return null; const o = blankLine();
+    for (const k of SKEYS) if (typeof l[k]==='string') o[k] = l[k].slice(0, 300);
+    if (!(o.kind in KINDS)) o.kind = 'grocery'; if (!(o.license in LICS)) o.license = 'none';
+    o.peak = (Array.isArray(l.peak) ? l.peak : []).filter(m=>Number.isInteger(m) && m>=1 && m<=12); return o; }).filter(Boolean);
+  return {key:'fs_'+id, fid:id, type:x.type, name:str(x.name,30).trim(), village:x.village, date:/^\d{4}-\d{2}-\d{2}$/.test(x.date)?x.date:'',
+    items:(Array.isArray(x.items)?x.items:[]).filter(i=>ids.has(i)), elderly:num(x.elderly), carless:num(x.carless), decisions, lines,
+    label:`${str(x.name,30)} (${x.village})`, at: x.updatedAt?.toMillis?.() || 0};
+}
+function facStart(){
+  if (FAC.unsub || !window.FB) return;
+  const {collection, onSnapshot} = FB.F;
+  FAC.unsub = onSnapshot(collection(FB.db, 'facilities'), snap=>{
+    const list = snap.docs.map(d=>facSanitize(d.id, d.data())).filter(Boolean).sort((a,b)=>b.at-a.at).slice(0, 40);
+    for (let i = PRESETS.length-1; i >= 0; i--) if (PRESETS[i].fid){ delete SUPPLY[PRESETS[i].key]; PRESETS.splice(i, 1); }
+    list.forEach(f=>{ PRESETS.push(f); SUPPLY[f.key] = f.lines; });
+    FAC.list = list;
+    if (state.fid && !list.some(f=>f.fid===state.fid)) state.fid = '';
+    renderTiles(); renderFacBar(); if (!$('supply').hidden) renderSupply();
+  }, e=>console.warn('facilities', e));
+}
+function facPayload(){
+  return {name:state.name.trim().slice(0,30), type:state.type, village:state.village, date:state.date||'', items:[...state.items].slice(0,30),
+    elderly:+state.elderly, carless:+state.carless, decisions:Object.fromEntries(Object.entries(decisions).map(([f,d])=>[f,d.v])),
+    lines:state.lines.slice(0,30).map(l=>({...Object.fromEntries(SKEYS.map(k=>[k, String(l[k]??'').slice(0,300)])), peak:[...(l.peak||[])]})),
+    by:AU.user.uid, updatedAt:FB.F.serverTimestamp()};
+}
+async function facSave(mode){
+  if (!isAdmin() || FAC.busy) return;
+  const {doc, collection, setDoc, deleteDoc} = FB.F;
+  if (mode!=='delete' && !state.name.trim()){ FAC.msg = '가게 이름을 입력해 주세요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
+  FAC.busy = true; FAC.msg = '저장 중…'; FAC.msgCls = ''; renderFacBar();
+  try {
+    if (mode==='delete'){ await deleteDoc(doc(FB.db, 'facilities', state.fid)); const nm = state.name; loadPreset('A'); FAC.msg = `‘${nm}’ 등록을 삭제했어요.`; }
+    else if (mode==='new'){ const ref = doc(collection(FB.db, 'facilities')); await setDoc(ref, facPayload()); state.fid = ref.id; state.preset = 'fs_'+ref.id; FAC.msg = '저장했어요. 이제 모든 사람의 목록에 보여요.'; }
+    else { await setDoc(doc(FB.db, 'facilities', state.fid), facPayload()); FAC.msg = mode==='lines' ? '유통망 기록을 저장했어요.' : '변경 내용을 저장했어요.'; }
+    FAC.msgCls = 'ok';
+  } catch(e){ console.warn(e); FAC.msg = '저장하지 못했어요: ' + (e.code==='permission-denied' ? '권한이 없어요(관리자 로그인 또는 보안 규칙 확인).' : (e.message||e)); FAC.msgCls = 'err'; }
+  FAC.busy = false; FAC.delArm = false; renderFacBar();
+}
+function renderFacBar(){
+  const el = $('facbar'); if (!el || !FAC) return;   // 초기화 전 호출 대비
+  const msg = FAC.msg ? `<span class="msg ${FAC.msgCls}">${esc(FAC.msg)}</span>` : '';
+  if (!isAdmin()){ el.innerHTML = `<span class="msg">🔒 가게 등록·수정은 담당 관리자만 할 수 있어요. 여기서 바꾼 값은 분석 체험용이라 저장되지 않아요.</span>`; return; }
+  const cur = state.fid ? PRESETS.find(p=>p.fid===state.fid) : null;
+  el.innerHTML = (cur ? `<button class="btn dark sm" type="button" data-fac="save" ${FAC.busy?'disabled':''}>변경 저장 (${esc(cur.name)})</button>
+      <button class="btn sm" type="button" data-fac="new" ${FAC.busy?'disabled':''}>새 가게로 저장</button>
+      <button class="btn sm" type="button" data-fac="${FAC.delArm?'delete':'arm'}" style="color:var(--gap)" ${FAC.busy?'disabled':''}>${FAC.delArm?'정말 삭제':'등록 삭제'}</button>`
+    : `<button class="btn dark sm" type="button" data-fac="new" ${FAC.busy?'disabled':''}>이 가게 등록(저장)</button>`) + msg;
+}
+$('facbar').addEventListener('click', e=>{
+  const b = e.target.closest('[data-fac]'); if (!b) return;
+  if (b.dataset.fac==='arm'){ FAC.delArm = true; FAC.msg = '한 번 더 누르면 모든 사람의 목록에서 지워져요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
+  facSave(b.dataset.fac);
+});
+renderFacBar();
+
 tLoad(); renderTaxiForm(); renderTaxi();
 setInterval(()=>{ if (!$('taxi').hidden) renderTaxi(); }, 60000);
 
@@ -2674,7 +2751,7 @@ if (!window.claude){
     window.FB = {auth, db:F.getFirestore(fa), A, F};
     A.getRedirectResult(auth).catch(e=>console.warn(e));
     A.onAuthStateChanged(auth, u=>{ onUser(u).catch(e=>{ console.warn(e); authErr(e); }); });
-    renderTaxi(); renderAdmin(); aiLoadConfig();
+    renderTaxi(); renderAdmin(); aiLoadConfig(); facStart();
   }).catch(e=>{ console.warn('Firebase 불러오기 실패', e); aiStart(); });
 }
 </script>
