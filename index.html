@@ -51,6 +51,7 @@ nav.top .in{display:flex;align-items:center;gap:28px;height:68px}
 .btn.sm{padding:6px 14px;font-size:13px}
 .btn:disabled{opacity:.45;cursor:default}
 .textlink{border:0;background:none;padding:0;color:var(--sage-d);font-weight:600}
+.lockinfo{font-size:12px;color:var(--muted,#6b7280);background:var(--bg2,#f1f1ec);border-radius:999px;padding:4px 10px;white-space:nowrap}.textlink.sm2{font-size:13px;margin-left:8px;text-decoration:underline}
 .textlink:hover{text-decoration:underline}
 .navlinks button[aria-current="page"]{color:var(--sage-d);font-weight:700;box-shadow:0 2px 0 var(--sage-d)}
 @media (max-width:1060px){nav.top .in{flex-wrap:wrap;height:auto;padding-block:10px 0;gap:10px 16px}.navlinks{order:3;width:100%;gap:22px;overflow-x:auto;padding-bottom:10px}.navlinks button{white-space:nowrap;padding-bottom:4px}}
@@ -1360,12 +1361,26 @@ function renderLines(){
       <span>${esc(l.supplier||'공급처 미기록')}</span><span class="meter"><span class="track"><span style="width:${c}%"></span></span>기록 ${c}%</span></button>`; }).join('')
     + `<button type="button" class="addline" id="btn-add">+ 공급 경로 추가</button>`;
 }
+/* 유통망 기록은 가게 주인 · 이어받는 사람(인수자) · 담당 관리자만 고칠 수 있음.
+   관리자가 가게·인수처별 편집자(uid)를 지정하는 구조. 시연 자료에는 지정된 편집자가 없어 관리자만 편집 가능하고,
+   그 밖의 방문자는 '체험 편집'(이 화면에서만 바뀌고 저장되지 않음)만 할 수 있다. */
+const SUPPLY_EDITORS = {};   // {가게 key: {owner:[uid], successor:[uid]}} — 실제 운영 시 Firestore에서 불러옴
+function supplyRole(){
+  let au; try { au = AU; } catch(_){ return ''; }   // 로그인 모듈이 아직 준비되기 전
+  if (au.admin) return '관리자';
+  const e = SUPPLY_EDITORS[state.preset] || {}, uid = au.user?.uid;
+  if (uid && (e.owner||[]).includes(uid)) return '가게 주인';
+  if (uid && (e.successor||[]).includes(uid)) return '이어받는 분';
+  return '';
+}
 function renderDetail(){
   const l = state.lines[state.sel];
+  const role = supplyRole();
+  if (state.edit && !role && !state.trial) state.edit = false;
   if (!l){ $('detail').innerHTML = `<div class="dhead"><div><h3>기록된 공급 경로가 없습니다.</h3><p>‘공급 경로 추가’를 눌러 첫 경로를 적어 주세요.</p></div></div>`; return; }
   const lic = l.license==='none' ? '' : `<span class="badge adj">${esc(LICS[l.license])} 필요</span>`;
   if (state.edit){
-    $('detail').innerHTML = `<div class="dhead"><div><h3>기록 편집</h3><p>비어 있는 칸이 적을수록 다음 사람이 따라 하기 쉽습니다.</p></div><button class="pill sm" type="button" data-done>완료</button></div>
+    $('detail').innerHTML = `<div class="dhead"><div><h3>기록 편집</h3><p>${role ? `${esc(role)} 권한으로 편집 중이에요. 비어 있는 칸이 적을수록 다음 사람이 따라 하기 쉽습니다.` : '<b style="color:var(--adj)">체험 편집</b> · 이 화면에서만 바뀌고 저장되지 않아요. 새로고침하면 원래대로 돌아갑니다.'}</p></div><button class="btn dark sm" type="button" data-done>완료</button></div>
       <div class="form2">${SFIELDS.map(([k,lab,type,opt])=>{ const full = type==='textarea'||k==='cat'||k==='contact' ? 'full' : '';
         const ctl = type==='select' ? `<select id="sf-${k}" data-sf="${k}">${Object.entries(opt).map(([val,txt])=>`<option value="${esc(val)}" ${l[k]===val?'selected':''}>${esc(txt)}</option>`).join('')}</select>`
           : type==='textarea' ? `<textarea id="sf-${k}" data-sf="${k}" placeholder="${esc(opt)}">${esc(l[k])}</textarea>`
@@ -1380,7 +1395,7 @@ function renderDetail(){
   const ranks = succRank(l); const chosen = state.succ[state.sel] ?? ranks[0]?.c.name; const pick = ranks.find(r=>r.c.name===chosen) || ranks[0];
   const miss = missingOf(l);
   $('detail').innerHTML = `<div class="dhead"><div><h3>${esc(l.cat||'새 공급 경로')}</h3><p>${esc(l.supplier||'공급처 미기록')} · ${esc(l.stype)} · ${esc(KINDS[l.kind])}</p></div>
-      <div class="rowact">${lic}<button class="pill sm ghost" type="button" data-edit>기록 편집</button></div></div>
+      <div class="rowact">${lic}${role ? `<button class="btn sm" type="button" data-edit>기록 편집</button>` : `<span class="lockinfo" title="가게 주인 · 이어받는 분 · 담당 관리자만 기록을 고칠 수 있어요">🔒 주인·인수자·관리자만 편집</span><button class="textlink sm2" type="button" data-edit data-trial>체험해 보기</button>`}</div></div>
     <dl class="kv" style="margin:0">${kv.map(([t,k])=>`<div><dt>${t}</dt><dd class="${l[k]?'':'empty'}">${esc(l[k]||'미기록')}</dd></div>`).join('')}</dl>
     <div><span class="lbl">많이 팔리는 달</span><div class="months" style="margin-top:6px">${Array.from({length:12},(_,i)=>`<span class="${l.peak.includes(i+1)?'on':''}">${i+1}월</span>`).join('')}</div></div>
     ${miss.length?`<p class="missing" style="margin:0">아직 비어 있는 항목: ${miss.join(', ')}</p>`:''}
@@ -1400,7 +1415,7 @@ function renderJSON(){ $('json').textContent = JSON.stringify(supplyJSON(), null
 function loadPreset(key){
   const p = PRESETS.find(x=>x.key===key), v = V(p.village);
   Object.assign(state, {preset:key, type:p.type, name:p.name, village:p.village, date:p.date, items:new Set(p.items), elderly:v.elderly, carless:v.carless, extra:[],
-    lines:structuredClone(SUPPLY[key]||[]), sel:0, succ:{}, edit:false});
+    lines:structuredClone(SUPPLY[key]||[]), sel:0, succ:{}, edit:false, trial:false});
   selectedPlan = 0; for (const k in decisions) delete decisions[k];
   $('extract-out').textContent = ''; $('f-memo').value = ''; $('review-out').textContent = '';
   renderForm(); renderAll(); renderSupply();
@@ -1443,8 +1458,8 @@ document.addEventListener('click', e=>{
   const pl = e.target.closest('[data-plan]'); if (pl){ selectedPlan = +pl.dataset.plan; resetDecisions(); renderAll(); return; }
   const dc = e.target.closest('[data-dec]'); if (dc){ decisions[dc.dataset.dec].v = dc.dataset.val; renderS4(); return; }
   const lc = e.target.closest('[data-line]'); if (lc){ state.sel = +lc.dataset.line; state.edit = false; renderLines(); renderDetail(); return; }
-  if (e.target.id==='btn-add'){ state.lines.push(blankLine()); state.sel = state.lines.length-1; state.edit = true; renderSupply(); renderAll(); $('sf-cat')?.focus(); return; }
-  if (e.target.closest('[data-edit]')){ state.edit = true; renderDetail(); return; }
+  if (e.target.id==='btn-add'){ state.trial = !supplyRole(); state.lines.push(blankLine()); state.sel = state.lines.length-1; state.edit = true; renderSupply(); renderAll(); $('sf-cat')?.focus(); return; }
+  if (e.target.closest('[data-edit]')){ state.trial = !supplyRole() && !!e.target.closest('[data-trial]'); state.edit = true; renderDetail(); return; }
   if (e.target.closest('[data-done]')){ state.edit = false; renderLines(); renderDetail(); renderJSON(); return; }
   const mb = e.target.closest('[data-month]');
   if (mb){ const l = state.lines[state.sel], m = +mb.dataset.month; l.peak = l.peak.includes(m) ? l.peak.filter(x=>x!==m) : [...l.peak, m].sort((a,b)=>a-b); mb.setAttribute('aria-pressed', l.peak.includes(m)); renderLines(); renderJSON(); return; }
@@ -2155,7 +2170,7 @@ async function googleLogin(){
 async function onUser(u){
   stopTaxiSync();
   Object.assign(AU, {user:u, prof:null, admin:false, priv:null, privKid:'', rows:null, delStep:0});
-  if (!u){ AU.needConsent = false; renderAuth(); renderTaxi(); renderAdmin(); return; }
+  if (!u){ AU.needConsent = false; state.edit = false; state.trial = false; renderAuth(); renderTaxi(); renderAdmin(); renderDetail(); return; }
   const {doc, getDoc, setDoc, serverTimestamp} = FB.F;
   const ref = doc(FB.db, 'users', u.uid);
   let prof = (await getDoc(ref)).data() || null;
@@ -2170,7 +2185,7 @@ async function onUser(u){
   AU.prof = prof; AU.needConsent = false;
   try { AU.admin = (await getDoc(doc(FB.db, 'admins', u.uid))).exists(); } catch(_){ AU.admin = false; }
   try { await syncVault(false); } catch(e){ console.warn('vault', e); }
-  renderAuth(); renderAdmin(); startTaxiSync();
+  renderAuth(); renderAdmin(); renderDetail(); startTaxiSync();
   const d = $('auth-dlg');
   if (!prof.nick) openAuth('profile'); else if (d.open && $('auth-body').dataset.mode==='consent') closeAuth();
 }
