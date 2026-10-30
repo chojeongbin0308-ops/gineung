@@ -1901,10 +1901,11 @@ async function errandCreate(item){
     await FB.F.addDoc(FB.F.collection(FB.db, 'taxiRequests'), {requester:AU.user.uid, nick:AU.prof.nick, village:v, items:[], etc:item, due, drop, price, fee:f.total, status:'open', driver:null, at:Date.now()});
   } else {
     const r = {id:'m'+(taxi.seq++), name:($('t-name').value.trim() || '주민'), village:v, items:[], etc:item, due, drop, price, fee:f.total, status:'open', mine:true, fresh:true, at:Date.now()};
-    taxi.reqs.push(r); tSave(); tSimulateAccept(r.id);
+    taxi.reqs.push(r); tSave();   // 기사가 직접 수락하기 전까지 '대기 중' 유지 (자동 수락 없음)
   }
   renderTaxi();
-  return `<p>✅ <b>‘${esc(item)}’</b> 부탁을 올렸어요. ${esc(v)} 쪽으로 돌아가는 이웃에게 알렸습니다.</p>
+  const who = (tLive() ? AU.prof?.nick : $('t-name').value.trim()) || '주민';
+  return `<p>✅ <b>${esc(who)}</b>님의 <b>‘${esc(item)}’</b> 부탁을 <b>기사 대기 중</b>으로 올렸어요. ${esc(v)} 쪽으로 돌아가는 이웃 기사님이 수락하기 전까지 대기 상태가 유지돼요.</p>
     <p class="muted">배달 수수료 약 ${won(f.total)} + 물건값은 받을 때 드리면 돼요.${tLive() ? '' : ' (로그인하지 않아 이 기기에서만 보이는 시연 부탁이에요)'}</p>
     <div class="acts">${act('내 부탁 보기','taxi')}</div>`;
 }
@@ -2607,7 +2608,7 @@ function renderTaxi(){
       <div class="who"><b>${esc(tItemsText(r))}</b> 부탁</div>
       ${tStepsHTML(r.status)}
       <div class="meta"><span>${esc(r.village)} · ${esc(r.drop)}</span><span>${esc(r.due)}</span><span>${tAgo(r.at)}</span></div>
-      <div class="row2"><span>${r.status==='open' ? '근처 이웃이 확인하는 중이에요' : r.status==='done' ? '배달이 끝났어요. 물건값과 수수료를 전달해 주세요' : `<b>${esc(r.driver)}</b>님이 ${r.status==='accepted'?'수락했어요. 읍내에서 사서 갈게요':'물건을 샀어요. 곧 도착해요'}`}</span>
+      <div class="row2"><span>${r.status==='open' ? '기사 대기 중 · 이웃 기사님이 수락하면 진행돼요' : r.status==='done' ? '배달이 끝났어요. 물건값과 수수료를 전달해 주세요' : `<b>${esc(r.driver)}</b>님이 ${r.status==='accepted'?'수락했어요. 읍내에서 사서 갈게요':'물건을 샀어요. 곧 도착해요'}`}</span>
         <span class="fee">${won(r.fee)}<small>수수료</small></span></div>
       ${r.status==='open' ? `<div class="rowact"><button class="btn sm" type="button" data-tcancel="${esc(r.id)}">요청 취소</button></div>` : ''}
     </div>`).join('') : '<div class="empty2">아직 부탁한 물건이 없습니다. 왼쪽에서 필요한 물건을 골라 이웃에게 부탁해 보세요.</div>';
@@ -2658,8 +2659,8 @@ $('taxi-form').addEventListener('submit', e=>{
   const r = {id:'m'+(taxi.seq++), name, village:v, items, etc, due:$('t-due').value, drop:$('t-drop').value, price:tPrice(items)+(etc?5000:0), fee:f.total, status:'open', mine:true, fresh:true, at:Date.now()};
   taxi.reqs.push(r); tSave();
   document.querySelectorAll('#t-items input').forEach(i=>i.checked=false); $('t-etc').value = ''; tFeePreview();
-  $('t-msg').textContent = `${v} 쪽으로 돌아가는 이웃에게 알림을 보냈습니다. (시연: 잠시 뒤 수락됩니다)`;
-  renderTaxi(); tSimulateAccept(r.id);
+  $('t-msg').textContent = `${v} 쪽으로 돌아가는 이웃에게 알림을 보냈습니다. 기사님이 수락하기 전까지 ‘대기 중’으로 보여요.`;
+  renderTaxi();
 });
 $('taxi').addEventListener('input', e=>{ if (e.target.closest('#taxi-form')) tFeePreview(); });
 $('taxi').addEventListener('change', e=>{
