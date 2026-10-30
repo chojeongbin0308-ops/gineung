@@ -1914,6 +1914,19 @@ function weatherAnswer(){
   return `<p>날씨는 <b>이 서비스 자료에 없어서</b> 알려 드릴 수 없어요.</p><p class="muted">기상청 날씨누리나 <a href="tel:131">131</a>(기상콜센터)에서 확인해 주세요. 여기서는 물건 사는 곳, 행복택시 부탁, 문 닫는 가게의 기능상속을 도와드려요.</p>
     <div class="chips2">${['두부 어디서 사?','세제 좀 사다 줘','기능상속이 뭐야?'].map(q=>`<button type="button" data-ask="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
 }
+const TAXI_RE = /행복\s*택시|행복\s*콜|^택시|택시\s*(이용|쓰|부르|타|뭐|란|설명|어떻게|신청|하고)/;
+function taxiAnswer(){
+  return `<p><b>행복택시</b>는 읍내에 다녀오는 이웃이 돌아오는 길에 필요한 물건을 <b>대신 사다 주는</b> 부탁 서비스예요.</p>
+    <p class="muted">부탁하는 법: 여기서 “세제 좀 사다 줘”처럼 말하거나, 행복택시 화면에서 물건을 골라 올리면 돼요. 이웃 기사님이 수락하면 사다 드리고, 수수료와 물건값은 받을 때 드려요.</p>
+    <div class="chips2">${['세제 좀 사다 줘','행복택시 요청 뭐 있어?'].map(q=>`<button type="button" data-ask="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    <div class="acts">${act('부탁하러 가기','taxi')}${act('배달해 주러 가기','taxi')}</div>`;
+}
+const SITE_RE = /(유통망\s*노트|분석\s*하기|분석\s*화면|로그인|회원\s*가입|가입|내\s*정보|탈퇴)/;
+function siteAnswer(t){
+  if (/유통망/.test(t)) return `<p><b>유통망 노트</b>는 가게가 물건을 들여오던 길(공급처·주문 방법·필요한 허가)을 기록해서, 이어받는 사람이 그대로 따라 할 수 있게 만든 안내서예요.</p><div class="acts">${act('유통망 노트 보기','supply')}</div>`;
+  if (/분석/.test(t)) return `<p><b>분석하기</b>에서는 문 닫을 가게를 골라 사라질 생활기능, 이어받을 주변 자원, 상속안을 5단계로 볼 수 있어요.</p><div class="acts">${act('분석하기로 가기','demo',1)}</div>`;
+  return `<p>오른쪽 위 <b>로그인</b>을 누르면 구글 계정으로 가입·로그인할 수 있어요. 로그인하면 행복택시 부탁이 다른 이웃에게 실제로 보이고, 가게 등록도 신청할 수 있어요. 탈퇴는 <b>내 정보</b>에서 할 수 있어요.</p>`;
+}
 const EUPMYEON = ['임실읍','청웅면','운암면','신평면','성수면','오수면','신덕면','삼계면','관촌면','강진면','덕치면','지사면'];
 function emergAnswer(){
   return `<p class="cnote" style="font-size:15px"><b>위급하면 지금 바로 <a href="tel:119">119</a>에 전화하세요.</b></p>
@@ -1970,7 +1983,10 @@ async function dialogAnswer(text){
   if (chatCtx.pending && NO_RE.test(t)){ chatCtx.pending = null; return '<p>네, 알겠어요. 필요하시면 언제든 다시 말씀해 주세요.</p>'; }
   chatCtx.pending = null;                       // 다른 질문을 하면 이전 제안은 취소
   if (YES_RE.test(t) || NO_RE.test(t)) return '<p>무엇을 찾거나 부탁하실지 말씀해 주세요. 예: “두부 사다 줘”, “등본 어디서 떼?”, “행복택시 요청 뭐 있어?”</p>';
+  if (TAXI_RE.test(t) && /(뭐야|뭔데|뭐지|무엇|이란|설명|어떻게|이용)/.test(t) && !/(요청|부탁|목록|올라|들어온)/.test(t)) return taxiAnswer();
   if (BOARD_RE.test(t)) return boardAnswer();
+  if (TAXI_RE.test(t) && !ERRAND_RE.test(t)) return taxiAnswer();
+  if (SITE_RE.test(t) && !findPreset(t)) return siteAnswer(t);
   if (WEATHER_RE.test(t)) return weatherAnswer();
   if (OOS_RE.test(t) && !/취소|불이익|위약/.test(t)) return oosAnswer();
   if (CONCEPT_RE.test(t) && !/어떻게|절차|진행/.test(t)) return conceptAnswer();
