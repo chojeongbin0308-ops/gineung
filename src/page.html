@@ -1846,7 +1846,7 @@ const YES_RE = /^(응|어|네|예|넹|그래|좋아|좋지|해\s*줘|올려\s*�
 const NO_RE = /^(아니|아니요|아뇨|됐어|괜찮아|안\s*해|싫어|아녀)\s*[.!~]*$/;
 const BOARD_RE = /(요청|부탁|게시판|대행|택시).*(뭐|머|어떤|목록|보여|있어|있나|올라|들어온)|(뭐|머|어떤).*(요청|부탁).*(있|올라)/;
 const ERRAND_RE = /(사다\s*줘|사다\s*주|사다\s*줄|대신\s*사|심부름|대행|배달해\s*줘|갖다\s*줘|가져다\s*줘|부탁할게|부탁해|올려\s*줘|등록해\s*줘)/;
-const errandItem = t => t.replace(/(좀|혹시|누가|이웃이|대신|하나|한\s*개|사다\s*(줘|주세요|줄\s*사람|주실\s*분|주쇼|주라)?|심부름|대행|배달해\s*줘|갖다\s*줘|가져다\s*줘|부탁(할게|해|합니다)?|올려\s*줘|등록해\s*줘|해\s*줘|[?!.~,])/g, ' ').replace(/(을|를|이|가|은|는|도|만)\s*$/,'').replace(/\s+/g,' ').trim().slice(0,40);
+const errandItem = t => t.replace(/(먹고\s*싶\S*|마시고\s*싶\S*|사고\s*싶\S*|갖고\s*싶\S*|필요(해|한데|하다|함|햐)?\S*|있남|있나|있어|있니|있능가|어디\S*|워디\S*|주변에?|근처에?|가까운|뭐야|뭔데|알려\s*\S*|좀|혹시|누가|이웃이|대신|하나|한\s*개|사다\s*(줘|주세요|줄\s*사람|주실\s*분|주쇼|주라)?|심부름|대행|배달해\s*줘|갖다\s*줘|가져다\s*줘|부탁(할게|해|합니다)?|올려\s*줘|등록해\s*줘|해\s*줘|[?!.~,])/g, ' ').replace(/(을|를|이|가|은|는|도|만)\s*$/,'').replace(/\s+/g,' ').trim().slice(0,40);
 function boardAnswer(){
   const open = tReqs().filter(r=>r.status==='open' && !r.mine).sort((a,b)=>b.at-a.at);
   const mine = tReqs().filter(r=>r.mine && r.status!=='done');
@@ -1878,10 +1878,15 @@ async function errandCreate(item){
 const EMERG_RE = /(119|응급|쓰러(졌|져)|숨(을|이)?\s*(안|못)\s*쉬|의식(이)?\s*없|피가\s*(많이|안\s*멈|멈추지)|가슴이\s*(아파|아퍼|조여|답답)|심장(이)?\s*(아파|멈|조여)|심정지|마비)/;
 const SYMPTOM_RE = /(아파|아퍼|아프|통증|열이|열나|열 ?난|복통|두통|배탈|설사|토했|어지러|기침)/;
 const OOS_RE = /(수익률|수익|매출\s*(이|은)?\s*(얼마|전망|오를|늘)|자본금|대출|세금|부가세|소득세|장부|재지원|계약|소송|법률|변호사|투자|주식|코인|보험료|연금)/;
-const CONCEPT_RE = /(기능\s*상속|상속)\s*(이|은|는|이란|란|의)?\s*(뭐|머|무엇|뭔|개념|뜻|의미|설명|정의)|기능\s*상속(이란|란)/;
+const CONCEPT_RE = /(기능\s*(상속|삭속|상쏙)|상속)\s*(이|은|는|이란|란|의)?\s*(뭐|머|무엇|뭔|개념|뜻|의미|설명|정의)|기능\s*상속(이란|란)/;
 const MARKET_RE = /이동\s*장터/;
 const ANALYZE_RE = /(뭐|뭘|무엇|머)\s*(팔|파는)|판매\s*품목|품목\s*(분석|정리)|가게\s*분석/;
 const CLOSED_RE = /폐업\s*(이력|기록|목록|현황|한|했던|된|점|가게)|(예전|옛날|전에)\s*(에)?\s*.{0,6}(있던|있었던|하던)\s*(가게|곳|점포|마트|슈퍼|수퍼|상회|상점|식당|약국|편의점|휴게소|주유소)|(문\s*닫은|문\s*닫았던|없어진|사라진)\s*(가게|곳|점포|데|마트|슈퍼|수퍼|상회|상점|식당|약국|편의점|휴게소|주유소)/;
+const WEATHER_RE = /(날씨|기온|일기\s*예보|미세\s*먼지|비\s*(와|오|올|온대)|눈\s*(와|오|올|온대)|우산\s*(챙|가져))/;
+function weatherAnswer(){
+  return `<p>날씨는 <b>이 서비스 자료에 없어서</b> 알려 드릴 수 없어요.</p><p class="muted">기상청 날씨누리나 <a href="tel:131">131</a>(기상콜센터)에서 확인해 주세요. 여기서는 물건 사는 곳, 행복택시 부탁, 문 닫는 가게의 기능상속을 도와드려요.</p>
+    <div class="chips2">${['두부 어디서 사?','세제 좀 사다 줘','기능상속이 뭐야?'].map(q=>`<button type="button" data-ask="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+}
 const EUPMYEON = ['임실읍','청웅면','운암면','신평면','성수면','오수면','신덕면','삼계면','관촌면','강진면','덕치면','지사면'];
 function emergAnswer(){
   return `<p class="cnote" style="font-size:15px"><b>위급하면 지금 바로 <a href="tel:119">119</a>에 전화하세요.</b></p>
@@ -1939,6 +1944,7 @@ async function dialogAnswer(text){
   chatCtx.pending = null;                       // 다른 질문을 하면 이전 제안은 취소
   if (YES_RE.test(t) || NO_RE.test(t)) return '<p>무엇을 찾거나 부탁하실지 말씀해 주세요. 예: “두부 사다 줘”, “등본 어디서 떼?”, “행복택시 요청 뭐 있어?”</p>';
   if (BOARD_RE.test(t)) return boardAnswer();
+  if (WEATHER_RE.test(t)) return weatherAnswer();
   if (OOS_RE.test(t) && !/취소|불이익|위약/.test(t)) return oosAnswer();
   if (CONCEPT_RE.test(t) && !/어떻게|절차|진행/.test(t)) return conceptAnswer();
   if (CLOSED_RE.test(t) && !findPreset(t)) { const h = closedAnswer(t); if (h) return h; }
