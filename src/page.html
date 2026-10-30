@@ -164,6 +164,7 @@ section.sec.white{background:var(--card);border-block:1px solid var(--line)}
 .tile .tt{font-size:12px;color:var(--sage-d);font-weight:600}
 .tile .reg{align-self:flex-start;font-size:11px;font-weight:700;color:#fff;background:var(--navy);border-radius:999px;padding:1px 8px;margin-bottom:2px}
 .facbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.facbar .msg{font-size:13px;color:var(--muted,#6b7280)}.facbar .msg.ok{color:var(--ok)}.facbar .msg.err{color:var(--gap)}
+.facreq{width:100%}.facreq input{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card)}
 .facnote{font-size:13px;color:var(--muted,#6b7280);margin:0 0 10px}.seg button[disabled]{opacity:.55;cursor:not-allowed}
 .tile strong{font-size:17px}
 .tile span.d{font-size:12px;color:var(--muted)}
@@ -1367,7 +1368,7 @@ function supplyRole(){
   let au; try { au = AU; } catch(_){ return ''; }   // 로그인 모듈이 아직 준비되기 전
   if (au.admin) return '관리자';
   const e = SUPPLY_EDITORS[state.preset] || {}, uid = au.user?.uid;
-  if (uid && (e.owner||[]).includes(uid)) return '가게 주인';
+  if (uid && ((e.owner||[]).includes(uid) || (state.fid && PRESETS.find(p=>p.fid===state.fid)?.owner===uid))) return '가게 주인';
   if (uid && (e.successor||[]).includes(uid)) return '이어받는 분';
   return '';
 }
@@ -1460,7 +1461,7 @@ document.addEventListener('click', e=>{
   const lc = e.target.closest('[data-line]'); if (lc){ state.sel = +lc.dataset.line; state.edit = false; renderLines(); renderDetail(); return; }
   if (e.target.id==='btn-add'){ state.trial = !supplyRole(); state.lines.push(blankLine()); state.sel = state.lines.length-1; state.edit = true; renderSupply(); renderAll(); $('sf-cat')?.focus(); return; }
   if (e.target.closest('[data-edit]')){ state.trial = !supplyRole() && !!e.target.closest('[data-trial]'); state.edit = true; renderDetail(); return; }
-  if (e.target.closest('[data-done]')){ state.edit = false; renderLines(); renderDetail(); renderJSON(); if (state.fid && isAdmin()) facSave('lines'); return; }
+  if (e.target.closest('[data-done]')){ state.edit = false; renderLines(); renderDetail(); renderJSON(); if (state.fid && (isAdmin() || supplyRole()==='가게 주인')) facSave('lines'); return; }
   const mb = e.target.closest('[data-month]');
   if (mb){ const l = state.lines[state.sel], m = +mb.dataset.month; l.peak = l.peak.includes(m) ? l.peak.filter(x=>x!==m) : [...l.peak, m].sort((a,b)=>a-b); mb.setAttribute('aria-pressed', l.peak.includes(m)); renderLines(); renderJSON(); return; }
   if (e.target.id==='btn-del'){ const b = e.target;
@@ -2155,7 +2156,7 @@ function closeAuth(){
 }
 const authErr = e => { const el = $('auth-err'); if (el) el.textContent = errText(e); else console.warn(e); };
 
-function adminViews(){ renderAuth(); renderTaxi(); renderAdmin(); renderDetail(); renderS4(); renderFacBar(); $('chat-settings').hidden = !isAdmin(); }
+function adminViews(){ if (FAC){ FAC.msg = ''; FAC.rejArm = ''; FAC.delArm = false; } renderAuth(); renderTaxi(); renderAdmin(); renderDetail(); renderS4(); renderFacBar(); $('chat-settings').hidden = !isAdmin(); }
 function renderAuth(){
   const b = $('nav-login'), u = AU.user;
   if (u && AU.prof){ const n = AU.prof.nick || u.displayName || '나'; b.innerHTML = `<span class="av" aria-hidden="true">${esc([...n][0])}</span>내 정보`; b.setAttribute('aria-label','내 정보'); }
@@ -2670,7 +2671,7 @@ $('taxi').addEventListener('click', e=>{
   const c = e.target.closest('[data-tcancel]'); if (c){ taxi.reqs = taxi.reqs.filter(x=>x.id!==c.dataset.tcancel); tSave(); renderTaxi(); }
 });
 /* ---------- 시설(가게) 등록: 관리자만 저장·수정·삭제, 모두가 보고 분석 ---------- */
-var FAC = {list:[], unsub:null, msg:'', msgCls:'', delArm:false, busy:false};
+var FAC = {list:[], unsub:null, msg:'', msgCls:'', delArm:false, busy:false, reqs:[], reqUnsub:null, reqUid:'', rejArm:''};
 function isAdmin(){ try { return !!AU.admin; } catch(_){ return false; } }
 function canDecide(){ return isAdmin() || !!state.decTrial; }
 function facSanitize(id, x){
@@ -2685,7 +2686,8 @@ function facSanitize(id, x){
     o.peak = (Array.isArray(l.peak) ? l.peak : []).filter(m=>Number.isInteger(m) && m>=1 && m<=12); return o; }).filter(Boolean);
   return {key:'fs_'+id, fid:id, type:x.type, name:str(x.name,30).trim(), village:x.village, date:/^\d{4}-\d{2}-\d{2}$/.test(x.date)?x.date:'',
     items:(Array.isArray(x.items)?x.items:[]).filter(i=>ids.has(i)), elderly:num(x.elderly), carless:num(x.carless), decisions, lines,
-    label:`${str(x.name,30)} (${x.village})`, at: x.updatedAt?.toMillis?.() || 0};
+    owner:/^[A-Za-z0-9]{1,128}$/.test(x.owner||'') ? x.owner : '', nick:str(x.nick,12), note:str(x.note,200), status:str(x.status,10), reason:str(x.reason,100), requester:str(x.requester,128),
+    label:`${str(x.name,30)} (${x.village})`, at: x.updatedAt?.toMillis?.() || x.at?.toMillis?.() || 0};
 }
 function facStart(){
   if (FAC.unsub || !window.FB) return;
@@ -2703,11 +2705,17 @@ function facPayload(){
   return {name:state.name.trim().slice(0,30), type:state.type, village:state.village, date:state.date||'', items:[...state.items].slice(0,30),
     elderly:+state.elderly, carless:+state.carless, decisions:Object.fromEntries(Object.entries(decisions).map(([f,d])=>[f,d.v])),
     lines:state.lines.slice(0,30).map(l=>({...Object.fromEntries(SKEYS.map(k=>[k, String(l[k]??'').slice(0,300)])), peak:[...(l.peak||[])]})),
-    by:AU.user.uid, updatedAt:FB.F.serverTimestamp()};
+    owner: PRESETS.find(p=>p.fid===state.fid)?.owner || '', by:AU.user.uid, updatedAt:FB.F.serverTimestamp()};
 }
 async function facSave(mode){
-  if (!isAdmin() || FAC.busy) return;
-  const {doc, collection, setDoc, deleteDoc} = FB.F;
+  if (FAC.busy) return;
+  const {doc, collection, setDoc, deleteDoc, updateDoc} = FB.F;
+  if (mode==='lines' && !isAdmin() && supplyRole()==='가게 주인'){
+    try { await updateDoc(doc(FB.db, 'facilities', state.fid), {lines:facPayload().lines, by:AU.user.uid, updatedAt:FB.F.serverTimestamp()}); FAC.msg = '유통망 기록을 저장했어요.'; FAC.msgCls = 'ok'; }
+    catch(e){ console.warn(e); FAC.msg = '유통망 기록을 저장하지 못했어요.'; FAC.msgCls = 'err'; }
+    renderFacBar(); return;
+  }
+  if (!isAdmin()) return;
   if (mode!=='delete' && !state.name.trim()){ FAC.msg = '가게 이름을 입력해 주세요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
   FAC.busy = true; FAC.msg = '저장 중…'; FAC.msgCls = ''; renderFacBar();
   try {
@@ -2718,21 +2726,91 @@ async function facSave(mode){
   } catch(e){ console.warn(e); FAC.msg = '저장하지 못했어요: ' + (e.code==='permission-denied' ? '권한이 없어요(관리자 로그인 또는 보안 규칙 확인).' : (e.message||e)); FAC.msgCls = 'err'; }
   FAC.busy = false; FAC.delArm = false; renderFacBar();
 }
+function facReqSync(){
+  const uid = (()=>{ try { return AU.user?.uid || ''; } catch(_){ return ''; } })(), key = uid ? (isAdmin() ? 'admin:'+uid : uid) : '';
+  if (FAC.reqUid === key) return;
+  if (FAC.reqUnsub){ FAC.reqUnsub(); FAC.reqUnsub = null; } FAC.reqs = []; FAC.reqUid = key;
+  if (!key || !window.FB) return;
+  const {collection, query, where, onSnapshot} = FB.F;
+  const q = isAdmin() ? query(collection(FB.db, 'facilityRequests'), where('status', '==', 'pending')) : query(collection(FB.db, 'facilityRequests'), where('requester', '==', uid));
+  FAC.reqUnsub = onSnapshot(q, snap=>{ FAC.reqs = snap.docs.map(d=>facSanitize(d.id, d.data())).filter(Boolean).sort((a,b)=>b.at-a.at).slice(0, 30); renderFacBar(); }, e=>console.warn('facilityRequests', e));
+}
+function facApply(f){   // 신청 내용을 분석 화면에 불러오기(저장 아님)
+  Object.assign(state, {preset:'', fid:'', type:f.type, name:f.name, village:f.village, date:f.date, items:new Set(f.items), elderly:f.elderly ?? V(f.village).elderly, carless:f.carless ?? V(f.village).carless, extra:[], lines:structuredClone(f.lines||[]), sel:0, succ:{}, edit:false, trial:false});
+  for (const k in decisions) delete decisions[k]; selectedPlan = 0; renderForm(); renderAll(); renderSupply();
+}
+async function facRequest(){
+  const {collection, doc, setDoc, serverTimestamp} = FB.F;
+  if (!state.name.trim()){ FAC.msg = '가게 이름을 입력해 주세요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
+  if (!state.items.size){ FAC.msg = '팔던 물건·하던 역할을 하나 이상 골라 주세요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
+  if (FAC.reqs.filter(r=>r.status==='pending').length >= 3){ FAC.msg = '검토 중인 신청이 3건 있어요. 결과가 나온 뒤 다시 신청해 주세요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
+  FAC.busy = true; renderFacBar();
+  try {
+    const pl = facPayload(); delete pl.by; delete pl.updatedAt; delete pl.owner; pl.decisions = {};
+    await setDoc(doc(collection(FB.db, 'facilityRequests')), {...pl, note:(FAC.note||'').trim().slice(0,200), requester:AU.user.uid, nick:AU.prof?.nick || '', status:'pending', reason:'', at:serverTimestamp()});
+    FAC.msg = '등록을 신청했어요. 관리자가 확인하면 모든 사람에게 보여요.'; FAC.msgCls = 'ok'; FAC.note = '';
+  } catch(e){ console.warn(e); FAC.msg = '신청하지 못했어요: ' + (e.code==='permission-denied' ? '로그인·동의 상태를 확인해 주세요.' : (e.message||e)); FAC.msgCls = 'err'; }
+  FAC.busy = false; renderFacBar();
+}
+async function facDecide(id, ok){
+  if (!isAdmin()) return;
+  const r = FAC.reqs.find(x=>x.fid===id); if (!r) return;
+  const {collection, doc, setDoc, updateDoc, serverTimestamp} = FB.F;
+  const reason = ($('rej-'+id)?.value || '').trim().slice(0,100) || '내용 확인 필요';   // 다시 그리기 전에 읽어 둠
+  FAC.busy = true; renderFacBar();
+  try {
+    if (ok){
+      const ref = doc(collection(FB.db, 'facilities'));
+      await setDoc(ref, {name:r.name, type:r.type, village:r.village, date:r.date, items:r.items, elderly:r.elderly ?? V(r.village).elderly, carless:r.carless ?? V(r.village).carless,
+        decisions:{}, lines:(r.lines||[]).map(l=>({...Object.fromEntries(SKEYS.map(k=>[k, String(l[k]??'')])), peak:[...(l.peak||[])]})), owner:r.requester, by:AU.user.uid, updatedAt:serverTimestamp()});
+      await updateDoc(doc(FB.db, 'facilityRequests', id), {status:'approved', reason:''});
+      FAC.msg = `‘${r.name}’ 등록을 승인했어요. 이제 모든 사람에게 보여요.`;
+    } else {
+      await updateDoc(doc(FB.db, 'facilityRequests', id), {status:'rejected', reason});
+      FAC.msg = `‘${r.name}’ 신청을 반려했어요.`;
+    }
+    FAC.msgCls = 'ok';
+  } catch(e){ console.warn(e); FAC.msg = '처리하지 못했어요: ' + (e.message||e); FAC.msgCls = 'err'; }
+  FAC.busy = false; FAC.rejArm = ''; renderFacBar();
+}
 function renderFacBar(){
   const el = $('facbar'); if (!el || !FAC) return;   // 초기화 전 호출 대비
   const msg = FAC.msg ? `<span class="msg ${FAC.msgCls}">${esc(FAC.msg)}</span>` : '';
-  if (!isAdmin()){ el.innerHTML = `<span class="msg">🔒 가게 등록·수정은 담당 관리자만 할 수 있어요. 여기서 바꾼 값은 분석 체험용이라 저장되지 않아요.</span>`; return; }
+  facReqSync();
+  const ST = {pending:['adj','검토 중'], approved:['ok','승인됨'], rejected:['gap','반려']};
+  const signed = (()=>{ try { return !!(AU.user && AU.prof); } catch(_){ return false; } })();
+  if (!isAdmin()){
+    const mine = FAC.reqs;
+    el.innerHTML = signed
+      ? `<div class="facreq"><p class="msg" style="margin:0 0 8px">위 칸을 형식에 맞게 채운 뒤 등록을 신청하세요. <b>관리자가 승인하면</b> 모든 사람의 목록에 보여요.</p>
+          <input id="fac-note" type="text" maxlength="200" value="${esc(FAC.note||'')}" placeholder="관리자에게 남길 말 (선택) 예: 제가 운영하는 가게예요, 연락처는 …">
+          <div class="facbar" style="margin-top:8px"><button class="btn dark sm" type="button" data-fac="request" ${FAC.busy?'disabled':''}>이 가게 등록 신청</button>${msg}</div>
+          ${mine.length ? `<div class="cm" style="margin-top:10px">${mine.map(r=>`<div><b>${esc(r.name)}</b><span class="badge ${ST[r.status]?.[0]||''}">${ST[r.status]?.[1]||esc(r.status)}</span><span class="s">${esc(r.village)} · ${md(r.date)} 폐업 예정${r.status==='rejected'&&r.reason?` · 반려 사유: ${esc(r.reason)}`:''}${r.status==='pending'?` · <button class="textlink" type="button" data-fac="cancel" data-id="${r.fid}">신청 취소</button>`:''}</span></div>`).join('')}</div>` : ''}</div>`
+      : `<span class="msg">가게 등록은 <b>로그인 후 신청</b>할 수 있어요. 관리자가 확인하면 모든 사람에게 보여요. 지금 바꾼 값은 분석 체험용이라 저장되지 않아요.</span><button class="btn sm" type="button" data-login>로그인하고 신청하기</button>`;
+    return;
+  }
   const cur = state.fid ? PRESETS.find(p=>p.fid===state.fid) : null;
+  const pend = FAC.reqs.filter(r=>r.status==='pending');
+  const reqHtml = pend.length ? `<div class="facreq" style="width:100%"><h4 style="margin:12px 0 6px">등록 신청 ${pend.length}건 <small class="muted">승인하면 모든 사람에게 보여요</small></h4><div class="cm">${pend.map(r=>`<div><b>${esc(r.name)}</b><span class="badge adj">검토 중</span><span class="s">${esc(r.village)} · ${FTYPE[r.type]} · ${md(r.date)} 폐업 예정 · 신청: ${esc(r.nick||'주민')}${r.note?`<br>메모: ${esc(r.note)}`:''}
+      <span class="facbar" style="margin-top:6px"><button class="btn sm" type="button" data-fac="preview" data-id="${r.fid}">불러와 분석</button><button class="btn dark sm" type="button" data-fac="approve" data-id="${r.fid}" ${FAC.busy?'disabled':''}>승인</button>${FAC.rejArm===r.fid?`<input id="rej-${r.fid}" type="text" maxlength="100" placeholder="반려 사유" style="max-width:180px"><button class="btn sm" type="button" data-fac="reject" data-id="${r.fid}" style="color:var(--gap)">반려 확정</button>`:`<button class="btn sm" type="button" data-fac="rejarm" data-id="${r.fid}" style="color:var(--gap)">반려</button>`}</span></span></div>`).join('')}</div></div>` : '';
   el.innerHTML = (cur ? `<button class="btn dark sm" type="button" data-fac="save" ${FAC.busy?'disabled':''}>변경 저장 (${esc(cur.name)})</button>
       <button class="btn sm" type="button" data-fac="new" ${FAC.busy?'disabled':''}>새 가게로 저장</button>
       <button class="btn sm" type="button" data-fac="${FAC.delArm?'delete':'arm'}" style="color:var(--gap)" ${FAC.busy?'disabled':''}>${FAC.delArm?'정말 삭제':'등록 삭제'}</button>`
-    : `<button class="btn dark sm" type="button" data-fac="new" ${FAC.busy?'disabled':''}>이 가게 등록(저장)</button>`) + msg;
+    : `<button class="btn dark sm" type="button" data-fac="new" ${FAC.busy?'disabled':''}>이 가게 바로 등록(관리자)</button>`) + msg + reqHtml;
 }
 $('facbar').addEventListener('click', e=>{
   const b = e.target.closest('[data-fac]'); if (!b) return;
+  const id = b.dataset.id;
+  if (b.dataset.fac==='request') return facRequest();
+  if (b.dataset.fac==='cancel'){ FB.F.deleteDoc(FB.F.doc(FB.db, 'facilityRequests', id)).catch(e=>console.warn(e)); return; }
+  if (b.dataset.fac==='preview'){ const r = FAC.reqs.find(x=>x.fid===id); if (r){ facApply(r); FAC.msg = `‘${r.name}’ 신청 내용을 불러왔어요(아직 저장 아님).`; FAC.msgCls = ''; renderFacBar(); } return; }
+  if (b.dataset.fac==='approve') return facDecide(id, true);
+  if (b.dataset.fac==='rejarm'){ FAC.rejArm = id; renderFacBar(); $('rej-'+id)?.focus(); return; }
+  if (b.dataset.fac==='reject') return facDecide(id, false);
   if (b.dataset.fac==='arm'){ FAC.delArm = true; FAC.msg = '한 번 더 누르면 모든 사람의 목록에서 지워져요.'; FAC.msgCls = 'err'; renderFacBar(); return; }
   facSave(b.dataset.fac);
 });
+$('facbar').addEventListener('input', e=>{ if (e.target.id==='fac-note') FAC.note = e.target.value; });
 renderFacBar();
 
 tLoad(); renderTaxiForm(); renderTaxi();

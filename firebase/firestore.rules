@@ -94,21 +94,48 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.requester == request.auth.uid;
     }
 
-    // 등록된 가게(시설): 누구나 읽기(분석·상담에 사용), 등록·수정·삭제는 관리자만
+    // 가게 정보 형식 검사 (신청·등록 공통)
+    function facShape(d) {
+      return shortStr(d.name, 30) && d.name.size() > 0
+        && d.type in ['food', 'agri']
+        && shortStr(d.village, 20) && shortStr(d.date, 10)
+        && d.items is list && d.items.size() <= 30
+        && d.elderly is number && d.carless is number
+        && d.decisions is map
+        && d.lines is list && d.lines.size() <= 30;
+    }
+    function facAdminWrite() {
+      let d = request.resource.data;
+      return isAdmin() && d.keys().hasOnly(['name', 'type', 'village', 'date', 'items', 'elderly', 'carless', 'decisions', 'lines', 'owner', 'by', 'updatedAt'])
+        && facShape(d) && d.owner is string && d.by == request.auth.uid && d.updatedAt == request.time;
+    }
+
+    // 등록된 가게(시설): 누구나 읽기, 등록·수정·삭제는 관리자만
+    // 승인된 가게의 주인(owner)은 자기 가게의 유통망 기록(lines)만 고칠 수 있음
     match /facilities/{id} {
       allow read: if true;
-      allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['name', 'type', 'village', 'date', 'items', 'elderly', 'carless', 'decisions', 'lines', 'by', 'updatedAt'])
-        && shortStr(request.resource.data.name, 30) && request.resource.data.name.size() > 0
-        && request.resource.data.type in ['food', 'agri']
-        && shortStr(request.resource.data.village, 20) && shortStr(request.resource.data.date, 10)
-        && request.resource.data.items is list && request.resource.data.items.size() <= 30
-        && request.resource.data.elderly is number && request.resource.data.carless is number
-        && request.resource.data.decisions is map
-        && request.resource.data.lines is list && request.resource.data.lines.size() <= 30
-        && request.resource.data.by == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      allow create: if facAdminWrite();
+      allow update: if facAdminWrite()
+        || (signedIn() && resource.data.owner == request.auth.uid
+          && changed().hasOnly(['lines', 'by', 'updatedAt'])
+          && request.resource.data.lines is list && request.resource.data.lines.size() <= 30
+          && request.resource.data.by == request.auth.uid && request.resource.data.updatedAt == request.time);
       allow delete: if isAdmin();
+    }
+
+    // 가게 등록 신청: 동의한 회원이 신청, 본인과 관리자만 보기, 승인·반려는 관리자만, 취소는 본인(검토 중일 때)
+    match /facilityRequests/{id} {
+      allow read: if (signedIn() && resource.data.requester == request.auth.uid) || isAdmin();
+      allow create: if consented()
+        && request.resource.data.keys().hasOnly(['name', 'type', 'village', 'date', 'items', 'elderly', 'carless', 'decisions', 'lines', 'note', 'requester', 'nick', 'status', 'reason', 'at'])
+        && facShape(request.resource.data)
+        && request.resource.data.requester == request.auth.uid
+        && request.resource.data.status == 'pending' && request.resource.data.reason == ''
+        && shortStr(request.resource.data.note, 200) && shortStr(request.resource.data.nick, 12)
+        && request.resource.data.at == request.time;
+      allow update: if isAdmin() && changed().hasOnly(['status', 'reason'])
+        && request.resource.data.status in ['approved', 'rejected'] && shortStr(request.resource.data.reason, 100);
+      allow delete: if (signedIn() && resource.data.requester == request.auth.uid && resource.data.status == 'pending') || isAdmin();
     }
 
     // 그 밖의 모든 데이터는 막음
