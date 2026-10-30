@@ -1661,7 +1661,7 @@ function intentOf(q){
   if (/(사려면|살 수|사고 싶|사야|사러|살 곳|살까|구매|구입|어디서 사|어떻게 사|사\?|사$|사요|받으려면|받아|받지|받을|받나|맡기|써야|어떻게 해)/.test(q) && itemOf(q) && !/이어받|인수|팔려면|판매하려/.test(q)) return 'buy';
   if (itemOf(q)?.[1]==='advice' && !/이어받|인수/.test(q)) return 'buy';
   if (/자격|등록|허가|면허|인허가|교육|판매관리인/.test(q)) return 'license';
-  if (/기능상속(은|이|을|는)?\s*(뭐|무엇|어떻게|절차|과정|진행|하려면)|절차|진행 과정|어떻게 진행/.test(q)) return 'process';
+  if (/(기능\s*상속|상속)\s*(은|이|을|는|의|하는)?\s*(뭐|무엇|어떻게|절차|과정|진행|하려면|방법|순서|단계|하는\s*(법|방법)|받는\s*(법|방법)|받으려면)|절차|진행 과정|어떻게 진행|어떻게 (해|하|받)/.test(q) && !/상속안/.test(q)) return 'process';
   if (/유통|공급|도매|들여|거래처|납품|어디서 (사|받)|이어받|인수|물려/.test(q)) return 'supply';
   if (/공백|부족|위험|못 (잇|이어)|안 되|빈/.test(q)) return 'gap';
   if (/자원|주변|이동장터|배송|마을회관|복지|콜택시/.test(q)) return 'resources';
@@ -1749,7 +1749,7 @@ function demoAnswer(q){
   if (it==='buy') return buyAnswer(q);
   if (it==='process') return processAnswer(q);
   if (it==='help' && !p) return helpAnswer();
-  if (it==='unknown' && !p) return unknownAnswer(q);
+  if (it==='unknown' && !p) return /기능\s*상속/.test(q) ? conceptAnswer() : unknownAnswer(q);
   if (it==='faq_partial') return `<p>네, <b>일부 기능만</b> 이어받을 수 있어요.</p><p>기능상속은 가게를 통째로 넘기는 게 아니라, 가게가 하던 일을 <b>생활기능 단위</b>(생필품 구매, 신선식품, 무거운 물건, 택배 받기 등)로 나눠서 기능마다 이어받을 곳을 정해요. 그래서 할 수 있는 기능만 골라 맡고, 나머지는 다른 기관이나 행복택시가 맡는 식으로 나눌 수 있어요.</p>
       <div class="acts">${act('어떤 기능이 있는지','ask:어떤 것들을 기능 상속 받을 수 있어?')}${act('상속안 예시 보기','ask:상리상회 상속안 추천해 줘')}</div>`;
   if (it==='faq_what') return `<p>이어받을 수 있는 생활기능은 이런 것들이에요.</p><div class="cm">${fold(Object.values(FUNCS).map(f=>`<div><b>${esc(f.name)}</b><span class="s">${esc(f.short||'')}</span></div>`), 5, '기능')}</div>
